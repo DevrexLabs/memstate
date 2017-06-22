@@ -2,6 +2,10 @@
 # Memstate
 In-memory event-sourced ACID-transactional distributed object graph engine. Memstate is written in C# for .NET Standard 1.4. Memstate runs either embedded in your process or as a separate server process.
 
+## UNDER CONSTRUCTION
+
+Memstate is under construction but will be used in a larger project with a real deadline mid September 2017. We will be setting up a continous release pipeline for nuget packages and docker images during June/July 2017 and then work towards a stable 1.0 release during September.
+
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, a LLC based in Sweden.
 Devrex Labs provides commercial support and consulting services. Contributions are welcome, check out the issues or submit a feature request.

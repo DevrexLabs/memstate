@@ -11,7 +11,7 @@ We also maintain OrigoDB, an in-memory database engine for .NET Framework.
 
 Memstate is a redesign based on our experience building and working with OrigoDB, taking the best parts and setting some new objectives:
 * Performance - OrigoDB does 3K TPS, we're now aiming at 100K per node
-* Simplified cluster coordination - OrigoDB Server has it's own replicated state machine implementation, memstate will piggy back on a distributed event streaming 
+* Simplified replication - OrigoDB Server has it's own replicated state machine implementation, memstate will rely on some distributed backing store for message ordering such as EventStore, Kafka or Kinesis
 * Server and Engine integrated in same project
 * Better multi-platform support - moving to to .NET Standard (Core)
 * Interoperability - Besides the native .NET client we are supporting JSON over HTTP and JSON Web Sockets

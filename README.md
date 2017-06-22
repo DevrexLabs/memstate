@@ -2,10 +2,25 @@
 # Memstate
 In-memory event-sourced ACID-transactional distributed object graph engine. Memstate is written in C# for .NET Standard 1.4. Memstate runs either embedded in your process or as a separate server process.
 
-## Contributions and governance
-Memstate is an open source project sponsored and governed by Devrex Labs, a LLC based in Sweden. Devrex Labs provides commercial support and consulting services. Contributions are welcome, check out the issues or submit a feature request.
+## Governance, Support and Contributions
+Memstate is an open source project sponsored and governed by Devrex Labs, a LLC based in Sweden.
+Devrex Labs provides commercial support and consulting services. Contributions are welcome, check out the issues or submit a feature request.
+
+## Background and Objectives
+We also maintain OrigoDB, an in-memory database engine for .NET Framework.
+
+Memstate is a redesign based on our experience building and working with OrigoDB, taking the best parts and setting some new objectives:
+* Performance - OrigoDB does 3K TPS, we're now aiming at 100K per node
+* Simplified cluster coordination - OrigoDB Server has it's own replicated state machine implementation, memstate will piggy back on a distributed event streaming 
+* Server and Engine integrated in same project
+* Better multi-platform support - moving to to .NET Standard (Core)
+* Interoperability - Besides the native .NET client we are supporting JSON over HTTP and JSON Web Sockets
+* Reactive - real-time push event notifications
+* Cloud ready - monitoring, control, service discovery, cloud based storage
+* Docker support - we will provide official docker images
 
 
+# Features
 ## In-memory object graph
 Your data fits in RAM, you might not need a database. Define your own object model and operations or use a built-in model such as redis, keyvalue, graph, relational or document, sparse array, etc
 

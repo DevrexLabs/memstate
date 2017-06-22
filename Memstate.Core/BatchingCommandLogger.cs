@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Memstate.Core
+﻿namespace Memstate.Core
 {
     public class BatchingCommandLogger : ICommandLogger
     {

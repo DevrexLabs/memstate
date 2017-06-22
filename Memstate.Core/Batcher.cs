@@ -14,7 +14,6 @@ namespace Memstate.Core
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Task _task;
 
-
         public Batcher(int batchSize, IAccept<T[]> handler)
         {
             _batchSize = batchSize;
@@ -31,12 +30,22 @@ namespace Memstate.Core
         {
             var buffer = new List<T>(_batchSize);
             var cancellationToken = _cancellationTokenSource.Token;
+            
             while (true)
             {
                 T item;
-                if (_queue.IsCompleted && _queue.Count == 0) break;
+                
+                if (_queue.IsCompleted && _queue.Count == 0)
+                {
+                    break;
+                }
+                
                 //wait for a first item
-                if (!_queue.TryTake(out item, -1, cancellationToken)) continue;
+                if (!_queue.TryTake(out item, -1, cancellationToken))
+                {
+                    continue;
+                }
+                
                 buffer.Add(item);
 
                 //take the rest but don't wait
@@ -47,6 +56,7 @@ namespace Memstate.Core
 
                 //at this point we have at least one request to process
                 var commands = buffer.ToArray();
+                
                 buffer.Clear();
                 _handler.Accept(commands);
             }
@@ -58,6 +68,5 @@ namespace Memstate.Core
             _cancellationTokenSource.Cancel();
             _task.Wait();
         }
-
     }
 }

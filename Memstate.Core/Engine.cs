@@ -32,7 +32,7 @@ namespace Memstate.Core
         {
             var tcs = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = tcs;
-            _commandLogger.AppendAsync(command);
+            _commandLogger.Append(command);
             return (TResult) await tcs.Task;
         }
 
@@ -40,7 +40,7 @@ namespace Memstate.Core
         {
             var tcs = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = tcs;
-            _commandLogger.AppendAsync(command);
+            _commandLogger.Append(command);
             return tcs.Task;
         }
 
@@ -67,10 +67,9 @@ namespace Memstate.Core
 
         public void Dispose()
         {
-            Disposing.Invoke(this, EventArgs.Empty);
+            _commandLogger.Dispose();
             _commandLoggedSubscription.Dispose();
         }
 
-        public event EventHandler Disposing = delegate { };
     }
 }

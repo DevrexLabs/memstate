@@ -1,8 +1,10 @@
-﻿namespace Memstate.Core
+﻿using System.IO;
+
+namespace Memstate.Core
 {
-    public interface ISerializer<T>
+    public interface ISerializer
     {
-        byte[] Serialize(T graph);
-        T Deserialize(byte[] data);
+        void Serialize(Stream stream, object graph);
+        object Deserialize(Stream stream);
     }
 }

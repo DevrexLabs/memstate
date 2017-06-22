@@ -15,10 +15,10 @@ namespace AsyncOrigoSpike
     public class EventStoreWriter  : IAccept<CommandChunk>, IDisposable
     {
         private readonly IEventStoreConnection _eventStore;
-        private readonly ISerializer<CommandChunk> _serializer;
+        private readonly ISerializer _serializer;
         private readonly String _streamName;
 
-        public EventStoreWriter(IEventStoreConnection connection, ISerializer<CommandChunk> serializer, String streamName)
+        public EventStoreWriter(IEventStoreConnection connection, ISerializer serializer, String streamName)
         {
             _serializer = serializer;
             _eventStore = connection;
@@ -34,7 +34,7 @@ namespace AsyncOrigoSpike
         /// create an instance with an open connection to an event store instance
         /// </summary>
         /// <returns></returns>
-        public static EventStoreWriter Create(ISerializer<CommandChunk> serializer, string streamName)
+        public static EventStoreWriter Create(ISerializer serializer, string streamName)
         {
             var endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1113);
             var connection = EventStoreConnection.Create(endPoint);

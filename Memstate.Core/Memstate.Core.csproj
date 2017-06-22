@@ -4,8 +4,4 @@
     <TargetFramework>netstandard1.6</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="BatchingCommandLogger.cs" />
-  </ItemGroup>
-
 </Project>

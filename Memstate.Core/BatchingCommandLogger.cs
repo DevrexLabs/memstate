@@ -1,13 +1,12 @@
-﻿using System;
+﻿using System.IO;
 
 namespace Memstate.Core
 {
-
     public class BatchingCommandLogger : ICommandLogger
     {
         private readonly Batcher<Command> _commandBatcher;
 
-        public BatchingCommandLogger(Action<Command[]> batchHandler, int maxBatchSize = 500)
+        public BatchingCommandLogger(IAccept<Command[]> batchHandler, int maxBatchSize = 500)
         {
             _commandBatcher = new Batcher<Command>(maxBatchSize, batchHandler);
 
@@ -17,9 +16,9 @@ namespace Memstate.Core
             _commandBatcher.Dispose();
         }
 
-        public void AppendAsync(Command command)
+        public void Append(Command command)
         {
-            _commandBatcher.Push(command);
+            _commandBatcher.Accept(command);
         }
     }
 }

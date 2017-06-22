@@ -34,9 +34,9 @@ namespace Memstate.Core
             while (true)
             {
                 T item;
-                if (_queue.IsCompleted) break; //todo: fix bug, could have leftover items
+                if (_queue.IsCompleted && _queue.Count == 0) break;
                 //wait for a first item
-                if (!_queue.TryTake(out item, -1, cancellationToken)) break;
+                if (!_queue.TryTake(out item, -1, cancellationToken)) continue;
                 buffer.Add(item);
 
                 //take the rest but don't wait

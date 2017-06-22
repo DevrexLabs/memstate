@@ -15,12 +15,12 @@ namespace Memstate.Aws
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly string _streamName;
         private string _lastSequenceNumber;
-        private readonly ISerializer<CommandChunk> _serializer;
+        private readonly ISerializer _serializer;
         private readonly IAccept<CommandChunk> _chunkHandler;
         private readonly Task _task;
 
         public KinesisCommandChunkSubscriber(AmazonKinesisClient client, 
-            ISerializer<CommandChunk> serializer,
+            ISerializer serializer,
             IAccept<CommandChunk> chunkHandler,
             string streamName, string lastSequenceNumber, string shardId)
         {
@@ -90,7 +90,7 @@ namespace Memstate.Aws
                     _lastSequenceNumber = response.Records.Last().SequenceNumber;
                     response.Records.ForEach(record =>
                     {
-                        var chunk = _serializer.Deserialize(record.Data.ToArray());
+                        var chunk = (CommandChunk)_serializer.Deserialize(record.Data.ToArray());
                         _chunkHandler.Accept(chunk);
                     });
                 }

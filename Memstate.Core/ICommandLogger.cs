@@ -2,8 +2,8 @@
 
 namespace Memstate.Core
 {
-    public interface ICommandLogger
+    public interface ICommandLogger : IDisposable
     {
-        void AppendAsync(Command command);
+        void Append(Command command);
     }
 }

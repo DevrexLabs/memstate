@@ -10,10 +10,10 @@ namespace Memstate.Aws
     { 
         private readonly AmazonKinesisClient _client;
         private readonly String _streamName;
-        private readonly ISerializer<CommandChunk> _serializer;
+        private readonly ISerializer _serializer;
 
         public KinesisCommandChunkWriter(AmazonKinesisClient client, 
-            string streamName, ISerializer<CommandChunk> serializer)
+            string streamName, ISerializer serializer)
         {
             _client = client;
             _streamName = streamName;

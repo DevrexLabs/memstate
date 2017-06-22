@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace Memstate.Core
 {
@@ -16,20 +15,22 @@ namespace Memstate.Core
     public abstract class Command<TModel> : Command
     {
         public abstract void Execute(TModel model);
+
         public override object ExecuteImpl(object model)
         {
             Execute((TModel) model);
+            
             return null;
         }
     }
 
-
     public abstract class Query<TModel, TResult> : Query
     {
         public abstract TResult Execute(TModel model);
+
         public override object ExecuteImpl(object model)
         {
-            return Execute((TModel)model);
+            return Execute((TModel) model);
         }
     }
 

@@ -19,7 +19,8 @@ namespace Memstate.Aws
         private readonly IAccept<CommandChunk> _chunkHandler;
         private readonly Task _task;
 
-        public KinesisCommandChunkSubscriber(AmazonKinesisClient client, 
+        public KinesisCommandChunkSubscriber(
+            AmazonKinesisClient client,
             ISerializer serializer,
             IAccept<CommandChunk> chunkHandler,
             string streamName, string lastSequenceNumber, string shardId)
@@ -45,7 +46,9 @@ namespace Memstate.Aws
                 StartingSequenceNumber = _lastSequenceNumber,
                 ShardId = shardId
             };
+
             var response = await _client.GetShardIteratorAsync(request);
+
             return response.ShardIterator;
         }
 
@@ -55,6 +58,7 @@ namespace Memstate.Aws
         {
             string lastShardId = null;
             var shardIds = new List<string>();
+
             while (true)
             {
                 var request = new DescribeStreamRequest
@@ -62,11 +66,19 @@ namespace Memstate.Aws
                     StreamName = _streamName,
                     ExclusiveStartShardId = lastShardId
                 };
+
                 var stream = (await _client.DescribeStreamAsync(request)).StreamDescription;
+
                 shardIds.AddRange(stream.Shards.Select(shard => shard.ShardId));
-                if (!stream.HasMoreShards) break;
+
+                if (!stream.HasMoreShards)
+                {
+                    break;
+                }
+
                 lastShardId = shardIds.Last();
             }
+
             return shardIds.ToArray();
         }
 
@@ -83,18 +95,30 @@ namespace Memstate.Aws
                     Limit = 100,
                     ShardIterator = shardIterator
                 };
+
                 var response = await _client.GetRecordsAsync(request);
-                if (response.Records == null) break; //todo: raise exception or event
+
+                if (response.Records == null)
+                {
+                    break; //todo: raise exception or event
+                }
+
                 if (response.Records.Any())
                 {
                     _lastSequenceNumber = response.Records.Last().SequenceNumber;
+
                     response.Records.ForEach(record =>
                     {
-                        var chunk = (CommandChunk)_serializer.Deserialize(record.Data.ToArray());
+                        var chunk = (CommandChunk) _serializer.Deserialize(record.Data.ToArray());
+
                         _chunkHandler.Accept(chunk);
                     });
                 }
-                else await Task.Delay(TimeSpan.FromMilliseconds(100));
+                else
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(100));
+                }
+
                 shardIterator = response.NextShardIterator;
             }
         }

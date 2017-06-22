@@ -2,7 +2,6 @@ using System.Threading;
 
 namespace Memstate.Core
 {
-
     /// <summary>
     /// Encapsulates the in-memory object graph,
     /// executes commands and queries
@@ -28,6 +27,7 @@ namespace Memstate.Core
             {
                 _lock.EnterWriteLock();
                 _version++;
+                
                 return command.ExecuteImpl(_model);
             }
             finally
@@ -41,6 +41,7 @@ namespace Memstate.Core
             try
             {
                 _lock.EnterReadLock();
+                
                 return query.ExecuteImpl(_model);
             }
             finally

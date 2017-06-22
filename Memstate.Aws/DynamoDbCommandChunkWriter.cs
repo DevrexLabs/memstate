@@ -12,6 +12,7 @@ namespace Memstate.Aws
         {
             _client = client;
         }
+        
         public void Accept(CommandChunk item)
         {
             throw new NotImplementedException();

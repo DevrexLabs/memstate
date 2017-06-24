@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Memstate.Core
 {
-    public class Batcher<T> : IAccept<T>, IDisposable
+    public class Batcher<T> : IHandle<T>, IDisposable
     {
         private readonly BlockingCollection<T> _queue = new BlockingCollection<T>();
-        private readonly IAccept<T[]> _handler;
+        private readonly Action<T[]> _handler;
         private readonly int _batchSize;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Task _task;
 
-        public Batcher(int batchSize, IAccept<T[]> handler)
+        public Batcher(int batchSize, Action<T[]> handler)
         {
             _batchSize = batchSize;
             _handler = handler;
             _task = Task.Factory.StartNew(QueueConsumer);
         }
 
-        public void Accept(T item)
+        public void Handle(T item)
         {
             _queue.Add(item);
         }
@@ -58,7 +58,7 @@ namespace Memstate.Core
                 var commands = buffer.ToArray();
                 
                 buffer.Clear();
-                _handler.Accept(commands);
+                _handler.Invoke(commands);
             }
         }
 

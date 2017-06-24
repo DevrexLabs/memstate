@@ -1,18 +1,16 @@
 using System;
+using System.Linq;
 using System.Net;
 using EventStore.ClientAPI;
 using Memstate.Core;
 
-namespace AsyncOrigoSpike
+namespace Memstate.EventStore
 {
-    /// <summary>
-    /// IJournalWriter implementation that writes to an EventStore 3 instance
-    /// </summary>
-    public class EventStoreWriter : IAccept<CommandChunk>, IDisposable
+    public class EventStoreWriter : IHandle<CommandChunk>, IDisposable
     {
         private readonly IEventStoreConnection _eventStore;
         private readonly ISerializer _serializer;
-        private readonly String _streamName;
+        private readonly string _streamName;
 
         public EventStoreWriter(IEventStoreConnection connection, ISerializer serializer, String streamName)
         {
@@ -35,18 +33,26 @@ namespace AsyncOrigoSpike
             var endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1113);
             var connection = EventStoreConnection.Create(endPoint);
             connection.ConnectAsync().Wait();
-            
+
             return new EventStoreWriter(connection, serializer, streamName);
         }
 
-        public async void Accept(CommandChunk chunk)
+        public async void Handle(CommandChunk chunk)
         {
-            var id = Guid.NewGuid();
-            var bytes = _serializer.Serialize(chunk);
-            var eventData = new EventData(id, _streamName, false, bytes, null);
-            //todo: add chunk meta data to event?
-            var result = await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, eventData);
-            //result.LogPosition.CommitPosition;
+            var events = chunk.Commands.Select(ToEventData);
+            await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
+        }
+
+        private EventData ToEventData(Command cmd)
+        {
+            var typeName = cmd.GetType().ToString();
+            var bytes = _serializer.Serialize(cmd);
+            return new EventData(
+                eventId: cmd.Id,
+                type: typeName,
+                isJson: false,
+                data: bytes,
+                metadata: null);
         }
     }
 }

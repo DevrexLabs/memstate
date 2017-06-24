@@ -16,13 +16,13 @@ namespace Memstate.Aws
         private readonly string _streamName;
         private string _lastSequenceNumber;
         private readonly ISerializer _serializer;
-        private readonly IAccept<CommandChunk> _chunkHandler;
+        private readonly IHandle<CommandChunk> _chunkHandler;
         private readonly Task _task;
 
         public KinesisCommandChunkSubscriber(
             AmazonKinesisClient client,
             ISerializer serializer,
-            IAccept<CommandChunk> chunkHandler,
+            IHandle<CommandChunk> chunkHandler,
             string streamName, string lastSequenceNumber, string shardId)
         {
             _client = client;
@@ -111,7 +111,7 @@ namespace Memstate.Aws
                     {
                         var chunk = (CommandChunk) _serializer.Deserialize(record.Data.ToArray());
 
-                        _chunkHandler.Accept(chunk);
+                        _chunkHandler.Handle(chunk);
                     });
                 }
                 else

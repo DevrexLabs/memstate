@@ -10,24 +10,18 @@ namespace Memstate.Core
     {
         private readonly object _model;
         private readonly ReaderWriterLockSlim _lock;
-        private ulong _version;
 
-        public Kernel(object model, ulong version)
+        public Kernel(object model)
         {
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-            _version = version;
         }
-
-        public ulong Version => _version;
 
         public object Execute(Command command)
         {
             try
             {
                 _lock.EnterWriteLock();
-                _version++;
-                
                 return command.ExecuteImpl(_model);
             }
             finally
@@ -41,7 +35,6 @@ namespace Memstate.Core
             try
             {
                 _lock.EnterReadLock();
-                
                 return query.ExecuteImpl(_model);
             }
             finally

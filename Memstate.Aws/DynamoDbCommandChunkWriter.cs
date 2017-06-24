@@ -4,7 +4,7 @@ using Memstate.Core;
 
 namespace Memstate.Aws
 {
-    public class DynamoDbCommandChunkWriter : IAccept<CommandChunk>, IDisposable
+    public class DynamoDbCommandChunkWriter : IHandle<CommandChunk>, IDisposable
     {
         private readonly AmazonDynamoDBClient _client;
 
@@ -13,7 +13,7 @@ namespace Memstate.Aws
             _client = client;
         }
         
-        public void Accept(CommandChunk item)
+        public void Handle(CommandChunk item)
         {
             throw new NotImplementedException();
         }

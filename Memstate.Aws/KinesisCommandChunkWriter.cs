@@ -6,7 +6,7 @@ using Memstate.Core;
 
 namespace Memstate.Aws
 {
-    public class KinesisCommandChunkWriter : IAccept<CommandChunk>, IDisposable
+    public class KinesisCommandChunkWriter : IHandle<CommandChunk>, IDisposable
     { 
         private readonly AmazonKinesisClient _client;
         private readonly string _streamName;
@@ -26,20 +26,19 @@ namespace Memstate.Aws
             _client.Dispose();
         }
 
-        public async void Accept(CommandChunk chunk)
+        public async void Handle(CommandChunk chunk)
         {
             var bytes = _serializer.Serialize(chunk);
-            
             var request = new PutRecordRequest
             {
-                SequenceNumberForOrdering = chunk.EngineSequenceNumber.ToString(),
+                SequenceNumberForOrdering = chunk.LocalSequenceNumber.ToString(),
                 StreamName = _streamName,
                 Data = new MemoryStream(bytes),
-                PartitionKey = chunk.Engine.ToString() //todo: ordering guarantees?
+                PartitionKey = chunk.PartitionKey
             };
             
             var response = await _client.PutRecordAsync(request);
-            var number = response.SequenceNumber;
+            chunk.GlobalSequenceNumber = response.SequenceNumber;
         }
     }
 }

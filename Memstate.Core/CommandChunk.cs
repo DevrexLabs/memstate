@@ -3,24 +3,26 @@
 namespace Memstate.Core
 {
     /// <summary>
-    /// A chunk of commands to be persisted
+    /// A chunk of commands with some metadata
     /// </summary>
     public class CommandChunk
     {
-        /// <summary>
-        /// Unique id of this block
-        /// </summary>
-        public Guid Id;
+        public CommandChunk(Command[] commands)
+        {
+            Commands = commands;
+            Created = DateTimeOffset.Now;
+        }
 
         /// <summary>
-        /// Id of this block
+        /// Globally unique sequence number of this chunk
+        /// 0 means not yet persisted
         /// </summary>
-        public ulong EngineSequenceNumber;
+        public string GlobalSequenceNumber;
 
-        /// <summary>
-        /// Unique id of the engine which created this block
-        /// </summary>
-        public Guid Engine;
+
+        public ulong LocalSequenceNumber;
+
+        public string PartitionKey;
 
         /// <summary>
         /// Timestamp when the block was created
@@ -32,7 +34,9 @@ namespace Memstate.Core
         /// </summary>
         public int Version = 1;
 
-        //The actual serialized data
+        /// <summary>
+        /// The actual commands
+        /// </summary>
         public Command[] Commands;
     }
 }

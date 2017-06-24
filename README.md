@@ -41,7 +41,7 @@ All operations (commands) are written to persistent storage and used to restore 
 Distribution in a memstate cluster requires a message streaming backend. The backend provides a global ordering of commands.
 
 * EventStore
-* Kinesis (AWS)
+* Kinesis (AWS) - discontinued, end to end latency is too poor
 * Kafka (planned)
 
 ## Permanent Storage Backend

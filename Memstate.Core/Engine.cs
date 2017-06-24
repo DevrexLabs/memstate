@@ -7,30 +7,37 @@ namespace Memstate.Core
     public class Engine<TModel> : IDisposable where TModel : class
     {
         private readonly Kernel _kernel;
-        private readonly ICommandLogger _commandLogger;
-        private readonly ConcurrentDictionary<Guid, object> _pendingLocalCommands;
-        private readonly IDisposable _commandLoggedSubscription;
+        private readonly IHandle<Command> _commandLogger;
+        private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
+        private readonly IDisposable _commandSubscription;
 
         public Engine(
             TModel model,
             ICommandSubscriptionSource subscriptionSource,
-            ICommandLogger commandLogger,
-            ulong version)
+            IHandle<Command> commandLogger,
+            long nextChunkId)
         {
-            _kernel = new Kernel(model, version);
+            _kernel = new Kernel(model);
             _commandLogger = commandLogger;
-            _commandLoggedSubscription = subscriptionSource.Subscribe(version + 1, ApplyCommand);
-            _pendingLocalCommands = new ConcurrentDictionary<Guid, object>();
+            _commandSubscription = subscriptionSource.Subscribe(nextChunkId, ApplyCommand);
+            _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
         }
 
-        private void ApplyCommand(Command command)
+        private void ApplyCommand(JournalEntry wrapper)
         {
-            object result = _kernel.Execute(command);
-
-            if (_pendingLocalCommands.TryRemove(command.Id, out var completion))
-            {
-                ((TaskCompletionSource<object>) completion).SetResult(result);
-            }
+                TaskCompletionSource<object> completion = null;
+                try
+                {
+                    var command = wrapper.Command;
+                    _pendingLocalCommands.TryRemove(command.Id, out completion);
+                    object result = _kernel.Execute(wrapper.Command);
+                    completion?.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    //todo: log
+                    completion?.SetException(ex);   
+                }
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
@@ -38,7 +45,7 @@ namespace Memstate.Core
             var tcs = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = tcs;
-            _commandLogger.Append(command);
+            _commandLogger.Handle(command);
 
             return (TResult) await tcs.Task;
         }
@@ -48,7 +55,7 @@ namespace Memstate.Core
             var tcs = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = tcs;
-            _commandLogger.Append(command);
+            _commandLogger.Handle(command);
 
             return tcs.Task;
         }
@@ -75,8 +82,7 @@ namespace Memstate.Core
 
         public void Dispose()
         {
-            _commandLogger.Dispose();
-            _commandLoggedSubscription.Dispose();
+            _commandSubscription.Dispose();
         }
     }
 }

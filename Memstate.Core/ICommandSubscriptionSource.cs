@@ -4,6 +4,6 @@ namespace Memstate.Core
 {
     public interface ICommandSubscriptionSource
     {
-        IDisposable Subscribe(ulong from, Action<Command> handler);
+        ICommandSubscription Subscribe(long from, Action<JournalEntry> handler);
     }
 }

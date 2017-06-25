@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
+using Memstate.JsonNet;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -10,7 +11,7 @@ namespace Memstate.Core.Tests
 {
     public class UnitTest1
     {
-        private ITestOutputHelper _log;
+        private readonly ITestOutputHelper _log;
 
         public UnitTest1(ITestOutputHelper log)
         {
@@ -56,6 +57,23 @@ namespace Memstate.Core.Tests
 
             int expected = 1;
             foreach(var task in tasks) Assert.Equal(expected++, task.Result);
+        }
+
+        [Fact]
+        public void FileCommandStoreWorkout()
+        {
+            var fileName = Path.GetTempFileName();
+            var serializer = new JsonSerializerAdapter();
+            var store = new FileCommandStore(fileName, serializer);
+            var records = new List<JournalRecord>();
+            store.Subscribe(1, records.Add);
+            foreach (var command in Enumerable.Range(1, 1000).Select(n => new AddString(n.ToString())))
+            {
+                store.Handle(command);
+            }
+            Task.Delay(1000).Wait();
+            //store.Dispose();
+            Assert.Equal(1000, records.Count);
         }
     }
 }

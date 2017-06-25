@@ -24,7 +24,7 @@ namespace Memstate.EventStore
                         ?? new CatchUpSubscriptionSettings(10000, 10000, false, false);
         }
 
-        public ICommandSubscription Subscribe(long from, Action<JournalEntry> handler)
+        public ICommandSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
             var ready = false;
 
@@ -32,14 +32,14 @@ namespace Memstate.EventStore
                 _streamName, 
                 from, 
                 _settings, 
-                (s, re) => handler.Invoke(JournalEntryFromEvent(re.Event)), s =>  ready = true );
+                (s, re) => handler.Invoke(JournalRecordFromEvent(re.Event)), s =>  ready = true );
             return new EventStoreSubscriptionAdapter(_connection,sub, () => ready);
         }
 
-        private JournalEntry JournalEntryFromEvent(RecordedEvent @event)
+        private JournalRecord JournalRecordFromEvent(RecordedEvent @event)
         {
             var command = (Command) _serializer.Deserialize(@event.Data);
-            return new JournalEntry(@event.EventNumber, @event.Created, command);
+            return new JournalRecord(@event.EventNumber, @event.Created, command);
         }
 
         class EventStoreSubscriptionAdapter : ICommandSubscription

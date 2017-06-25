@@ -4,6 +4,6 @@ namespace Memstate.Core
 {
     public interface ICommandSubscriptionSource
     {
-        ICommandSubscription Subscribe(long from, Action<JournalEntry> handler);
+        ICommandSubscription Subscribe(long from, Action<JournalRecord> handler);
     }
 }

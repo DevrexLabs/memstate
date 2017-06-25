@@ -6,7 +6,7 @@ using Memstate.Core;
 
 namespace Memstate.EventStore
 {
-    public class EventStoreWriter : IHandle<CommandChunk>, IDisposable
+    public class EventStoreWriter : IHandle<Command[]>, IDisposable
     {
         private readonly IEventStoreConnection _eventStore;
         private readonly ISerializer _serializer;
@@ -37,9 +37,9 @@ namespace Memstate.EventStore
             return new EventStoreWriter(connection, serializer, streamName);
         }
 
-        public async void Handle(CommandChunk chunk)
+        public async void Handle(Command[] commands)
         {
-            var events = chunk.Commands.Select(ToEventData);
+            var events = commands.Select(ToEventData);
             await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
         }
 

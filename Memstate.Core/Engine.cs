@@ -15,22 +15,22 @@ namespace Memstate.Core
             TModel model,
             ICommandSubscriptionSource subscriptionSource,
             IHandle<Command> commandLogger,
-            long nextChunkId)
+            long nextRecord)
         {
             _kernel = new Kernel(model);
             _commandLogger = commandLogger;
-            _commandSubscription = subscriptionSource.Subscribe(nextChunkId, ApplyCommand);
+            _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
         }
 
-        private void ApplyCommand(JournalEntry wrapper)
+        private void ApplyRecord(JournalRecord record)
         {
                 TaskCompletionSource<object> completion = null;
                 try
                 {
-                    var command = wrapper.Command;
+                    var command = record.Command;
                     _pendingLocalCommands.TryRemove(command.Id, out completion);
-                    object result = _kernel.Execute(wrapper.Command);
+                    object result = _kernel.Execute(record.Command);
                     completion?.SetResult(result);
                 }
                 catch (Exception ex)
@@ -42,22 +42,22 @@ namespace Memstate.Core
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var completionSource = new TaskCompletionSource<object>();
 
-            _pendingLocalCommands[command.Id] = tcs;
+            _pendingLocalCommands[command.Id] = completionSource;
             _commandLogger.Handle(command);
 
-            return (TResult) await tcs.Task;
+            return (TResult) await completionSource.Task;
         }
 
         public Task ExecuteAsync(Command<TModel> command)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var completionSource = new TaskCompletionSource<object>();
 
-            _pendingLocalCommands[command.Id] = tcs;
+            _pendingLocalCommands[command.Id] = completionSource;
             _commandLogger.Handle(command);
 
-            return tcs.Task;
+            return completionSource.Task;
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)

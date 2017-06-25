@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Aws", "Memstate.Aw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Core.Tests", "Memstate.Core.Tests\Memstate.Core.Tests.csproj", "{462D0925-B77F-4FC6-8818-29E736767CDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

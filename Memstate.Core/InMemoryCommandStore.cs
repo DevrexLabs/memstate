@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Memstate.Core
 {
     public class InMemoryCommandStore : IHandle<Command>, ICommandSubscriptionSource
     {
-        class Subscription : IHandle<JournalEntry>, ICommandSubscription
+        class Subscription : IHandle<JournalRecord>, ICommandSubscription
         {
             public readonly Guid Id = Guid.NewGuid();
-            private readonly Action<JournalEntry> _callback;
-            public long NextChunkId;
+            private readonly Action<JournalRecord> _callback;
+            private long _nextRecord;
             private readonly Action<Subscription> _onDisposed;
 
-            public Subscription(Action<JournalEntry> callback, long nextChunkId, Action<Subscription> onDisposed)
+            public Subscription(Action<JournalRecord> callback, long nextRecord, Action<Subscription> onDisposed)
             {
-                NextChunkId = nextChunkId;
+                _nextRecord = nextRecord;
                 _callback = callback;
                 _onDisposed = onDisposed;
             }
@@ -30,25 +29,25 @@ namespace Memstate.Core
                 return true;
             }
 
-            public void Handle(JournalEntry chunk)
+            public void Handle(JournalRecord record)
             {
-                _callback.Invoke(chunk);
-                NextChunkId++;
+                if (record.RecordNumber != _nextRecord) throw new InvalidOperationException("expected version " + _nextRecord + ", got " + record.RecordNumber);
+                _nextRecord++;
+                _callback.Invoke(record);
             }
         }
 
         private readonly Dictionary<Guid, Subscription> _subscriptions;
         private readonly BatchingCommandLogger _batchingLogger;
-        private ulong _nextChunkSequenceNumber;
-        private readonly List<CommandChunk> _chunks = new List<CommandChunk>();
-        private readonly ConcurrentQueue<CommandChunk> _incomingChunks 
-            = new ConcurrentQueue<CommandChunk>();
+        private long _nextRecord;
+        private readonly List<JournalRecord> _journal = new List<JournalRecord>();
+      
 
-        public InMemoryCommandStore(Guid engineId, ulong nextSequence = 1)
+        public InMemoryCommandStore(long nextRecord = 1)
         {
             _batchingLogger = new BatchingCommandLogger(OnCommandBatch, 100);
             _subscriptions = new Dictionary<Guid, Subscription>();
-            _nextChunkSequenceNumber = nextSequence;
+            _nextRecord = nextRecord;
         }
 
         public void Dispose()
@@ -58,9 +57,18 @@ namespace Memstate.Core
 
         private void OnCommandBatch(Command[] commands)
         {
-            var chunk = new CommandChunk(commands);
-            chunk.LocalSequenceNumber = _nextChunkSequenceNumber++;
-            _incomingChunks.Enqueue(chunk);
+            lock (_journal)
+            {
+                foreach (var command in commands)
+                {
+                    var record = new JournalRecord(_nextRecord++, DateTime.Now, command);
+                    _journal.Add(record);
+                    foreach (var sub in _subscriptions.Values)
+                    {
+                        sub.Handle(record);
+                    }
+                }
+            }
         }
 
         public void Handle(Command command)
@@ -70,18 +78,22 @@ namespace Memstate.Core
 
         private void RemoveSubscription(Subscription subscription)
         {
-            lock (_subscriptions)
+            lock (_journal)
             {
                 _subscriptions.Remove(subscription.Id);
             }
         }
 
-        public ICommandSubscription Subscribe(long from, Action<JournalEntry> handler)
+        public ICommandSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
             var subscription = new Subscription(handler, from, RemoveSubscription);
-            lock (_subscriptions)
+            lock (_journal)
             {
                 _subscriptions.Add(subscription.Id, subscription);
+                for (int i = (int)from - 1; i < _journal.Count; i++)
+                {
+                    subscription.Handle(_journal[i]);
+                }
             }
             return subscription;
         }

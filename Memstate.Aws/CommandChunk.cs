@@ -1,6 +1,7 @@
 ﻿using System;
+using Memstate.Core;
 
-namespace Memstate.Core
+namespace Memstate.Aws
 {
     /// <summary>
     /// A chunk of commands with some metadata

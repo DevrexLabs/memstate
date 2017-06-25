@@ -2,6 +2,8 @@
 # Memstate
 In-memory event-sourced ACID-transactional distributed object graph engine. Memstate is written in C# for .NET Standard 1.4. Memstate runs either embedded in your process or as a separate server process.
 
+[![CLA assistant](https://cla-assistant.io/readme/badge/DevrexLabs/memstate)](https://cla-assistant.io/DevrexLabs/memstate)
+
 ## UNDER CONSTRUCTION
 
 Memstate is under construction but will be used in a larger project with a real deadline mid September 2017. We will be setting up a continous release pipeline for nuget packages and docker images during June/July 2017 and then work towards a stable 1.0 release during September.

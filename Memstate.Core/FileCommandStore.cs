@@ -7,26 +7,37 @@ namespace Memstate.Core
 {
     public class FileCommandStore : IHandle<Command>, ICommandSubscriptionSource
     {
-        
-
         private readonly Dictionary<Guid, Subscription> _subscriptions;
         private readonly Batcher<Command> _commandBatcher;
         private long _nextRecord;
         private readonly FileStream _journalStream;
         private readonly ISerializer _serializer;
+        private readonly FileRecordLayout _fileLayout;
 
-        public FileCommandStore(String fileName, ISerializer serializer, long nextRecord = 1)
+        public FileCommandStore(String fileName, ISerializer serializer, LayoutOptions layoutOptions = LayoutOptions.None)
         {
             _journalStream = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             _commandBatcher = new Batcher<Command>(OnCommandBatch, 100);
             _subscriptions = new Dictionary<Guid, Subscription>();
-            _nextRecord = nextRecord;
+            _nextRecord = _journalStream.Length == 0 ? 1 : 1 + ReadLastRecordNumber();
             _serializer = serializer;
+            _fileLayout = new FileRecordLayout(layoutOptions);
+        }
+
+        /// <summary>
+        /// Last 8 bytes of file is the record number of the last record
+        /// </summary>
+        /// <returns></returns>
+        private long ReadLastRecordNumber()
+        {
+            _journalStream.Position = _journalStream.Length - 8;
+            return new BinaryReader(_journalStream).ReadInt64();
         }
 
         public void Dispose()
         {
             _commandBatcher.Dispose();
+            _journalStream.Dispose();
         }
 
         private JournalRecord ToJournalRecord(Command command)
@@ -36,13 +47,20 @@ namespace Memstate.Core
 
         private void OnCommandBatch(IEnumerable<Command> commands)
         {
-            var memoryStream = new MemoryStream();
+            
             var records = commands.Select(ToJournalRecord).ToArray();
-            _serializer.Serialize(memoryStream, records);
+            var bytes = _serializer.Serialize(records);
             lock (_journalStream)
             {
-                _journalStream.Position = _journalStream.Length + 1;
-                memoryStream.CopyTo(_journalStream);
+                var writer = new BinaryWriter(_journalStream);
+                _fileLayout.Write(bytes, writer);
+
+                //write the record number of the last record, and backup it will be overwritten by the next batch
+                //so only the last 8 bytes of the file will have a record number
+                writer.Write(records.Last().RecordNumber);
+                writer.Flush();
+                _journalStream.Flush(true);
+                SeekToAppendPosition();
             }
             foreach (var record in records)
             {
@@ -71,15 +89,26 @@ namespace Memstate.Core
             lock (_journalStream)
             {
                 _journalStream.Position = 0;
-                while (_journalStream.Position < _journalStream.Length)
+                var reader = new BinaryReader(_journalStream);
+                long numRecords = _nextRecord - 1;
+                long lastRecordRead = 0;
+                while (lastRecordRead < numRecords)
                 {
-                    var records = (JournalRecord[])_serializer.Deserialize(_journalStream);
+                    var bytes = _fileLayout.Read(reader);
+                    var records = (JournalRecord[])_serializer.Deserialize(bytes);
                     foreach (var record in records)
                     {
+                        lastRecordRead = record.RecordNumber;
                         yield return record;
                     }
                 }
+                SeekToAppendPosition();
             }
+        }
+
+        private void SeekToAppendPosition()
+        {
+            _journalStream.Position = Math.Max(_journalStream.Length-8, 0);
         }
 
         public ICommandSubscription Subscribe(long from, Action<JournalRecord> handler)

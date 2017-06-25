@@ -64,13 +64,31 @@ namespace Memstate.Core.Tests
             var serializer = new JsonSerializerAdapter();
             var store = new FileCommandStore(fileName, serializer);
             var records = new List<JournalRecord>();
-            store.Subscribe(1, records.Add);
-            foreach (var command in Enumerable.Range(1, 1000).Select(n => new AddStringCommand(n.ToString())))
+            var sub = store.Subscribe(1, records.Add);
+            for (int i = 0; i < 1000; i++)
             {
+                var command = new AddStringCommand(i.ToString());
                 store.Handle(command);
             }
             store.Dispose();
+            sub.Dispose();
             Assert.Equal(1000, records.Count);
+
+            //simulate replay, records are read from file
+            records.Clear();
+            store = new FileCommandStore(fileName,serializer);
+            sub = store.Subscribe(1, records.Add);
+            Assert.Equal(1000,records.Count);
+            
+            //push more commands
+            for (int i = 0; i < 1000; i++)
+            {
+                var command = new AddStringCommand(i.ToString());
+                store.Handle(command);
+            }
+            store.Dispose();
+            sub.Dispose();
+            Assert.Equal(2000,records.Count);
         }
 
 

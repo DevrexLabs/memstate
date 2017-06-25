@@ -18,7 +18,7 @@ namespace Memstate.JsonNet
                     IgnoreSerializableAttribute = true,
                     SerializeCompilerGeneratedMembers = true
                 },
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.None,
                 TypeNameHandling = TypeNameHandling.All,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 MissingMemberHandling = MissingMemberHandling.Ignore

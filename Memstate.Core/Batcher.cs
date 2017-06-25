@@ -38,14 +38,14 @@ namespace Memstate.Core
                 try
                 {
                     buffer.Add(_items.Take());
-                    while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
-                    {
-                        buffer.Add(item);
-                    }
-                    _batchHandler.Invoke(buffer);
-                    buffer.Clear();
                 }
                 catch (InvalidOperationException) { }
+                while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
+                {
+                    buffer.Add(item);
+                }
+                _batchHandler.Invoke(buffer);
+                buffer.Clear();
             }
         }
 

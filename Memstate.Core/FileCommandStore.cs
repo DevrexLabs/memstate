@@ -40,17 +40,15 @@ namespace Memstate.Core
         }
 
         private readonly Dictionary<Guid, Subscription> _subscriptions;
-        private readonly BatchingCommandLogger _batchingLogger;
+        private readonly Batcher<Command> _commandBatcher;
         private long _nextRecord;
         private readonly FileStream _journalStream;
-        private readonly String _fileName;
         private readonly ISerializer _serializer;
 
         public FileCommandStore(String fileName, ISerializer serializer, long nextRecord = 1)
         {
-            _fileName = fileName;
-            _journalStream = File.Open(_fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            _batchingLogger = new BatchingCommandLogger(OnCommandBatch, 100);
+            _journalStream = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            _commandBatcher = new Batcher<Command>(OnCommandBatch, 100);
             _subscriptions = new Dictionary<Guid, Subscription>();
             _nextRecord = nextRecord;
             _serializer = serializer;
@@ -58,15 +56,18 @@ namespace Memstate.Core
 
         public void Dispose()
         {
-            _batchingLogger.Dispose();
+            _commandBatcher.Dispose();
         }
 
-        private void OnCommandBatch(Command[] commands)
+        private JournalRecord ToJournalRecord(Command command)
+        {
+            return new JournalRecord(_nextRecord++, DateTime.Now, command);
+        }
+
+        private void OnCommandBatch(IEnumerable<Command> commands)
         {
             var memoryStream = new MemoryStream();
-            var records = commands
-                .Select(command => new JournalRecord(_nextRecord++, DateTime.Now, command))
-                .ToArray();
+            var records = commands.Select(ToJournalRecord).ToArray();
             _serializer.Serialize(memoryStream, records);
             lock (_journalStream)
             {
@@ -84,7 +85,7 @@ namespace Memstate.Core
 
         public void Handle(Command command)
         {
-            _batchingLogger.Handle(command);
+            _commandBatcher.Append(command);
         }
 
         private void RemoveSubscription(Subscription subscription)

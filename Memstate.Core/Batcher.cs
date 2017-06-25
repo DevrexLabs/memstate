@@ -1,72 +1,58 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Memstate.Core
 {
-    public class Batcher<T> : IHandle<T>, IDisposable
+    public class Batcher<T> : IDisposable
     {
-        private readonly BlockingCollection<T> _queue = new BlockingCollection<T>();
-        private readonly Action<T[]> _handler;
-        private readonly int _batchSize;
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly Task _task;
+        public const int DefaultMaxBatchSize = 1000;
+        public const int DefaultBoundedCapacity = 10000;
+        private readonly int _maxBatchSize;
+        private readonly BlockingCollection<T> _items;
+        private readonly Action<IEnumerable<T>> _batchHandler;
+        private readonly Task _batchTask;
 
-        public Batcher(int batchSize, Action<T[]> handler)
+        public Batcher(Action<IEnumerable<T>> batchHandler, 
+            int maxBatchSize = DefaultMaxBatchSize, 
+            int boundedCapacity = DefaultBoundedCapacity)
         {
-            _batchSize = batchSize;
-            _handler = handler;
-            _task = Task.Factory.StartNew(QueueConsumer);
+            _maxBatchSize = maxBatchSize;
+            _items = new BlockingCollection<T>(boundedCapacity);
+            _batchHandler = batchHandler;
+            _batchTask = Task.Run(() => ProcessItems());
         }
 
-        public void Handle(T item)
+        public void Append(T item)
         {
-            _queue.Add(item);
+            _items.Add(item);
         }
 
-        private void QueueConsumer()
+        
+        private void ProcessItems()
         {
-            var buffer = new List<T>(_batchSize);
-            var cancellationToken = _cancellationTokenSource.Token;
-            
-            while (true)
+            var buffer = new List<T>(_maxBatchSize);
+            while (!_items.IsCompleted)
             {
-                T item;
-                
-                if (_queue.IsCompleted && _queue.Count == 0)
+                try
                 {
-                    break;
+                    buffer.Add(_items.Take());
+                    while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
+                    {
+                        buffer.Add(item);
+                    }
+                    _batchHandler.Invoke(buffer);
+                    buffer.Clear();
                 }
-                
-                //wait for a first item
-                if (!_queue.TryTake(out item, -1, cancellationToken))
-                {
-                    continue;
-                }
-                
-                buffer.Add(item);
-
-                //take the rest but don't wait
-                while (buffer.Count < _batchSize && _queue.TryTake(out item))
-                {
-                    buffer.Add(item);
-                }
-
-                //at this point we have at least one request to process
-                var commands = buffer.ToArray();
-                
-                buffer.Clear();
-                _handler.Invoke(commands);
+                catch (InvalidOperationException) { }
             }
         }
 
         public void Dispose()
         {
-            _queue.CompleteAdding();
-            _cancellationTokenSource.Cancel();
-            _task.Wait();
+            _items.CompleteAdding();
+            _batchTask.Wait();
         }
     }
 }

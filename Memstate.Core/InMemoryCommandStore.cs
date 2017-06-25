@@ -38,14 +38,14 @@ namespace Memstate.Core
         }
 
         private readonly Dictionary<Guid, Subscription> _subscriptions;
-        private readonly BatchingCommandLogger _batchingLogger;
+        private readonly Batcher<Command> _batchingLogger;
         private long _nextRecord;
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
       
 
         public InMemoryCommandStore(long nextRecord = 1)
         {
-            _batchingLogger = new BatchingCommandLogger(OnCommandBatch, 100);
+            _batchingLogger = new Batcher<Command>(OnCommandBatch, 100);
             _subscriptions = new Dictionary<Guid, Subscription>();
             _nextRecord = nextRecord;
         }
@@ -55,7 +55,7 @@ namespace Memstate.Core
             _batchingLogger.Dispose();
         }
 
-        private void OnCommandBatch(Command[] commands)
+        private void OnCommandBatch(IEnumerable<Command> commands)
         {
             lock (_journal)
             {
@@ -73,7 +73,7 @@ namespace Memstate.Core
 
         public void Handle(Command command)
         {
-            _batchingLogger.Handle(command);
+            _batchingLogger.Append(command);
         }
 
         private void RemoveSubscription(Subscription subscription)

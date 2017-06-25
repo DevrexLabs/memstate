@@ -71,8 +71,8 @@ namespace Memstate.Core.Tests
             {
                 store.Handle(command);
             }
-            Task.Delay(1000).Wait();
-            //store.Dispose();
+            //Task.Delay(1000).Wait();
+            store.Dispose();
             Assert.Equal(1000, records.Count);
         }
     }

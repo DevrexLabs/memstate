@@ -58,37 +58,35 @@ namespace Memstate.Core.Tests
         }
 
         [Fact]
-        public void FileCommandStoreWorkout()
+        public void FileJournalSmokeTest()
         {
             var fileName = Path.GetTempFileName();
             var serializer = new JsonSerializerAdapter();
-            var store = new FileCommandStore(fileName, serializer);
+            var journalWriter = new FileJournalWriter(serializer, fileName, 1);
+            var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
-            var sub = store.Subscribe(1, records.Add);
+            var sub = subSource.Subscribe(1, records.Add);
             for (int i = 0; i < 1000; i++)
             {
                 var command = new AddStringCommand(i.ToString());
-                store.Handle(command);
+                journalWriter.Handle(command);
             }
-            store.Dispose();
+            journalWriter.Dispose();
             sub.Dispose();
+            subSource.Dispose();
+
             Assert.Equal(1000, records.Count);
 
-            //simulate replay, records are read from file
+           
+
+            var reader = new FileJournalReader(fileName, serializer);
             records.Clear();
-            store = new FileCommandStore(fileName,serializer);
-            sub = store.Subscribe(1, records.Add);
-            Assert.Equal(1000,records.Count);
-            
-            //push more commands
-            for (int i = 0; i < 1000; i++)
+            foreach (var record in reader.GetRecords())
             {
-                var command = new AddStringCommand(i.ToString());
-                store.Handle(command);
+                records.Add(record);
             }
-            store.Dispose();
-            sub.Dispose();
-            Assert.Equal(2000,records.Count);
+            Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(1, 1000)));
+            reader.Dispose();
         }
 
 

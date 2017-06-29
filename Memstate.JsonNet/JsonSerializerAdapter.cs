@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Memstate.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -21,26 +22,39 @@ namespace Memstate.JsonNet
                 PreserveReferencesHandling = PreserveReferencesHandling.None,
                 TypeNameHandling = TypeNameHandling.All,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                MissingMemberHandling = MissingMemberHandling.Ignore
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                CheckAdditionalContent = false                
             };
 
             _serializer = JsonSerializer.Create(settings);
         }
 
-        public object Deserialize(Stream serializationStream)
+        public object ReadObject(Stream serializationStream)
         {
-            var reader = new JsonTextReader(new StreamReader(serializationStream));
-
+            var streamReader = new StreamReader(serializationStream);
+            var line = streamReader.ReadLine();
+            var reader = new JsonTextReader(new StringReader(line));
             return _serializer.Deserialize(reader);
         }
 
-        public void Serialize(Stream serializationStream, object graph)
+        public IEnumerable<T> ReadObjects<T>(Stream stream)
         {
-            var writer = new JsonTextWriter(new StreamWriter(serializationStream));
+            var streamReader = new StreamReader(stream);
+            var jsonReader = new JsonTextReader(streamReader);
+            jsonReader.SupportMultipleContent = true;
+            while (jsonReader.Read())
+            {
+                yield return _serializer.Deserialize<T>(jsonReader);
+            }
+        }
 
-            _serializer.Serialize(writer, graph);
-
+        public void WriteObject(Stream serializationStream, object @object)
+        {
+            var streamWriter = new StreamWriter(serializationStream);
+            var writer = new JsonTextWriter(streamWriter);
+            _serializer.Serialize(writer, @object);
             writer.Flush();
+            streamWriter.Flush();
         }
     }
 }

@@ -17,8 +17,6 @@ namespace Memstate.Core
 
         public readonly Command Command;
 
-        public TimeSpan Age => DateTimeOffset.Now - Written;
-
         public JournalRecord(long recordNumber, DateTime written, Command command)
         {
             RecordNumber = recordNumber;

@@ -1,14 +1,17 @@
-﻿using System.IO;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Memstate.Core
 {
     public static class SerializerExtensions
     {
+
         public static byte[] Serialize(this ISerializer serializer, object graph)
         {
             var ms = new MemoryStream();
             
-            serializer.Serialize(ms, graph);
+            serializer.WriteObject(ms, graph);
             ms.Position = 0;
             
             return ms.ToArray();
@@ -21,7 +24,7 @@ namespace Memstate.Core
                 Position = 0
             };
             
-            return serializer.Deserialize(ms);
+            return serializer.ReadObject(ms);
         }
     }
 }

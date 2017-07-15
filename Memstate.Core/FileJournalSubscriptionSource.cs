@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Memstate.Core
 {
-    public class FileJournalSubscriptionSource : ICommandSubscriptionSource
+    public class FileJournalSubscriptionSource : IJournalSubscriptionSource
     {
         private readonly Dictionary<Guid, Subscription> _subscriptions;
         private readonly FileJournalWriter _journalWriter;

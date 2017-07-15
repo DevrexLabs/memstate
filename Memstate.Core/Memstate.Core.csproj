@@ -8,4 +8,8 @@
     <Compile Remove="CommandChunk.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.1.0" />
+  </ItemGroup>
+
 </Project>

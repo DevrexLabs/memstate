@@ -2,7 +2,7 @@ using System;
 
 namespace Memstate.Core
 {
-    public interface ICommandSubscription : IDisposable
+    public interface IJournalSubscription : IDisposable
     {
         bool Ready();
     }

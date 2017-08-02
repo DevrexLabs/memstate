@@ -2,14 +2,14 @@
 
 namespace Memstate.Core
 {
-    public class Subscription : IHandle<JournalRecord>, ICommandSubscription
+    public class JournalSubscription :  IJournalSubscription
     {
         public readonly Guid Id = Guid.NewGuid();
         private readonly Action<JournalRecord> _callback;
         private long _nextRecord;
-        private readonly Action<Subscription> _onDisposed;
+        private readonly Action<JournalSubscription> _onDisposed;
 
-        public Subscription(Action<JournalRecord> callback, long nextRecord, Action<Subscription> onDisposed)
+        public JournalSubscription(Action<JournalRecord> callback, long nextRecord, Action<JournalSubscription> onDisposed)
         {
             _nextRecord = nextRecord;
             _callback = callback;

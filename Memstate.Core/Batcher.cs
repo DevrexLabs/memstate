@@ -10,7 +10,7 @@ namespace Memstate.Core
         public delegate void BatchHandler(IEnumerable<T> items);
 
         public event BatchHandler OnBatch = delegate { };
-
+    
         public const int DefaultMaxBatchSize = 1000;
         public const int DefaultBoundedCapacity = 10000;
         private readonly int _maxBatchSize;

@@ -5,13 +5,13 @@ namespace Memstate.Core
 {
     public class FileJournalSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly Dictionary<Guid, Subscription> _subscriptions;
+        private readonly Dictionary<Guid, JournalSubscription> _subscriptions;
         private readonly FileJournalWriter _journalWriter;
 
         public FileJournalSubscriptionSource(FileJournalWriter journalWriter)
         {
             _journalWriter = journalWriter;
-            _subscriptions = new Dictionary<Guid, Subscription>();
+            _subscriptions = new Dictionary<Guid, JournalSubscription>();
             _journalWriter.RecordsWritten += OnRecordsWritten;
         }
 
@@ -29,9 +29,9 @@ namespace Memstate.Core
             }
         }
 
-        public ICommandSubscription Subscribe(long @from, Action<JournalRecord> handler)
+        public IJournalSubscription Subscribe(long @from, Action<JournalRecord> handler)
         {
-            var sub = new Subscription(handler, @from, OnDisposed);
+            var sub = new JournalSubscription(handler, @from, OnDisposed);
             lock (_subscriptions)
             {
                 _subscriptions.Add(sub.Id, sub);
@@ -39,7 +39,7 @@ namespace Memstate.Core
             return sub;
         }
 
-        private void OnDisposed(Subscription subscription)
+        private void OnDisposed(JournalSubscription subscription)
         {
             lock (_subscriptions)
             {

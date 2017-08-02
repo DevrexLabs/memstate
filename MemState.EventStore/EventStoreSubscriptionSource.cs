@@ -24,7 +24,7 @@ namespace Memstate.EventStore
                         ?? new CatchUpSubscriptionSettings(10000, 10000, false, false);
         }
 
-        public ICommandSubscription Subscribe(long from, Action<JournalRecord> handler)
+        public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
             var ready = false;
 
@@ -34,29 +34,6 @@ namespace Memstate.EventStore
                 _settings, 
                 (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)), s =>  ready = true );
             return new EventStoreSubscriptionAdapter(_connection,sub, () => ready);
-        }
-
-        class EventStoreSubscriptionAdapter : ICommandSubscription
-        {
-            private readonly IEventStoreConnection _connection;
-            private readonly EventStoreCatchUpSubscription _subscription;
-            private readonly Func<bool> _ready;
-
-            public bool Ready() => _ready.Invoke();
-            
-            public EventStoreSubscriptionAdapter(IEventStoreConnection connection, EventStoreCatchUpSubscription subscription, Func<bool> ready)
-            {
-                _connection = connection;
-                _subscription = subscription;
-                _ready = ready;
-            }
-
-            public void Dispose()
-            {
-                //todo: we don't own the connection, closing it here feels wrong
-                _subscription.Stop();
-                _connection.Close();
-            }
         }
     }
 }

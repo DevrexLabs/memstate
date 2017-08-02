@@ -5,9 +5,7 @@ namespace Memstate.Core
 {
     public class InMemoryCommandStore : IJournalWriter, IJournalSubscriptionSource
     {
-        
-
-        private readonly Dictionary<Guid, Subscription> _subscriptions;
+        private readonly Dictionary<Guid, JournalSubscription> _subscriptions;
         private readonly Batcher<Command> _batchingLogger;
         private long _nextRecord;
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
@@ -18,7 +16,7 @@ namespace Memstate.Core
             _batchingLogger = new Batcher<Command>(100);
             _batchingLogger.OnBatch += OnCommandBatch;
 
-            _subscriptions = new Dictionary<Guid, Subscription>();
+            _subscriptions = new Dictionary<Guid, JournalSubscription>();
             _nextRecord = nextRecord;
         }
 
@@ -48,7 +46,7 @@ namespace Memstate.Core
             _batchingLogger.Add(command);
         }
 
-        private void RemoveSubscription(Subscription subscription)
+        private void RemoveSubscription(JournalSubscription subscription)
         {
             lock (_journal)
             {
@@ -56,9 +54,9 @@ namespace Memstate.Core
             }
         }
 
-        public ICommandSubscription Subscribe(long from, Action<JournalRecord> handler)
+        public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
-            var subscription = new Subscription(handler, from, RemoveSubscription);
+            var subscription = new JournalSubscription(handler, from, RemoveSubscription);
             lock (_journal)
             {
                 _subscriptions.Add(subscription.Id, subscription);

@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core", "Memstate.Core\Memstate.Core.csproj", "{56BAD584-FCA5-48BA-972F-828413A3A3D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemState.EventStore", "MemState.EventStore\MemState.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemState.EventStore", "MemState.EventStore\MemState.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Aws", "Memstate.Aws\Memstate.Aws.csproj", "{783DAB34-32B1-4FED-A655-3AF2A667816C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core.Tests", "Memstate.Core.Tests\Memstate.Core.Tests.csproj", "{462D0925-B77F-4FC6-8818-29E736767CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Core.Tests", "Memstate.Core.Tests\Memstate.Core.Tests.csproj", "{462D0925-B77F-4FC6-8818-29E736767CDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.EventStore.Test", "Memstate.EventStore.Test\Memstate.EventStore.Test.csproj", "{D40B3E65-05B7-4398-A5D9-A2AF87805C20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +27,6 @@ Global
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{783DAB34-32B1-4FED-A655-3AF2A667816C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{783DAB34-32B1-4FED-A655-3AF2A667816C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{783DAB34-32B1-4FED-A655-3AF2A667816C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{783DAB34-32B1-4FED-A655-3AF2A667816C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

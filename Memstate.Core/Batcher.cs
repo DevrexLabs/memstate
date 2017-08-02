@@ -12,15 +12,14 @@ namespace Memstate.Core
         public event BatchHandler OnBatch = delegate { };
     
         public const int DefaultMaxBatchSize = 1000;
-        public const int DefaultBoundedCapacity = 10000;
         private readonly int _maxBatchSize;
         private readonly BlockingCollection<T> _items;
         private readonly Task _batchTask;
 
-        public Batcher(int maxBatchSize = DefaultMaxBatchSize, int boundedCapacity = DefaultBoundedCapacity)
+        public Batcher(int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
         {
             _maxBatchSize = maxBatchSize;
-            _items = new BlockingCollection<T>(boundedCapacity);
+            _items = new BlockingCollection<T>(boundedCapacity ?? Int32.MaxValue);
             _batchTask = Task.Run(() => ProcessItems());
         }
 

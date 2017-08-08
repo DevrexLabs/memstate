@@ -3,6 +3,8 @@
     <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyName>Memstate</AssemblyName>
     <RootNamespace>Memstate</RootNamespace>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="CommandChunk.cs" />

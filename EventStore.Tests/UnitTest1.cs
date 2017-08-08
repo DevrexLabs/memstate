@@ -53,10 +53,10 @@ namespace EventStore.Tests
             eventStoreWriter.Dispose();
             var reader = new EventStoreReader(connection, serializer, streamName);
             var records = reader.GetRecords().ToArray();
-            Assert.Equal(1, records.Length);
-            
             reader.Dispose();
             connection.Close();
+            _log.WriteLine("hello");
+            Assert.Equal(1, records.Length);
         }
 
         [Fact]

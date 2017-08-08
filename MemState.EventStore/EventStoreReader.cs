@@ -21,17 +21,16 @@ namespace Memstate.EventStore
 
         public void Dispose()
         {
-            _connection.Dispose();    
         }
 
         public IEnumerable<JournalRecord> GetRecords()
         {
-            long nextRecord = 1;
+            long nextRecord = 0;
             var eventsPerSlice = 100;
             while (true)
             {
                 var slice = _connection.ReadStreamEventsForwardAsync(_streamName, nextRecord, eventsPerSlice, false).Result;
-                foreach (var @event in Enumerable.Select<ResolvedEvent, RecordedEvent>(slice.Events, e => e.Event))
+                foreach (var @event in slice.Events.Select(e => e.Event))
                 {
                     yield return @event.ToJournalRecord(_serializer);
                 }

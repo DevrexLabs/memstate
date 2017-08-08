@@ -4,7 +4,7 @@ using Memstate.Core;
 
 namespace Memstate.EventStore
 {
-    public class EventStoreSubscriptionSource : ICommandSubscriptionSource
+    public class EventStoreSubscriptionSource : IJournalSubscriptionSource
     {
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
@@ -32,14 +32,8 @@ namespace Memstate.EventStore
                 _streamName, 
                 from, 
                 _settings, 
-                (s, re) => handler.Invoke(JournalRecordFromEvent(re.Event)), s =>  ready = true );
+                (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)), s =>  ready = true );
             return new EventStoreSubscriptionAdapter(_connection,sub, () => ready);
-        }
-
-        private JournalRecord JournalRecordFromEvent(RecordedEvent @event)
-        {
-            var command = (Command) _serializer.Deserialize(@event.Data);
-            return new JournalRecord(@event.EventNumber, @event.Created, command);
         }
 
         class EventStoreSubscriptionAdapter : ICommandSubscription

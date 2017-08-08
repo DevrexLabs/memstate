@@ -8,7 +8,7 @@ namespace Memstate.Core.Tests
         [Fact]
         public void Batcher_terminates_when_disposed()
         {
-            var batcher = new Batcher<int>(null);
+            var batcher = new Batcher<int>(200);
             batcher.Dispose();
         }
 

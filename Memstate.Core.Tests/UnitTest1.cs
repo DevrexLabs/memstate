@@ -69,7 +69,7 @@ namespace Memstate.Core.Tests
             for (int i = 0; i < 1000; i++)
             {
                 var command = new AddStringCommand(i.ToString());
-                journalWriter.Handle(command);
+                journalWriter.AppendAsync(command);
             }
             journalWriter.Dispose();
             sub.Dispose();
@@ -88,7 +88,5 @@ namespace Memstate.Core.Tests
             Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(1, 1000)));
             reader.Dispose();
         }
-
-
     }
 }

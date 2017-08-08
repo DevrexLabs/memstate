@@ -7,20 +7,21 @@ namespace Memstate.Core
     public class Engine<TModel> : IDisposable where TModel : class
     {
         private readonly Kernel _kernel;
-        private readonly IHandle<Command> _commandLogger;
+        private readonly IJournalWriter _journalWriter;
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
         private readonly IDisposable _commandSubscription;
 
         public Engine(
             TModel model,
-            ICommandSubscriptionSource subscriptionSource,
-            IHandle<Command> commandLogger,
+            IJournalSubscriptionSource subscriptionSource,
+            IJournalWriter journalWriter,
             long nextRecord)
         {
             _kernel = new Kernel(model);
-            _commandLogger = commandLogger;
+            _journalWriter = journalWriter;
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
+            
         }
 
         private void ApplyRecord(JournalRecord record)
@@ -45,7 +46,7 @@ namespace Memstate.Core
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
-            _commandLogger.Handle(command);
+            _journalWriter.AppendAsync(command);
 
             return (TResult) await completionSource.Task;
         }
@@ -55,7 +56,7 @@ namespace Memstate.Core
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
-            _commandLogger.Handle(command);
+            _journalWriter.AppendAsync(command);
 
             return completionSource.Task;
         }
@@ -82,6 +83,7 @@ namespace Memstate.Core
 
         public void Dispose()
         {
+            _journalWriter.Dispose();
             _commandSubscription.Dispose();
         }
     }

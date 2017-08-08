@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Memstate.Core
 {
-    public class InMemoryCommandStore : IHandle<Command>, ICommandSubscriptionSource
+    public class InMemoryCommandStore : IJournalWriter, IJournalSubscriptionSource
     {
         
 
@@ -15,7 +15,9 @@ namespace Memstate.Core
 
         public InMemoryCommandStore(long nextRecord = 1)
         {
-            _batchingLogger = new Batcher<Command>(OnCommandBatch, 100);
+            _batchingLogger = new Batcher<Command>(100);
+            _batchingLogger.OnBatch += OnCommandBatch;
+
             _subscriptions = new Dictionary<Guid, Subscription>();
             _nextRecord = nextRecord;
         }
@@ -41,9 +43,9 @@ namespace Memstate.Core
             }
         }
 
-        public void Handle(Command command)
+        public void AppendAsync(Command command)
         {
-            _batchingLogger.Append(command);
+            _batchingLogger.Add(command);
         }
 
         private void RemoveSubscription(Subscription subscription)

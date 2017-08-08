@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core.Tests", "Memstate.Core.Tests\Memstate.Core.Tests.csproj", "{462D0925-B77F-4FC6-8818-29E736767CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.EventStore.Test", "Memstate.EventStore.Test\Memstate.EventStore.Test.csproj", "{D40B3E65-05B7-4398-A5D9-A2AF87805C20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.Tests", "EventStore.Tests\EventStore.Tests.csproj", "{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D40B3E65-05B7-4398-A5D9-A2AF87805C20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

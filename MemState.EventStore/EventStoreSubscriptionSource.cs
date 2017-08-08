@@ -21,7 +21,7 @@ namespace Memstate.EventStore
             _serializer = serializer;
             _streamName = streamName;
             _settings = subscriptionSettings 
-                        ?? new CatchUpSubscriptionSettings(10000, 10000, false, false);
+                        ?? new CatchUpSubscriptionSettings(10000, 4096, false, false);
         }
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)

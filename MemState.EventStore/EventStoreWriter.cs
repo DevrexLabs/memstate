@@ -20,25 +20,6 @@ namespace Memstate.EventStore
             _streamName = streamName;
         }
 
-        public  override void Dispose()
-        {
-            base.Dispose();
-            _eventStore.Close();
-        }
-
-        /// <summary>
-        /// create an instance with an open connection to an event store instance
-        /// </summary>
-        /// <returns></returns>
-        public static EventStoreWriter Create(ISerializer serializer, string streamName)
-        {
-            var endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1113);
-            var connection = EventStoreConnection.Create(endPoint);
-            connection.ConnectAsync().Wait();
-
-            return new EventStoreWriter(connection, serializer, streamName);
-        }
-
         protected override async void OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData);

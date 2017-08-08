@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>    
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Prefer32Bit>False</Prefer32Bit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.0-alpha-1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+    <ProjectReference Include="..\MemState.EventStore\MemState.EventStore.csproj" />
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+  </ItemGroup>
+
+</Project>

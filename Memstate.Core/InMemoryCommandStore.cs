@@ -11,7 +11,7 @@ namespace Memstate.Core
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
       
 
-        public InMemoryCommandStore(long nextRecord = 1)
+        public InMemoryCommandStore(long nextRecord = 0)
         {
             _batchingLogger = new Batcher<Command>(100);
             _batchingLogger.OnBatch += OnCommandBatch;
@@ -60,7 +60,7 @@ namespace Memstate.Core
             lock (_journal)
             {
                 _subscriptions.Add(subscription.Id, subscription);
-                for (int i = (int)from - 1; i < _journal.Count; i++)
+                for (int i = (int)from; i < _journal.Count; i++)
                 {
                     subscription.Handle(_journal[i]);
                 }

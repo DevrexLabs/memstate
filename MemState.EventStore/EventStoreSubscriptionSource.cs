@@ -29,11 +29,12 @@ namespace Memstate.EventStore
             var ready = false;
 
             var sub = _connection.SubscribeToStreamFrom(
-                _streamName, 
-                from, 
-                _settings, 
-                (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)), s =>  ready = true );
-            return new EventStoreSubscriptionAdapter(_connection,sub, () => ready);
+                stream: _streamName, 
+                lastCheckpoint: from, 
+                settings: _settings, 
+                eventAppeared: (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)),
+                liveProcessingStarted: s =>  ready = true );
+            return new EventStoreSubscriptionAdapter(sub, () => ready);
         }
     }
 }

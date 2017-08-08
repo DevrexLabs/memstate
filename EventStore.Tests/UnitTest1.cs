@@ -40,7 +40,7 @@ namespace EventStore.Tests
         }
 
         [Fact]
-        public async Task CanWrite()
+        public async Task CanWriteOne()
         {
             var streamName = "xunit-test-" + Guid.NewGuid();
             var cstr = "ConnectTo=tcp://admin:changeit@localhost:1113; VerboseLogging=True";
@@ -58,6 +58,31 @@ namespace EventStore.Tests
             _log.WriteLine("hello");
             Assert.Equal(1, records.Length);
         }
+
+        [Fact]
+        public async Task CanWriteMany()
+        {
+            var streamName = "xunit-test-" + Guid.NewGuid();
+            var cstr = "ConnectTo=tcp://admin:changeit@localhost:1113; VerboseLogging=True";
+            var connection = EventStoreConnection.Create(cstr);
+            await connection.ConnectAsync();
+            var serializer = new JsonSerializerAdapter();
+
+            var eventStoreWriter = new EventStoreWriter(connection, serializer, streamName);
+            for(var i = 0; i < 10000; i++)
+            {
+                eventStoreWriter.AppendAsync(new AddStringCommand());
+            }
+            
+            eventStoreWriter.Dispose();
+            var reader = new EventStoreReader(connection, serializer, streamName);
+            var records = reader.GetRecords().ToArray();
+            reader.Dispose();
+            connection.Close();
+            _log.WriteLine("hello");
+            Assert.Equal(10000, records.Length);
+        }
+
 
         [Fact]
         public async Task Smoke()

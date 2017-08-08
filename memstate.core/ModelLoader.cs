@@ -4,7 +4,7 @@ namespace Memstate.Core
     {
         public ModelLoader()
         {
-            
+            LastRecordNumber = -1;
         }
 
         public long LastRecordNumber { get; private set; }

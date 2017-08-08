@@ -48,7 +48,7 @@ namespace Memstate.Core.Tests
         {
             var initialModel = new List<string>();
             var commandStore = new InMemoryCommandStore();
-            var engine = new Engine<List<string>>(initialModel,commandStore, commandStore, 1);
+            var engine = new Engine<List<string>>(initialModel,commandStore, commandStore, 0);
             var tasks = Enumerable.Range(10, 10000)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(n.ToString())))
                 .ToArray();
@@ -62,10 +62,10 @@ namespace Memstate.Core.Tests
         {
             var fileName = Path.GetTempFileName();
             var serializer = new JsonSerializerAdapter();
-            var journalWriter = new FileJournalWriter(serializer, fileName, 1);
+            var journalWriter = new FileJournalWriter(serializer, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
-            var sub = subSource.Subscribe(1, records.Add);
+            var sub = subSource.Subscribe(0, records.Add);
             for (int i = 0; i < 1000; i++)
             {
                 var command = new AddStringCommand(i.ToString());
@@ -85,8 +85,9 @@ namespace Memstate.Core.Tests
             {
                 records.Add(record);
             }
-            Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(1, 1000)));
+            Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(0, 1000)));
             reader.Dispose();
+            File.Delete(fileName);
         }
     }
 }

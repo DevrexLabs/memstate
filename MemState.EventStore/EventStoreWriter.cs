@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Memstate.Core;
 
@@ -19,10 +20,10 @@ namespace Memstate.EventStore
             _streamName = streamName;
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData);
-            _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Wait();
+            var writeResult = await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
         }
 
         private EventData ToEventData(Command cmd)

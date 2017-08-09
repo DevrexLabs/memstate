@@ -7,9 +7,9 @@ namespace Memstate.Core
 {
     public class Batcher<T> : IDisposable
     {
-        public delegate void BatchHandler(IEnumerable<T> items);
+        public delegate Task BatchHandler(IEnumerable<T> items);
 
-        public event BatchHandler OnBatch = delegate { };
+        public event BatchHandler OnBatch;
     
         public const int DefaultMaxBatchSize = 1000;
         private readonly int _maxBatchSize;
@@ -20,7 +20,7 @@ namespace Memstate.Core
         {
             _maxBatchSize = maxBatchSize;
             _items = new BlockingCollection<T>(boundedCapacity ?? Int32.MaxValue);
-            _batchTask = Task.Run(() => ProcessItems());
+            _batchTask = Task.Run(ProcessItems);
         }
 
         public void Add(T item)
@@ -29,7 +29,7 @@ namespace Memstate.Core
         }
 
         
-        private void ProcessItems()
+        private async Task ProcessItems()
         {
             var buffer = new List<T>(_maxBatchSize);
             while (!_items.IsCompleted)
@@ -43,7 +43,7 @@ namespace Memstate.Core
                 {
                     buffer.Add(item);
                 }
-                OnBatch.Invoke(buffer);
+                if (buffer.Count > 0 && OnBatch != null) await OnBatch.Invoke(buffer);
                 buffer.Clear();
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Memstate.Core
 {
@@ -25,11 +26,12 @@ namespace Memstate.Core
             return new JournalRecord(_nextRecord++, DateTime.Now, command);
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var records = commands.Select(ToJournalRecord).ToArray();
             _serializer.WriteObject(_journalStream, records);
             RecordsWritten.Invoke(records);
+            return Task.CompletedTask;
         }
 
         public override void Dispose()

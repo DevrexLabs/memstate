@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Memstate.Core
+﻿namespace Memstate.Core
 {
     public interface IJournalWriter
     {

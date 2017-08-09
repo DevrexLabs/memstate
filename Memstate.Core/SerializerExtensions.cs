@@ -1,11 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace Memstate.Core
 {
     public static class SerializerExtensions
     {
+        public static T Clone<T>(this ISerializer serializer, T graph)
+        {
+            return (T) serializer.Deserialize(serializer.Serialize(graph));
+        }
 
         public static byte[] Serialize(this ISerializer serializer, object graph)
         {

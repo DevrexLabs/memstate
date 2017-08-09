@@ -8,6 +8,38 @@ using Xunit.Abstractions;
 
 namespace Memstate.Core.Tests
 {
+    class AddStringCommand : Command<List<string>, int>
+    {
+        public readonly string StringToAdd;
+
+        public AddStringCommand(string stringToAdd)
+        {
+            StringToAdd = stringToAdd;
+        }
+
+        public override int Execute(List<string> model)
+        {
+            model.Add(StringToAdd);
+            return model.Count;
+        }
+    }
+    public class CommandTests
+    {
+
+        private static IEnumerable<object[]> Serializers()
+        {
+            yield return new object[] {new JsonSerializerAdapter()};
+        } 
+
+        [MemberData(nameof(Serializers))]
+        [Theory]
+        public void Command_keeps_id_after_serialization(ISerializer serializer)
+        {
+            var original = new AddStringCommand("dummy");
+            var clone = serializer.Clone(original);
+            Assert.Equal(original.Id, clone.Id);
+        }
+    }
     public class SmokeTests
     {
         private readonly ITestOutputHelper _log;
@@ -16,23 +48,6 @@ namespace Memstate.Core.Tests
         {
             _log = log;
         }
-
-        class AddStringCommand : Command<List<string>, int>
-        {
-            public readonly string StringToAdd;
-
-            public AddStringCommand(string stringToAdd)
-            {
-                StringToAdd = stringToAdd;
-            }
-
-            public override int Execute(List<string> model)
-            {
-                model.Add(StringToAdd);
-                return model.Count;
-            }
-        }
-
         [Fact]
         public void Test1()
         {

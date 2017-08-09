@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Memstate.Core
 {
@@ -19,7 +20,7 @@ namespace Memstate.Core
             _batcher.Add(command);
         }
 
-        protected abstract void OnCommandBatch(IEnumerable<Command> commands);
+        protected abstract Task OnCommandBatch(IEnumerable<Command> commands);
 
         public virtual void Dispose()
         {

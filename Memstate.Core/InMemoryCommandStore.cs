@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Memstate.Core
 {
@@ -25,7 +26,7 @@ namespace Memstate.Core
             _batchingLogger.Dispose();
         }
 
-        private void OnCommandBatch(IEnumerable<Command> commands)
+        private Task OnCommandBatch(IEnumerable<Command> commands)
         {
             lock (_journal)
             {
@@ -39,6 +40,7 @@ namespace Memstate.Core
                     }
                 }
             }
+            return Task.CompletedTask;
         }
 
         public void AppendAsync(Command command)

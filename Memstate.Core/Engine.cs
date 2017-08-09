@@ -19,9 +19,8 @@ namespace Memstate.Core
         {
             _kernel = new Kernel(model);
             _journalWriter = journalWriter;
-            _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
-            
+            _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
         }
 
         private void ApplyRecord(JournalRecord record)

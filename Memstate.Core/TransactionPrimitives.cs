@@ -41,7 +41,11 @@ namespace Memstate.Core
 
     public abstract class Command
     {
-        public readonly Guid Id = Guid.NewGuid();
+        protected Command()
+        {
+            Id = Guid.NewGuid();
+        }
+        public Guid Id { get; set; } 
         public abstract object ExecuteImpl(object model);
     }
 }

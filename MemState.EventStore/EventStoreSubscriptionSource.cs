@@ -26,11 +26,13 @@ namespace Memstate.EventStore
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
-            var ready = false;
+            long? checkPoint = null;
+            if (from > 0) checkPoint = from - 1;
 
+            var ready = false;
             var sub = _connection.SubscribeToStreamFrom(
                 stream: _streamName, 
-                lastCheckpoint: from, 
+                lastCheckpoint: checkPoint, 
                 settings: _settings, 
                 eventAppeared: (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)),
                 liveProcessingStarted: s =>  ready = true );

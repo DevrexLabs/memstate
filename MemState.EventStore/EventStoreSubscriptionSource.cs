@@ -1,6 +1,8 @@
 using System;
 using EventStore.ClientAPI;
 using Memstate.Core;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Memstate.EventStore
 {
@@ -10,6 +12,8 @@ namespace Memstate.EventStore
         private readonly ISerializer _serializer;
         private readonly string _streamName;
         private readonly CatchUpSubscriptionSettings _settings;
+
+        private readonly ILogger _logger = Logging.CreateLogger<EventStoreSubscriptionSource>();
 
         public EventStoreSubscriptionSource(IEventStoreConnection connection, 
             ISerializer serializer, 
@@ -34,8 +38,16 @@ namespace Memstate.EventStore
                 stream: _streamName, 
                 lastCheckpoint: checkPoint, 
                 settings: _settings, 
-                eventAppeared: (s, re) => handler.Invoke(re.Event.ToJournalRecord(_serializer)),
-                liveProcessingStarted: s =>  ready = true );
+                eventAppeared: (s, re) =>
+                {
+                    _logger.LogDebug("eventAppeared, recordNumber {0}", re.OriginalEventNumber);
+                    handler.Invoke(re.Event.ToJournalRecord(_serializer));
+                },
+                liveProcessingStarted: s =>
+                {
+                    ready = true;
+                    _logger.LogInformation("liveProcessingStarted");
+                });
             return new EventStoreSubscriptionAdapter(sub, () => ready);
         }
     }

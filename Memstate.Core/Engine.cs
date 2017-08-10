@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Core
 {
     public class Engine<TModel> : IDisposable where TModel : class
     {
+        private readonly ILogger _logger = Logging.CreateLogger<Engine<TModel>>();
         private readonly Kernel _kernel;
         private readonly IJournalWriter _journalWriter;
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
@@ -29,13 +31,14 @@ namespace Memstate.Core
                 try
                 {
                     var command = record.Command;
-                    _pendingLocalCommands.TryRemove(command.Id, out completion);
+                    var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
+                    _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
                     object result = _kernel.Execute(record.Command);
                     completion?.SetResult(result);
                 }
                 catch (Exception ex)
                 {
-                    //todo: log
+                    _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                     completion?.SetException(ex);   
                 }
         }
@@ -45,8 +48,8 @@ namespace Memstate.Core
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
-            _journalWriter.AppendAsync(command);
-
+            _journalWriter.Send(command);
+            //return await Task.FromResult(default(TResult));
             return (TResult) await completionSource.Task;
         }
 
@@ -55,7 +58,7 @@ namespace Memstate.Core
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
-            _journalWriter.AppendAsync(command);
+            _journalWriter.Send(command);
 
             return completionSource.Task;
         }
@@ -82,8 +85,10 @@ namespace Memstate.Core
 
         public void Dispose()
         {
+            _logger.LogDebug("Begin Dispose");
             _journalWriter.Dispose();
             _commandSubscription.Dispose();
+            _logger.LogDebug("End Dispose");
         }
     }
 }

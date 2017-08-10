@@ -43,7 +43,7 @@ namespace Memstate.Core
             return Task.CompletedTask;
         }
 
-        public void AppendAsync(Command command)
+        public void Send(Command command)
         {
             _batchingLogger.Add(command);
         }

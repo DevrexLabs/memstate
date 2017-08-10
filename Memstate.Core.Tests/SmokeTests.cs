@@ -84,7 +84,7 @@ namespace Memstate.Core.Tests
             for (int i = 0; i < 1000; i++)
             {
                 var command = new AddStringCommand(i.ToString());
-                journalWriter.AppendAsync(command);
+                journalWriter.Send(command);
             }
             journalWriter.Dispose();
             sub.Dispose();

@@ -31,13 +31,14 @@ namespace EventStore.Tests
         }
     }
 
-    public class UnitTest1
+    public class EventStoreTests
     {
         private readonly ITestOutputHelper _log;
 
-        public UnitTest1(ITestOutputHelper log)
+        public EventStoreTests(ITestOutputHelper log)
         {
             _log = log;
+            TestOutputLoggingProvider.SetOutputHelper(log);
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace EventStore.Tests
             var serializer = new JsonSerializerAdapter();
 
             var eventStoreWriter = new EventStoreWriter(connection, serializer, streamName);
-            eventStoreWriter.AppendAsync(new AddStringCommand());
+            eventStoreWriter.Send(new AddStringCommand());
             eventStoreWriter.Dispose();
             var reader = new EventStoreReader(connection, serializer, streamName);
             var records = reader.GetRecords().ToArray();
@@ -72,7 +73,7 @@ namespace EventStore.Tests
             var eventStoreWriter = new EventStoreWriter(connection, serializer, streamName);
             for(var i = 0; i < 10000; i++)
             {
-                eventStoreWriter.AppendAsync(new AddStringCommand());
+                eventStoreWriter.Send(new AddStringCommand());
             }
             
             eventStoreWriter.Dispose();
@@ -96,7 +97,7 @@ namespace EventStore.Tests
             var eventStoreWriter = new EventStoreWriter(connection, serializer, streamName);
             for (var i = 0; i < numRecords; i++)
             {
-                eventStoreWriter.AppendAsync(new AddStringCommand());
+                eventStoreWriter.Send(new AddStringCommand());
             }
             eventStoreWriter.Dispose();
 
@@ -109,6 +110,32 @@ namespace EventStore.Tests
                 records.Select(r => (int)r.RecordNumber)
                 .SequenceEqual(Enumerable.Range(0,numRecords)));
 
+        }
+
+        [Fact]
+        public async Task EventsBatchWrittenAppearOnCatchUpSubscription()
+        {
+            //arrange
+            var streamName = "xunit-test-" + Guid.NewGuid();
+            var cstr = "ConnectTo=tcp://admin:changeit@localhost:1113; VerboseLogging=True";
+            var connection = EventStoreConnection.Create(cstr);
+            await connection.ConnectAsync();
+            var serializer = new JsonSerializerAdapter();
+            var records = new List<JournalRecord>();
+            var sub = new EventStoreSubscriptionSource(connection, serializer, streamName).Subscribe(0, records.Add);
+            var writer = new EventStoreWriter(connection, serializer, streamName);
+
+            //act
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Dispose();
+            while (!sub.Ready()) Thread.Sleep(0);
+            sub.Dispose();
+
+            Assert.Equal(5, records.Count);
         }
 
         [Fact]
@@ -125,18 +152,23 @@ namespace EventStore.Tests
             var writer = new EventStoreWriter(connection,serializer, streamName);
 
             //act
-            writer.AppendAsync(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
+            writer.Send(new AddStringCommand());
             writer.Dispose();
             while (!sub.Ready()) Thread.Sleep(0);
             sub.Dispose();
 
-            Assert.Equal(1, records.Count);
+            Assert.Equal(5, records.Count);
         }
 
 
         [Fact]
         public async Task Smoke()
         {
+            const int numRecords = 1;
             var streamName = "xunit-test-" + Guid.NewGuid();
             var cstr = "ConnectTo=tcp://admin:changeit@localhost:1113; VerboseLogging=True";
             var connection = EventStoreConnection.Create(cstr);
@@ -144,13 +176,13 @@ namespace EventStore.Tests
             var serializer = new JsonSerializerAdapter();
             var builder = new EventStoreEngineBuilder(connection, serializer, streamName);
             Engine<List<string>> engine = builder.Load<List<string>>();
-            _log.WriteLine("engine loaded");
 
-            var tasks = Enumerable.Range(10, 100)
+            var tasks = Enumerable.Range(10, numRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
                 .ToArray();
-            int expected = 1;
-            foreach (var task in tasks) Assert.Equal(expected++, task.Result);
+            Task.WaitAll(tasks);
+            //int expected = 1;
+            //foreach (var task in tasks) Assert.Equal(expected++, task.Result);
             //foreach (var number in Enumerable.Range(1,100))
             //{
             //    var command = new AddStringCommand() {StringToAdd = number.ToString()};
@@ -158,14 +190,14 @@ namespace EventStore.Tests
             //    _log.WriteLine("executed " + number);
             //    Assert.Equal(number, count);
             //}
+
             engine.Dispose();
-            _log.WriteLine("dispose after write, loading...");
 
             //is the builder reusable?
             //can we load when there are existing commands in the stream
             engine = builder.Load<List<string>>();
             var strings = engine.Execute(new GetStringsQuery());
-            Assert.Equal(100, strings.Count);
+            Assert.Equal(numRecords, strings.Count);
             engine.Dispose();
             connection.Close();
         }

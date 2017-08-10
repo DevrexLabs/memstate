@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Core
 {
@@ -15,6 +16,8 @@ namespace Memstate.Core
         private readonly int _maxBatchSize;
         private readonly BlockingCollection<T> _items;
         private readonly Task _batchTask;
+
+        private readonly ILogger _logger = Logging.CreateLogger<Batcher<T>>();
 
         public Batcher(int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
         {
@@ -50,8 +53,10 @@ namespace Memstate.Core
 
         public void Dispose()
         {
+            _logger.LogDebug("Begin Dispose");
             _items.CompleteAdding();
-            _batchTask.Wait();
+            //_batchTask.Wait();
+            _logger.LogDebug("End Dispose");
         }
     }
 }

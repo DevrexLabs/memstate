@@ -1,4 +1,5 @@
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Core
 {
@@ -10,11 +11,13 @@ namespace Memstate.Core
     {
         private readonly object _model;
         private readonly ReaderWriterLockSlim _lock;
+        private readonly ILogger _logger = Logging.CreateLogger<Kernel>();
 
         public Kernel(object model)
         {
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+            _logger.LogInformation("Created Kernel");
         }
 
         public object Execute(Command command)

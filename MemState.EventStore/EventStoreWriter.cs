@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Memstate.Core;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Memstate.EventStore
 {
@@ -12,6 +14,8 @@ namespace Memstate.EventStore
         private readonly IEventStoreConnection _eventStore;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
+
+        private readonly ILogger _logger = Logging.CreateLogger<EventStoreWriter>();
 
         public EventStoreWriter(IEventStoreConnection connection, ISerializer serializer, String streamName)
         {
@@ -23,7 +27,9 @@ namespace Memstate.EventStore
         protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData);
+            _logger.LogDebug("Writing {0} events", commands.Count());
             var writeResult = await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
+            _logger.LogDebug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
         }
 
         private EventData ToEventData(Command cmd)

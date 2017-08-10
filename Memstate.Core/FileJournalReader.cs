@@ -21,13 +21,16 @@ namespace Memstate.Core
         _journalStream.Dispose();
     }
 
-    public IEnumerable<JournalRecord> GetRecords()
+    public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
     {
         foreach (var records in _serializer.ReadObjects<JournalRecord[]>(_journalStream))
         {
             foreach (var record in records)
             {
-                yield return record;
+                if (record.RecordNumber >= fromRecord)
+                {
+                    yield return record;
+                }
             }
         }
     }

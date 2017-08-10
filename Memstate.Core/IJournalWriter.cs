@@ -2,7 +2,7 @@
 {
     public interface IJournalWriter
     {
-        void AppendAsync(Command command);
+        void Send(Command command);
         void Dispose();
     }
 }

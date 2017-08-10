@@ -15,7 +15,7 @@ namespace Memstate.Core
 
         }
 
-        public void AppendAsync(Command command)
+        public void Send(Command command)
         {
             _batcher.Add(command);
         }

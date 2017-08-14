@@ -7,19 +7,21 @@ namespace Memstate.Core
 {
     public class Engine<TModel> : IDisposable where TModel : class
     {
-        private readonly ILogger _logger = Logging.CreateLogger<Engine<TModel>>();
+        private readonly ILogger _logger;
         private readonly Kernel _kernel;
         private readonly IJournalWriter _journalWriter;
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
         private readonly IDisposable _commandSubscription;
 
         public Engine(
+            Config config,
             TModel model,
             IJournalSubscriptionSource subscriptionSource,
             IJournalWriter journalWriter,
             long nextRecord)
         {
-            _kernel = new Kernel(model);
+            _logger = config.CreateLogger<Engine<TModel>>();
+            _kernel = new Kernel(config, model);
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);

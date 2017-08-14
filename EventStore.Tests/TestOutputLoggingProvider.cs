@@ -7,27 +7,20 @@ namespace EventStore.Tests
 {
     public class TestOutputLoggingProvider : ILoggerProvider
     {
-        private static ITestOutputHelper _testOutputHelper;
-        private static int _testContext = 0;
-        public static void SetOutputHelper(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-            _testContext++;
-        }
-
-        static TestOutputLoggingProvider()
-        {
-            Logging.Factory.AddProvider(new TestOutputLoggingProvider());
-
-        }
+        private readonly ITestOutputHelper _testOutputHelper;
 
         public void Dispose()
         {
         }
 
+        public TestOutputLoggingProvider(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         public ILogger CreateLogger(string categoryName)
         {
-            return new TestOutputLogger(MinimumLogLevel, categoryName, _testOutputHelper, _testContext);
+            return new TestOutputLogger(MinimumLogLevel, categoryName, _testOutputHelper);
         }
 
         public LogLevel MinimumLogLevel { get; set; } = LogLevel.Trace;

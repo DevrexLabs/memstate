@@ -12,9 +12,9 @@ namespace Memstate.Core
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
       
 
-        public InMemoryCommandStore(long nextRecord = 0)
+        public InMemoryCommandStore(Config config, long nextRecord = 0)
         {
-            _batchingLogger = new Batcher<Command>(100);
+            _batchingLogger = new Batcher<Command>(config, 100);
             _batchingLogger.OnBatch += OnCommandBatch;
 
             _subscriptions = new Dictionary<Guid, JournalSubscription>();

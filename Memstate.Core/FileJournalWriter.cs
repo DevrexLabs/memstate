@@ -14,7 +14,8 @@ namespace Memstate.Core
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };
 
-        public FileJournalWriter(ISerializer serializer, string fileName, long nextRecord)
+        public FileJournalWriter(Config config, ISerializer serializer, string fileName, long nextRecord) 
+            : base(config)
         {
             _nextRecord = nextRecord;
             _journalStream = File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.None);

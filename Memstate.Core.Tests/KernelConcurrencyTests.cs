@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Memstate.Core.Tests
 {
-    public class KernelConcurrency
+    public class KernelConcurrencyTests
     {
-        Dictionary<int,int> _accounts = new Dictionary<int, int>();
         class AccountModel : Dictionary<int, int> { }
 
         class AccountsSummed : Query<AccountModel, int>
@@ -40,13 +40,14 @@ namespace Memstate.Core.Tests
             }
         }
 
-        AccountModel _bank;
-        Kernel _kernel;
+        readonly AccountModel _bank;
+        readonly Kernel _kernel;
 
-        public KernelConcurrency()
+        public KernelConcurrencyTests(ITestOutputHelper testOutputHelper)
         {
+            var config = new Config();
             _bank = new AccountModel();
-            _kernel = new Kernel(_bank);
+            _kernel = new Kernel(config, _bank);
         }
 
         private IEnumerable<Command> RandomTransferCommands(int numCommands)

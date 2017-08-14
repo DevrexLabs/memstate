@@ -17,10 +17,11 @@ namespace Memstate.Core
         private readonly BlockingCollection<T> _items;
         private readonly Task _batchTask;
 
-        private readonly ILogger _logger = Logging.CreateLogger<Batcher<T>>();
+        private readonly ILogger _logger;
 
-        public Batcher(int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
+        public Batcher(Config config, int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
         {
+            _logger = config.CreateLogger<Batcher<T>>();
             _maxBatchSize = maxBatchSize;
             _items = new BlockingCollection<T>(boundedCapacity ?? Int32.MaxValue);
             _batchTask = Task.Run(ProcessItems);
@@ -55,7 +56,7 @@ namespace Memstate.Core
         {
             _logger.LogDebug("Begin Dispose");
             _items.CompleteAdding();
-            //_batchTask.Wait();
+            _batchTask.Wait();
             _logger.LogDebug("End Dispose");
         }
     }

@@ -15,11 +15,12 @@ namespace Memstate.EventStore
         private readonly String _streamName;
         private readonly int _eventsPerSlice;
 
-        private readonly ILogger _logger = Logging.CreateLogger<EventStoreReader>();
+        private readonly ILogger _logger;
 
 
-        public EventStoreReader(IEventStoreConnection connection, ISerializer serializer, String streamName, int eventsPerSlice = 1024)
+        public EventStoreReader(Config config, IEventStoreConnection connection, ISerializer serializer, String streamName, int eventsPerSlice = 1024)
         {
+            _logger = config.CreateLogger<EventStoreReader>();
             _connection = connection;
             _serializer = serializer;
             _streamName = streamName;

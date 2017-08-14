@@ -7,23 +7,24 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 namespace Memstate.EventStore
 {
     public class EventStoreSubscriptionAdapter : IJournalSubscription
-        {
+    {
         private readonly EventStoreCatchUpSubscription _subscription;
         private readonly Func<bool> _ready;
-        private readonly ILogger _logger = Logging.CreateLogger<EventStoreWriter>();
+        private readonly ILogger _logger;
 
         public bool Ready() => _ready.Invoke();
             
-            public EventStoreSubscriptionAdapter(EventStoreCatchUpSubscription subscription, Func<bool> ready)
-            {
-                _subscription = subscription;
-                _ready = ready;
-            }
+        public EventStoreSubscriptionAdapter(Config config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
+        {
+            _logger = config.CreateLogger<EventStoreSubscriptionAdapter>();
+            _subscription = subscription;
+            _ready = ready;
+        }
 
-            public void Dispose()
-            {
-                _logger.LogInformation("Disposing");
-                _subscription.Stop();
-            }
+        public void Dispose()
+        {
+            _logger.LogInformation("Disposing");
+            _subscription.Stop();
         }
     }
+}

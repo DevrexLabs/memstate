@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Core
 {
@@ -7,6 +8,10 @@ namespace Memstate.Core
     {
         private readonly IConfiguration _config;
 
+        public Config()
+        {
+            
+        }
         public Config(IConfiguration config)
         {
             _config = config;
@@ -25,5 +30,13 @@ namespace Memstate.Core
             var serializer = (ISerializer)Activator.CreateInstance(type);
             return serializer;
         }
+
+        public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
+
+        public ILogger<T> CreateLogger<T>()
+        {
+            return LoggerFactory.CreateLogger<T>();
+        }
+
     }
 }

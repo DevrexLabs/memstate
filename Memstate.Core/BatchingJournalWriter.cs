@@ -8,9 +8,9 @@ namespace Memstate.Core
     {
         private readonly Batcher<Command> _batcher;
 
-        protected BatchingJournalWriter()
+        protected BatchingJournalWriter(Config config)
         {
-            _batcher = new Batcher<Command>();
+            _batcher = new Batcher<Command>(config);
             _batcher.OnBatch += OnCommandBatch;
 
         }

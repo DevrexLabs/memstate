@@ -9,12 +9,15 @@ namespace Memstate.Core
     /// </summary>
     public class Kernel
     {
+        private readonly Config _config;
         private readonly object _model;
         private readonly ReaderWriterLockSlim _lock;
-        private readonly ILogger _logger = Logging.CreateLogger<Kernel>();
+        private readonly ILogger _logger;
 
-        public Kernel(object model)
+        public Kernel(Config config, object model)
         {
+            _config = config;
+            _logger = _config.CreateLogger<Kernel>();
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
             _logger.LogInformation("Created Kernel");

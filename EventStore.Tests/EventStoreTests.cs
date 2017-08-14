@@ -106,6 +106,8 @@ namespace EventStore.Tests
         [Fact]
         public void EventsBatchWrittenAppearOnCatchUpSubscription()
         {
+            const int numRecords = 5;
+
             //arrange
             var serializer = new JsonSerializerAdapter();
             var records = new List<JournalRecord>();
@@ -113,13 +115,12 @@ namespace EventStore.Tests
             var writer = new EventStoreWriter(Config, _connection, serializer, _streamName);
 
             //act
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
+            for (int i = 0; i < numRecords; i++)
+            {
+                writer.Send(new AddStringCommand());
+            }
             writer.Dispose();
-            while (!sub.Ready()) Thread.Sleep(0);
+            while(records.Count < 5) Thread.Sleep(0);
             sub.Dispose();
 
             Assert.Equal(5, records.Count);

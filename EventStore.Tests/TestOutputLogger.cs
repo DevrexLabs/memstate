@@ -22,7 +22,15 @@ namespace EventStore.Tests
 
             if (logLevel >= _minimumLevel)
             {
-                _testOutputHelper.WriteLine(template, DateTime.Now.ToString("O"), logLevel.ToString(), _category, formatter.Invoke(state, exception));   
+                try
+                {
+                    _testOutputHelper.WriteLine(template, DateTime.Now.ToString("O"), logLevel.ToString(), _category,
+                        formatter.Invoke(state, exception));
+                }
+                catch
+                {
+                    //ignored
+                }
             }
         }
 

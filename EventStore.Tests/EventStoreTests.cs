@@ -52,6 +52,20 @@ namespace EventStore.Tests
         }
 
         [Fact]
+        public void EnginePoc_command_round_trip()
+        {
+            var numCommands = 1000;
+            var engine = new EnginePoc<List<string>>(_connection);
+            for (int i = 0; i < numCommands; i++)
+            {
+                engine.ExecuteAsync(new AddStringCommand() {StringToAdd = i.ToString()});
+            }
+            engine.Dispose();
+            Assert.Equal(numCommands, engine.CommandsReceived);
+
+        }
+
+        [Fact]
         public void CanWriteOne()
         {
             var serializer = new JsonSerializerAdapter();
@@ -148,6 +162,24 @@ namespace EventStore.Tests
             Assert.Equal(5, records.Count);
         }
 
+        public class Reverse : Command<List<String>>
+        {
+            public override void Execute(List<string> model)
+            {
+                model.Reverse();
+            }
+        }
+
+        [Fact]
+        public void Can_execute_void_commands()
+        {
+            var serializer = new JsonSerializerAdapter();
+            var builder = new EventStoreEngineBuilder(Config, _connection, serializer, _streamName);
+            Engine<List<string>> engine = builder.Load<List<string>>();
+
+            engine.ExecuteAsync(new Reverse());
+            engine.Dispose();
+        }
 
         [Fact(Skip="deadlocks")]
         public void Smoke()

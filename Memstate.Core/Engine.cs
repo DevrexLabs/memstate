@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -89,6 +90,7 @@ namespace Memstate.Core
         {
             _logger.LogDebug("Begin Dispose");
             _journalWriter.Dispose();
+            while (!_pendingLocalCommands.IsEmpty) Thread.Sleep(10);
             _commandSubscription.Dispose();
             _logger.LogDebug("End Dispose");
         }

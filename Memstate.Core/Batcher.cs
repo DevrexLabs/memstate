@@ -8,7 +8,7 @@ namespace Memstate.Core
 {
     public class Batcher<T> : IDisposable
     {
-        public delegate Task BatchHandler(IEnumerable<T> items);
+        public delegate void BatchHandler(IEnumerable<T> items);
 
         public event BatchHandler OnBatch;
     
@@ -47,8 +47,11 @@ namespace Memstate.Core
                 {
                     buffer.Add(item);
                 }
-                if (buffer.Count > 0 && OnBatch != null) await OnBatch.Invoke(buffer);
-                buffer.Clear();
+                if (buffer.Count > 0)
+                {
+                    OnBatch?.Invoke(buffer);
+                    buffer.Clear();
+                }
             }
         }
 

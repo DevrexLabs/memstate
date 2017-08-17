@@ -20,7 +20,7 @@ namespace Memstate.Core
             _batcher.Add(command);
         }
 
-        protected abstract Task OnCommandBatch(IEnumerable<Command> commands);
+        protected abstract void OnCommandBatch(IEnumerable<Command> commands);
 
         public virtual void Dispose()
         {

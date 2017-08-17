@@ -181,7 +181,7 @@ namespace EventStore.Tests
             engine.Dispose();
         }
 
-        [Fact(Skip="deadlocks")]
+        [Fact]
         public void Smoke()
         {
             const int numRecords = 1;
@@ -192,9 +192,9 @@ namespace EventStore.Tests
             var tasks = Enumerable.Range(10, numRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
                 .ToArray();
-            Task.WaitAll(tasks);
-            //int expected = 1;
-            //foreach (var task in tasks) Assert.Equal(expected++, task.Result);
+            //Task.WaitAll(tasks);
+            int expected = 1;
+            foreach (var task in tasks) Assert.Equal(expected++, task.Result);
             //foreach (var number in Enumerable.Range(1,100))
             //{
             //    var command = new AddStringCommand() {StringToAdd = number.ToString()};

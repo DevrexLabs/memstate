@@ -26,11 +26,11 @@ namespace Memstate.EventStore
             _streamName = streamName;
         }
 
-        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
+        protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
-            var events = commands.Select(ToEventData);
-            _logger.LogDebug("Writing {0} events", commands.Count());
-            var writeResult = await _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
+            var events = commands.Select(ToEventData).ToArray();
+            _logger.LogDebug("Writing {0} events", events.Count());
+            var writeResult = _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Result;
             _logger.LogDebug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
         }
 

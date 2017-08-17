@@ -27,12 +27,11 @@ namespace Memstate.Core
             return new JournalRecord(_nextRecord++, DateTime.Now, command);
         }
 
-        protected override Task OnCommandBatch(IEnumerable<Command> commands)
+        protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
             var records = commands.Select(ToJournalRecord).ToArray();
             _serializer.WriteObject(_journalStream, records);
             RecordsWritten.Invoke(records);
-            return Task.CompletedTask;
         }
 
         public override void Dispose()

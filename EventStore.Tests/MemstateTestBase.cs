@@ -1,4 +1,4 @@
-using Memstate.Core;
+using Memstate;
 using Xunit.Abstractions;
 
 namespace EventStore.Tests

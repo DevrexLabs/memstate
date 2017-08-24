@@ -1,7 +1,7 @@
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Memstate.Core
+namespace Memstate
 {
     /// <summary>
     /// Encapsulates the in-memory object graph,

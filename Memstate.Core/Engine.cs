@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public class Engine<TModel> : IDisposable where TModel : class
     {

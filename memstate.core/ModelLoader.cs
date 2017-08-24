@@ -1,4 +1,6 @@
-namespace Memstate.Core
+using System;
+
+namespace Memstate
 {
     public class ModelLoader
     {

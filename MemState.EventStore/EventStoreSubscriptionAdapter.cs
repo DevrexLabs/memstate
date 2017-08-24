@@ -1,6 +1,5 @@
 ﻿using System;
 using EventStore.ClientAPI;
-using Memstate.Core;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 

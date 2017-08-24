@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public class Config
     {

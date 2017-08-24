@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public class Batcher<T> : IDisposable
     {

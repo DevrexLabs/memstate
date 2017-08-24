@@ -1,6 +1,6 @@
 using System;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public class JournalRecord
     {

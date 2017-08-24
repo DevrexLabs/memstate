@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using Memstate.Core;
+using Memstate;
 using Memstate.EventStore;
 using Memstate.JsonNet;
 using Xunit;

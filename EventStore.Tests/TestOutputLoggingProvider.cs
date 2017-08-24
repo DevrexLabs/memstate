@@ -1,5 +1,4 @@
 using System;
-using Memstate.Core;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 

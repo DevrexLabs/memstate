@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public class FileJournalReader : IJournalReader
 

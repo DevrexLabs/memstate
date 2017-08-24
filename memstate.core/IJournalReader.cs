@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public interface IJournalReader : IDisposable
     {

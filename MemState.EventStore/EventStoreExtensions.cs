@@ -1,5 +1,4 @@
 using EventStore.ClientAPI;
-using Memstate.Core;
 
 namespace Memstate.EventStore
 {

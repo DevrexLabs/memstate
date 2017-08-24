@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public static class SerializerExtensions
     {

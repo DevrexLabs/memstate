@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Memstate.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

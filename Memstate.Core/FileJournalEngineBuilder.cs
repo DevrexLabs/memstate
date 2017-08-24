@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Configuration;
-
-namespace Memstate.Core
+namespace Memstate
 {
     public class FileJournalEngineBuilder : IEngineBuilder
     {

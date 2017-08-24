@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public interface ISerializer
     {

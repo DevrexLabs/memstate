@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memstate.Core
+namespace Memstate
 {
     public abstract class Command<TModel, TResult> : Command
     {

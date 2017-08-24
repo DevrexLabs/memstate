@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core.Tests", "Mems
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.Tests", "EventStore.Tests\EventStore.Tests.csproj", "{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}"
 EndProject
+Project("{4E87A139-B0AA-4668-B6B0-C580618988FC}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

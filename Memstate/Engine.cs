@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +13,7 @@ namespace Memstate
         private readonly IJournalWriter _journalWriter;
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
         private readonly IDisposable _commandSubscription;
-
+        private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
         private long _lastRecordNumber;
 
         public Engine(
@@ -32,20 +33,26 @@ namespace Memstate
 
         private void ApplyRecord(JournalRecord record)
         {
-                TaskCompletionSource<object> completion = null;
-                try
+            TaskCompletionSource<object> completion = null;
+            try
+            {
+                var command = record.Command;
+                var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
+                if (isLocalCommand) _pendingCommandsChanged.Set();
+                _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
+                long expected = Interlocked.Increment(ref _lastRecordNumber);
+                if (expected != record.RecordNumber)
                 {
-                    var command = record.Command;
-                    var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
-                    _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
-                    object result = _kernel.Execute(record.Command);
-                    completion?.SetResult(result);
+                    _logger.LogError("ApplyRecord: RecordNumber out of order. Expected {0}, got {1}", expected, record.RecordNumber);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
-                    completion?.SetException(ex);   
-                }
+                object result = _kernel.Execute(record.Command);
+                completion?.SetResult(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+                completion?.SetException(ex);   
+            }
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
@@ -90,7 +97,7 @@ namespace Memstate
         {
             _logger.LogDebug("Begin Dispose");
             _journalWriter.Dispose();
-            while (!_pendingLocalCommands.IsEmpty) Task.Delay(millisecondsDelay: 10).Wait();
+            while (!_pendingLocalCommands.IsEmpty) _pendingCommandsChanged.WaitOne();
             _commandSubscription.Dispose();
             _logger.LogDebug("End Dispose");
         }

@@ -10,6 +10,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+    <ProjectReference Include="..\Memstate\Memstate.csproj" />
   </ItemGroup>
 </Project>

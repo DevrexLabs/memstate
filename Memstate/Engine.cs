@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +13,8 @@ namespace Memstate
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
         private readonly IDisposable _commandSubscription;
 
+        private long _lastRecordNumber;
+
         public Engine(
             Config config,
             TModel model,
@@ -21,6 +22,7 @@ namespace Memstate
             IJournalWriter journalWriter,
             long nextRecord)
         {
+            _lastRecordNumber = nextRecord - 1;
             _logger = config.CreateLogger<Engine<TModel>>();
             _kernel = new Kernel(config, model);
             _journalWriter = journalWriter;
@@ -49,12 +51,8 @@ namespace Memstate
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
-
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
-            //return await Task.FromResult(default(TResult));
-            
-            // TODO: Add timeout and throw exception on timeout.
             return (TResult) await completionSource.Task;
         }
 
@@ -92,7 +90,7 @@ namespace Memstate
         {
             _logger.LogDebug("Begin Dispose");
             _journalWriter.Dispose();
-            while (!_pendingLocalCommands.IsEmpty) Thread.Sleep(10);
+            while (!_pendingLocalCommands.IsEmpty) Task.Delay(millisecondsDelay: 10).Wait();
             _commandSubscription.Dispose();
             _logger.LogDebug("End Dispose");
         }

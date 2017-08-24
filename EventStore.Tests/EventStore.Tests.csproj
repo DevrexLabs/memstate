@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
-    <ProjectReference Include="..\MemState.EventStore\MemState.EventStore.csproj" />
+    <ProjectReference Include="..\MemState.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+    <ProjectReference Include="..\Memstate\Memstate.csproj" />
   </ItemGroup>
 
 </Project>

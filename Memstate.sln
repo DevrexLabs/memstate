@@ -1,21 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core", "Memstate.Core\Memstate.Core.csproj", "{56BAD584-FCA5-48BA-972F-828413A3A3D3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemState.EventStore", "MemState.EventStore\MemState.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.EventStore", "MemState.EventStore\Memstate.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core.Tests", "Memstate.Core.Tests\Memstate.Core.Tests.csproj", "{462D0925-B77F-4FC6-8818-29E736767CDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStore.Tests", "EventStore.Tests\EventStore.Tests.csproj", "{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.Tests", "EventStore.Tests\EventStore.Tests.csproj", "{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
 EndProject
-Project("{4E87A139-B0AA-4668-B6B0-C580618988FC}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate", "Memstate\Memstate.csproj", "{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Tests", "Memstate.Tests\Memstate.Tests.csproj", "{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{56BAD584-FCA5-48BA-972F-828413A3A3D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56BAD584-FCA5-48BA-972F-828413A3A3D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56BAD584-FCA5-48BA-972F-828413A3A3D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56BAD584-FCA5-48BA-972F-828413A3A3D3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,10 +31,6 @@ Global
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{462D0925-B77F-4FC6-8818-29E736767CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{462D0925-B77F-4FC6-8818-29E736767CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,8 +43,19 @@ Global
 		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02A27644-C712-4A6E-83BB-9911E76CDB75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6E73EDED-3BE9-4939-911D-3AAF11D77414}
 	EndGlobalSection
 EndGlobal

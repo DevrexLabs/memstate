@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Memstate;
 using Memstate.EventStore;
 using Memstate.JsonNet;
 using Xunit;
 using Xunit.Abstractions;
+#pragma warning disable 4014
 
 namespace EventStore.Tests
 {

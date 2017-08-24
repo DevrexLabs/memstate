@@ -24,7 +24,7 @@ namespace Memstate
             _logger = config.CreateLogger<Batcher<T>>();
             _maxBatchSize = maxBatchSize;
             _items = new BlockingCollection<T>(boundedCapacity ?? Int32.MaxValue);
-            _batchTask = Task.Run(ProcessItems);
+            _batchTask = Task.Run((Action) ProcessItems);
         }
 
         public void Add(T item)
@@ -33,7 +33,7 @@ namespace Memstate
         }
 
         
-        private async Task ProcessItems()
+        private void ProcessItems()
         {
             var buffer = new List<T>(_maxBatchSize);
             while (!_items.IsCompleted)

@@ -6,7 +6,7 @@ using Memstate.JsonNet;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Memstate.Core.Tests
+namespace Memstate.Tests
 {
     class AddStringCommand : Command<List<string>, int>
     {

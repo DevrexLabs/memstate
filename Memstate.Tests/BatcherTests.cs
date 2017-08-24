@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Xunit;
 
-namespace Memstate.Core.Tests
+namespace Memstate.Tests
 {
     public class BatcherTests
     {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Memstate.Core.Tests
+namespace Memstate.Tests
 {
     public class KernelConcurrencyTests
     {

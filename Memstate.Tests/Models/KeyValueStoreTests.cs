@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Xunit;
 
-namespace Memstate.Core.Tests.Models
+namespace Memstate.Tests.Models
 {
     public class KeyValueStoreTests
     {

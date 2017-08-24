@@ -53,6 +53,8 @@ namespace Memstate
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
             //return await Task.FromResult(default(TResult));
+            
+            // TODO: Add timeout and throw exception on timeout.
             return (TResult) await completionSource.Task;
         }
 

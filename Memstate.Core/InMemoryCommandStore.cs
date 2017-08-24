@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Memstate
 {
-    public class InMemoryCommandStore : IJournalWriter, IJournalSubscriptionSource
+    public class InMemoryCommandStore : IJournalWriter, IJournalReader, IJournalSubscriptionSource
     {
         private readonly Dictionary<Guid, JournalSubscription> _subscriptions;
         private readonly Batcher<Command> _batchingLogger;
@@ -23,6 +24,11 @@ namespace Memstate
         public void Dispose()
         {
             _batchingLogger.Dispose();
+        }
+
+        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        {
+            return _journal.Skip((int) fromRecord);
         }
 
         private void OnCommandBatch(IEnumerable<Command> commands)

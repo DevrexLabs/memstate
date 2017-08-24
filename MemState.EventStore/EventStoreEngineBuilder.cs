@@ -22,12 +22,17 @@ namespace Memstate.EventStore
             _streamName = streamName;
         }
         
-        public Engine<T> Load<T>() where T : class, new()
+        public Engine<T> Build<T>() where T : class, new()
+        {
+            return Build(new T());
+        }
+
+        public Engine<T> Build<T>(T initialModel) where T : class
         {
             _logger.LogInformation("Loading Engine from stream {0}", _streamName);
             var reader = new EventStoreReader(_config, _connection, _serializer, _streamName);
             var loader = new ModelLoader();
-            var model = loader.Load<T>(reader);
+            var model = loader.Load(reader, initialModel);
             _logger.LogInformation("Model loaded, LastRecordNumber {0}", loader.LastRecordNumber);
 
             var subscriptionSource = new EventStoreSubscriptionSource(_config, _connection, _serializer, _streamName);

@@ -14,6 +14,12 @@ namespace Memstate
         public TModel Load<TModel>(IJournalReader reader) where TModel:new()
         {
             TModel model = new TModel();
+
+            return Load(reader, model);
+        }
+
+        public TModel Load<TModel>(IJournalReader reader, TModel model)
+        {
             foreach (var journalRecord in reader.GetRecords())
             {
                 try
@@ -24,6 +30,11 @@ namespace Memstate
                 catch {}
             }
             return model;
+        }
+
+        public TModel Load<TModel>(IJournalReader reader, Func<TModel> constructor)
+        {
+            return Load(reader, constructor.Invoke());
         }
     }
 }

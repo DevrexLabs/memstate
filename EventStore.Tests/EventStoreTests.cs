@@ -175,7 +175,7 @@ namespace EventStore.Tests
         {
             var serializer = new JsonSerializerAdapter();
             var builder = new EventStoreEngineBuilder(Config, _connection, serializer, _streamName);
-            Engine<List<string>> engine = builder.Load<List<string>>();
+            Engine<List<string>> engine = builder.Build<List<string>>();
 
             engine.ExecuteAsync(new Reverse());
             engine.Dispose();
@@ -187,7 +187,7 @@ namespace EventStore.Tests
             const int numRecords = 1;
             var serializer = new JsonSerializerAdapter();
             var builder = new EventStoreEngineBuilder(Config, _connection, serializer, _streamName);
-            Engine<List<string>> engine = builder.Load<List<string>>();
+            Engine<List<string>> engine = builder.Build<List<string>>();
 
             var tasks = Enumerable.Range(10, numRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
@@ -207,7 +207,7 @@ namespace EventStore.Tests
 
             //is the builder reusable?
             //can we load when there are existing commands in the stream
-            engine = builder.Load<List<string>>();
+            engine = builder.Build<List<string>>();
             var strings = engine.Execute(new GetStringsQuery());
             Assert.Equal(numRecords, strings.Count);
             engine.Dispose();

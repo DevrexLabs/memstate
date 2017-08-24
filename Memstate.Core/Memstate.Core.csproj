@@ -18,5 +18,11 @@
     <Reference Include="System.Threading.Thread">
       <HintPath>..\..\..\..\Users\rober\.nuget\packages\system.threading.thread\4.0.0\ref\netstandard1.3\System.Threading.Thread.dll</HintPath>
     </Reference>
+    <Reference Include="System.Threading.Thread, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\..\.nuget\packages\system.threading.thread\4.0.0\ref\netstandard1.3\System.Threading.Thread.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model" />
   </ItemGroup>
 </Project>

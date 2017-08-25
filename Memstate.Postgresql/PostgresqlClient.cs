@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 using Npgsql;
 
 namespace Memstate.Postgresql
@@ -53,7 +54,8 @@ CREATE TRIGGER ""{1}_notify_command""
 
             settings.Serializer = serializer;
 
-            return new PostgresqlWriter(settings);
+            //return new PostgresqlWriter(settings);
+            throw new NotImplementedException();
         }
 
         public PostgresqlSubscriptionSource CreateSubscriptionSource()

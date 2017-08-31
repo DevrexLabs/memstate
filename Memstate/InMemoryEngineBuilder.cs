@@ -1,4 +1,6 @@
-﻿namespace Memstate
+﻿using System;
+
+namespace Memstate
 {
     public class InMemoryEngineBuilder : IEngineBuilder
     {

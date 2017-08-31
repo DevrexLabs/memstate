@@ -1,3 +1,6 @@
+using System;
+using System.Net.Http.Headers;
+using System.Reflection;
 using EventStore.ClientAPI;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -21,7 +24,7 @@ namespace Memstate.EventStore
             _serializer = serializer;
             _streamName = streamName;
         }
-        
+
         public Engine<T> Build<T>() where T : class, new()
         {
             return Build(new T());

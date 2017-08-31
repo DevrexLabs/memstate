@@ -4,6 +4,8 @@ namespace Memstate
 {
     public abstract class Client<TModel>
     {
+        internal abstract object Execute(Query query);
+
         public abstract void Execute(Command<TModel> command);
 
         public abstract TResult Execute<TResult>(Command<TModel, TResult> command);
@@ -21,6 +23,11 @@ namespace Memstate
     {
         public TcpClient(string endpoint)
         {
+        }
+
+        internal override object Execute(Query query)
+        {
+            throw new System.NotImplementedException();
         }
 
         public override void Execute(Command<TModel> command)
@@ -61,6 +68,11 @@ namespace Memstate
         public LocalClient(Engine<TModel> engine)
         {
             _engine = engine;
+        }
+
+        internal override object Execute(Query query)
+        {
+            return _engine.Execute(query);
         }
 
         public override void Execute(Command<TModel> command)

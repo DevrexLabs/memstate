@@ -1,3 +1,5 @@
+using System;
+
 namespace Memstate
 {
     public class FileJournalEngineBuilder : IEngineBuilder
@@ -11,12 +13,12 @@ namespace Memstate
             _config = config;
         }
 
-        public Engine<TModel> Build<TModel>() where TModel : class, new()
+        public Engine<T> Build<T>() where T : class, new()
         {
-            return Build(new TModel());
+            return Build(new T());
         }
 
-        public Engine<TModel> Build<TModel>(TModel initialModel) where TModel : class
+        public Engine<T> Build<T>(T initialModel) where T : class
         {
             var serializer = _config.GetSerializer();
             var reader = new FileJournalReader(_journalFile, serializer);
@@ -26,7 +28,7 @@ namespace Memstate
             var nextRecordNumber = loader.LastRecordNumber + 1;
             var writer = new FileJournalWriter(_config, serializer, _journalFile, nextRecordNumber);
             var subscriptionSource = new FileJournalSubscriptionSource(writer);
-            return new Engine<TModel>(_config, model, subscriptionSource, writer, nextRecordNumber);
+            return new Engine<T>(_config, model, subscriptionSource, writer, nextRecordNumber);
         }
     }
 }

@@ -28,6 +28,8 @@ namespace Memstate
     {
         public abstract TResult Execute(TModel model);
 
+        public bool? ResultIsIsolated { get; set; }
+
         public override object ExecuteImpl(object model)
         {
             return Execute((TModel) model);

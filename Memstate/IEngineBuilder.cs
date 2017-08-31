@@ -1,3 +1,5 @@
+using System;
+
 namespace Memstate
 {
     public interface IEngineBuilder

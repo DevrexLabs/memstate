@@ -187,7 +187,7 @@ namespace EventStore.Tests
             const int numRecords = 1;
             var serializer = new JsonSerializerAdapter();
             var builder = new EventStoreEngineBuilder(Config, _connection, serializer, _streamName);
-            Engine<List<string>> engine = builder.Build<List<string>>();
+            var engine = builder.Build<List<string>>();
 
             var tasks = Enumerable.Range(10, numRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))

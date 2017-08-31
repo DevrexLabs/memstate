@@ -1,75 +1,58 @@
 
+using System.Linq;
+using FakeItEasy;
+using Xunit;
 
 namespace Memstate.Tests.DispatchProxy
 {
     public class OperationAttributeMapToTests
     {
-        internal class TestEngine : Engine<TestModel>
+        internal class SetCustomerCommand : Command<ITestModel>
         {
-            //the query or command that was executed
-            public object Executee;
+            public Customer Customer { get; }
 
-            public TResult Execute<TResult>(Query<TestModel, TResult> query)
-            {
-                Executee = query;
-                return default(TResult);
-            }
-
-            public void Execute(Command<TestModel> command)
-            {
-                Executee = command;
-            }
-
-            public TResult Execute<TResult>(Command<TestModel, TResult> command)
-            {
-                Executee = command;
-                return default(TResult);
-            }
-
-            public object Execute(Command command)
-            {
-                Executee = command;
-                return null;
-            }
-
-            public object Execute(Query query)
-            {
-                Executee = query;
-                return null;
-            }
-        }
-
-        internal class SetCustomerCommand : Command<TestModel>
-        {
-            public readonly Customer Customer;
             public SetCustomerCommand(Customer customer)
             {
                 Customer = customer;
             }
 
-            public override void Execute(TestModel model)
+            public override void Execute(ITestModel model)
             {
                 model.SetCustomer(Customer);
             }
         }
-        internal class TestModel : Model
+
+        internal interface ITestModel
+        {
+            Customer Customer { get; }
+
+            [Command(MapTo = typeof(SetCustomerCommand))]
+            void SetCustomer(Customer c);
+        }
+
+        internal class TestModel : ITestModel
         {
             public Customer Customer { get; private set; }
 
-            [Command(MapTo = typeof(SetCustomerCommand))]
             public void SetCustomer(Customer c)
             {
                 Customer = Customer;
             }
         }
 
-        [Test]
+        [Fact]
         public void MapsToCommand()
         {
-            var engine = new TestEngine();
-            var proxy = (TestModel) new Proxy<TestModel>(engine).GetTransparentProxy();
+            var config  = new Config();
+            var commandStore = new InMemoryCommandStore(config);
+            var builder = new InMemoryEngineBuilder(config, commandStore);
+            var engine = builder.Build<ITestModel>(new TestModel());
+            var client = new LocalClient<ITestModel>(engine);
+            var proxy = client.GetProxy();
             proxy.SetCustomer(new Customer());
-            Assert.AreEqual(typeof(SetCustomerCommand), engine.Executee.GetType());
+            var journalEntry = commandStore.GetRecords().FirstOrDefault();
+            Assert.NotNull(journalEntry);
+            Assert.IsType(typeof(SetCustomerCommand), journalEntry.Command);
         }
     }
 }

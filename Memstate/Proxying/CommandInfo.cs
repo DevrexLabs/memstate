@@ -36,7 +36,17 @@ namespace Memstate
                 proxyCommand.ResultIsIsolated = ResultIsIsolated;
                 command = proxyCommand;
             }
-            return engine.Execute((Command<T,object>)command);
+            var commandHasResult = command.GetType().GenericTypeArguments.Length == 2;
+            if (commandHasResult)
+            {
+                return engine.Execute((Command<T, object>) command);
+            }
+            else
+            {
+                engine.Execute((Command<T>) command);
+                return null;
+
+            }
         }
     }
 }

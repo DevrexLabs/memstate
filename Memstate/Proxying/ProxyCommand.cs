@@ -3,26 +3,15 @@ using System.Reflection;
 
 namespace Memstate
 {
-    public class ProxyCommand<TModel> : Command<TModel, object>//, IOperationWithResult
+    public class ProxyCommand<TModel> : Command<TModel, object>
     {
-        private bool? _resultIsIsolated;
-
-        /// <summary>
-        /// Name that uniquely identifies the method to call, including overloads.
-        /// Implementation: Obtained by calling TargetMethod.ToString()
-        /// Versions prior to 0.19 just the method name.
-        /// </summary>
         public string MethodName { get; set; }
 
         public object[] Arguments { get; set; }
 
         public Type[] GenericTypeArguments { get; set; }
 
-        public bool? ResultIsIsolated
-        {
-            get { return _resultIsIsolated; }
-            set { _resultIsIsolated = value; }
-        }
+        public bool? ResultIsIsolated { get; set; }
 
         public ProxyCommand(string methodName, object[] inArgs, Type[] genericTypeArguments)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 
 namespace Memstate
@@ -44,12 +45,15 @@ namespace Memstate
         private object GetMappedOperation(MethodCall methodCall)
         {
             var mapTo = OperationAttribute.MapTo;
-            /*
-            var constructor = mapTo.GetConstructor(callMessage.InArgs.Select(args => args.GetType()).ToArray());
-            if (constructor == null) return null;
-            return constructor.Invoke(callMessage.InArgs);
-            */
-            return null;
+            try
+            {
+                return Activator.CreateInstance(mapTo, methodCall.Args);
+            }
+            catch (Exception)
+            {
+                //todo: we should log this as a warning because the mapto failed
+                return null;
+            }
         }
 
         public object Execute(Client<T> engine, MethodCall callMessage, string signature)

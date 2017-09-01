@@ -38,6 +38,9 @@ namespace Memstate.Tests
         /// <returns></returns>
         int GetCommandsExecuted();
 
+
+        int MyProperty { get; set; }
+
         void AddCustomer(string name);
         void GenericCommand<T>(T item);
         R ComplexGeneric<T, R>(KeyValuePair<T,R> pair );
@@ -79,6 +82,19 @@ namespace Memstate.Tests
         }
 
         public int CommandsExecuted { get; set; }
+
+        private int myVar;
+
+        public int MyProperty
+        {
+            get => myVar;
+            set
+            {
+                CommandsExecuted++;
+                myVar = value;
+            }
+        }
+
 
         public bool OnLoadExecuted { get; private set; }
 

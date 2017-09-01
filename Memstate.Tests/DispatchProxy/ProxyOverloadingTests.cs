@@ -72,14 +72,14 @@ namespace Memstate.Tests.DispatchProxy
             Assert.Throws<Exception>(() =>
             {
                 Client<ModelWithRefArg> client = null;
-                var proxy = client.GetProxy();
+                var proxy = client.GetDispatchProxy();
             });
         }
 
         [Fact]
         public void OutArgsNotAllowed()
         {
-            Assert.Throws<Exception>(() => new ModelProxy<ModelWithOutArg>());
+            Assert.Throws<Exception>(() => new DispatchProxy<ModelWithOutArg>());
         }
 
 

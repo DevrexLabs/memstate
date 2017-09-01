@@ -48,7 +48,7 @@ namespace Memstate.Tests.DispatchProxy
             var builder = new InMemoryEngineBuilder(config, commandStore);
             var engine = builder.Build<ITestModel>(new TestModel());
             var client = new LocalClient<ITestModel>(engine);
-            var proxy = client.GetProxy();
+            var proxy = client.GetDispatchProxy();
             proxy.SetCustomer(new Customer());
             var journalEntry = commandStore.GetRecords().FirstOrDefault();
             Assert.NotNull(journalEntry);

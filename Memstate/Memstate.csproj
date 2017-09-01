@@ -10,6 +10,9 @@
     <Authors>Devrex Labs Team</Authors>
     <Company>Devrex Labs</Company>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Model\**" />
     <EmbeddedResource Remove="Model\**" />

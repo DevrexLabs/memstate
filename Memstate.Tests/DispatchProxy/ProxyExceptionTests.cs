@@ -13,7 +13,7 @@ namespace Memstate.Tests.DispatchProxy
         public ProxyExceptionTests()
         {
             _client = null;
-            _proxy = _client.GetProxy();
+            _proxy = _client.GetDispatchProxy();
             _callsToExecuting = 0;
             _callsToExecuted = 0;
             //_engine.CommandExecuting += (sender, args) => _callsToExecuting++;

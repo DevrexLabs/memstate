@@ -28,25 +28,25 @@ namespace Memstate
 
         }
 
-        protected override object Execute(Client<T> engine, string signature, object command, MethodCall methodCallMessage)
+        protected override object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature)
         {
-            if (command == null)
-            {
-                var proxyCommand = new ProxyCommand<T>(signature, methodCallMessage.Args, methodCallMessage.TargetMethod.GetGenericArguments());
-                proxyCommand.ResultIsIsolated = ResultIsIsolated;
-                command = proxyCommand;
-            }
-            var commandHasResult = command.GetType().GenericTypeArguments.Length == 2;
+            var genericArgs = methodCall.TargetMethod.GetGenericArguments();
+            var proxyCommand = new ProxyCommand<T>(signature, methodCall.Args, genericArgs);
+            proxyCommand.ResultIsIsolated = ResultIsIsolated;
+            return engine.Execute(proxyCommand);
+        }
+
+        protected override object ExecuteMapped(Client<T> engine, MethodCall methodCallMessage, object mappedCommand)
+        {
+            //Command<TModel>.Execute is void
+            //Command<TModel,TResult>.Execute returns TResult 
+            var commandHasResult = mappedCommand.GetType().GenericTypeArguments.Length == 2;
             if (commandHasResult)
             {
-                return engine.Execute((Command<T, object>) command);
+                return engine.Execute((Command<T, object>) mappedCommand);
             }
-            else
-            {
-                engine.Execute((Command<T>) command);
-                return null;
-
-            }
+            engine.Execute((Command<T>) mappedCommand);
+            return null;
         }
     }
 }

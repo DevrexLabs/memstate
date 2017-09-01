@@ -5,7 +5,6 @@ namespace Memstate
 {
     internal abstract class OperationInfo<T>
     {
-
         public readonly MethodInfo MethodInfo;
         public readonly OperationAttribute OperationAttribute;
 
@@ -42,26 +41,34 @@ namespace Memstate
         /// Query type to map to, return an instance of that type, otherwise null
         /// </summary>
         /// <returns></returns>
-        private object GetMappedOperation(MethodCall methodCall)
+        private bool TryGetMappedOperation(MethodCall methodCall, out object mappedOperation)
         {
-            var mapTo = OperationAttribute.MapTo;
             try
             {
-                return Activator.CreateInstance(mapTo, methodCall.Args);
+                mappedOperation = Activator.CreateInstance(OperationAttribute.MapTo, methodCall.Args);
+                return true;
             }
             catch (Exception)
             {
-                //todo: we should log this as a warning because the mapto failed
-                return null;
+                var errorMessage = $"Failed to map method {methodCall.TargetMethod.Name} " +
+                                   $"to {OperationAttribute.MapTo.Name}, no matching constructor. " +
+                                   "Add a constructor with the same arguments as the method.";
+                //todo: log
+                mappedOperation = null;
+                return false;
             }
         }
 
-        public object Execute(Client<T> engine, MethodCall callMessage, string signature)
+        public object Execute(Client<T> client, MethodCall methodCall, string signature)
         {
-            var operation = IsMapped ? GetMappedOperation(callMessage) : null;
-            return Execute(engine, signature, operation, callMessage);
+            if (IsMapped && TryGetMappedOperation(methodCall, out var mappedOperation))
+            {
+                return ExecuteMapped(client, methodCall, mappedOperation);
+            }
+            return ExecuteProxy(client, methodCall, signature);
         }
 
-        protected abstract object Execute(Client<T> engine, string signature, object operation, MethodCall methodCall);
+        protected abstract object ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedOperation);
+        protected abstract object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature);
     }
 }

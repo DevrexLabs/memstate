@@ -10,8 +10,12 @@ namespace Memstate
         {
         }
 
+        protected override object ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedOperation)
+        {
+            throw new NotSupportedException("Proxy method not allowed");
+        }
 
-        protected override object Execute(Client<T> engine, string signature, object operation, MethodCall methodCall)
+        protected override object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature)
         {
             throw new NotSupportedException("Proxy method not allowed");
         }

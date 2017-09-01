@@ -10,15 +10,17 @@ namespace Memstate
 
         }
 
-        protected override object Execute(Client<T> client, string signature, object query, MethodCall methodCall)
+        protected override object ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedQuery)
         {
-            if (query == null)
-            {
-                var proxyQuery = new ProxyQuery<T>(signature, methodCall.Args, methodCall.TargetMethod.GetGenericArguments());
-                proxyQuery.ResultIsIsolated = ResultIsIsolated;
-                query = proxyQuery;
-            }
-            return client.Execute((Query) query);
+            return client.Execute((Query)mappedQuery);
+        }
+
+        protected override object ExecuteProxy(Client<T> client, MethodCall methodCall, string signature)
+        {
+            var genericArgs = methodCall.TargetMethod.GetGenericArguments();
+            var proxyQuery = new ProxyQuery<T>(signature, methodCall.Args, genericArgs);
+            proxyQuery.ResultIsIsolated = ResultIsIsolated;
+            return client.Execute(proxyQuery);
         }
     }
 }

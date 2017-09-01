@@ -20,16 +20,15 @@ namespace Memstate.Tests.DispatchProxy
             ITestModel model = new TestModel();
             var engine = new InMemoryEngineBuilder(config).Build(model);
              _client = new LocalClient<ITestModel>(engine);
-            _proxy = _client.GetProxy();
+            _proxy = _client.GetDispatchProxy();
         }
 
 	    [Fact]
 	    public void CanSetProperty()
 	    {
-	        int flag = 0;
-	       // _client.CommandExecuted += (sender, args) => flag ++;
-	        _proxy.CommandsExecuted = 42;
-            Assert.Equal(1, flag);
+	        int expected = _proxy.CommandsExecuted + 1;
+	        _proxy.MyProperty = 42;
+            Assert.Equal(expected, _proxy.CommandsExecuted);
 	    }
 
 		[Fact]

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Memstate
 {
-    public class ModelProxy<TModel> : DispatchProxy
+    public class DispatchProxy<TModel> : DispatchProxy
     {
         private Client<TModel> _handler;
         private MethodMap<TModel> _methods;

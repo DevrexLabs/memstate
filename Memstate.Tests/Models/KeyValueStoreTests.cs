@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Memstate.Models.KeyValue;
+using Memstate.Models;
 using Xunit;
 
 namespace Memstate.Tests.Models

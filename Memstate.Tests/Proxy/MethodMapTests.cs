@@ -1,20 +1,14 @@
 ﻿using Xunit;
 
-namespace Memstate.Tests.DispatchProxy
+namespace Memstate.Tests.Proxy
 {
 
     public class MethodMapTests
     {
-        private MethodMap<TestModel> _map;
+        private readonly MethodMap<TestModel> _map = MethodMap.MapFor<TestModel>();
 
-
-        public MethodMapTests()
-        {
-            _map = MethodMap.MapFor<TestModel>();
-        }
         public class TestModel
         {
-
             internal void InternalMethod() { }
 
             internal int InternalQuery()

@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate", "Memstate\Memsta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Tests", "Memstate.Tests\Memstate.Tests.csproj", "{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Host", "Memstate.Host\Memstate.Host.csproj", "{6FB2441B-9638-4591-96C0-F181E339BFFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BF289BC-3C8C-4464-9746-C87D40C9CD2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FB2441B-9638-4591-96C0-F181E339BFFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FB2441B-9638-4591-96C0-F181E339BFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FB2441B-9638-4591-96C0-F181E339BFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FB2441B-9638-4591-96C0-F181E339BFFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

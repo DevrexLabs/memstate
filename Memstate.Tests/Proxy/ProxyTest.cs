@@ -5,7 +5,7 @@ using System.Reflection;
 using Xunit;
 
 
-namespace Memstate.Tests.DispatchProxy
+namespace Memstate.Tests.Proxy
 {
 
     public class ProxyTest 

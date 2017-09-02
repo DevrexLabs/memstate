@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Memstate.Models.KeyValue
+namespace Memstate.Models
 {
-    public class KeyValueStore<T>
+    public class KeyValueStore<T> : IKeyValueStore<T>
     {
         private readonly SortedDictionary<string, Node> _store = new SortedDictionary<string, Node>();
 

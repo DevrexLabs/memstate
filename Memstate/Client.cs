@@ -19,9 +19,10 @@ namespace Memstate
         public abstract Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query);
     }
 
-    public class TcpClient<TModel> : Client<TModel> where TModel : class
+    public class MemstateTcpClient<TModel> : Client<TModel> where TModel : class
     {
-        public TcpClient(string endpoint)
+
+        public MemstateTcpClient(string endpoint)
         {
         }
 

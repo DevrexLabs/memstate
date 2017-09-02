@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,8 @@ namespace Memstate
             get => _config[$"Memstate:{key}"];
             set => _config[$"Memstate:{key}"] = value;
         }
+
+        public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
         public ISerializer GetSerializer()
         {

@@ -14,7 +14,7 @@ namespace Memstate.Tcp
     {
         private readonly Engine<T> _engine;
         private readonly TcpListener _tcpListener;
-        private Task _serverTask;
+        private Task _listenerTask;
         private readonly ILogger _log;
         private readonly CancellationTokenSource _cancellationSource;
         private readonly ISet<Task> _connections = new HashSet<Task>();
@@ -35,7 +35,7 @@ namespace Memstate.Tcp
         {
             _log.LogInformation("Starting");
             _tcpListener.Start();
-            _serverTask = Task.Run(() => AcceptConnections(_cancellationSource.Token));
+            _listenerTask = Task.Run(() => AcceptConnections(_cancellationSource.Token));
             _log.LogDebug("Started");
         }
 
@@ -50,7 +50,19 @@ namespace Memstate.Tcp
                     _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
                     _log.LogInformation("Connection from {0}", tcpClient.Client.RemoteEndPoint);
                 }
-                else await Task.Delay(10, cancellationToken);
+                else await DelayEx(TimeSpan.FromMilliseconds(40), cancellationToken);
+            }
+        }
+
+        private static async Task DelayEx(TimeSpan timeSpan, CancellationToken cancellationToken, bool throwOnCancel = false)
+        {
+            try
+            {
+                await Task.Delay(timeSpan, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                if (throwOnCancel) throw;
             }
         }
 
@@ -113,7 +125,7 @@ namespace Memstate.Tcp
         {
             _log.LogInformation("Closing");
             _cancellationSource.Cancel();
-            _serverTask.Wait();
+            _listenerTask.Wait();
             _tcpListener.Stop(); //todo: should we stop before Cancel() and Wait() ?
             _log.LogDebug("Closed");
         }

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using Memstate.Models;
 using Memstate.Tcp;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host
 {
@@ -27,10 +26,12 @@ namespace Memstate.Host
         {
             Console.WriteLine("Connecting to localhost:3001");
         }
+
         static void RunServer()
         {
-            Console.WriteLine("Starting server on port 3001");
+            Console.WriteLine("Starting server on port 3001, type exit to quit");
             Config config = new Config();
+            config.LoggerFactory.AddConsole();
             var engine = new InMemoryEngineBuilder(config).Build<KeyValueStore<int>>();
             var server = new MemstateServer<KeyValueStore<int>>(config, engine);
             server.Start();
@@ -39,7 +40,8 @@ namespace Memstate.Host
                 Console.WriteLine("Type exit to quit");
             }
             server.Stop();
-
+            Console.WriteLine("Server stopped, hit enter to terminate");
+            Console.ReadLine();
         }
     }
 }

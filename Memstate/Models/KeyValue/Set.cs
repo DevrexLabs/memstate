@@ -1,5 +1,9 @@
 ﻿namespace Memstate.Models.KeyValue
 {
+    /// <summary>
+    /// Assign a value to the given Key, returns the resulting version
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Set<T> : Command<KeyValueStore<T>, int>
     {
         public Set(string key, T value, int? expectedVersion = null)

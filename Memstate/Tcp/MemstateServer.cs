@@ -50,11 +50,11 @@ namespace Memstate.Tcp
                     _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
                     _log.LogInformation("Connection from {0}", tcpClient.Client.RemoteEndPoint);
                 }
-                else await DelayEx(TimeSpan.FromMilliseconds(40), cancellationToken);
+                else await DelayOrCanceled(TimeSpan.FromMilliseconds(40), cancellationToken);
             }
         }
 
-        private static async Task DelayEx(TimeSpan timeSpan, CancellationToken cancellationToken, bool throwOnCancel = false)
+        private static async Task DelayOrCanceled(TimeSpan timeSpan, CancellationToken cancellationToken)
         {
             try
             {
@@ -62,13 +62,12 @@ namespace Memstate.Tcp
             }
             catch (TaskCanceledException)
             {
-                if (throwOnCancel) throw;
+                
             }
         }
 
         private async Task HandleConnection(TcpClient tcpClient)
         {
-
             var serializer = _config.GetSerializer();
             var stream = tcpClient.GetStream();
 
@@ -79,7 +78,9 @@ namespace Memstate.Tcp
 
             while (!_cancellationSource.Token.IsCancellationRequested)
             {
-                var message = await ReadNetworkMessage(stream, serializer);
+                _log.LogDebug("Waiting for message");
+                var message = await NetworkMessage.ReadAsync(stream, serializer, _cancellationSource.Token);
+                _log.LogDebug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
                 serverProtocol.Handle(message);
             }
             //Assuming all methods are sync, then the following is not necessary
@@ -90,37 +91,21 @@ namespace Memstate.Tcp
 
         private async Task SendMessages(BlockingCollection<NetworkMessage> messages, Stream stream)
         {
+            //todo: consider using MessageProcessor
             var serializer = _config.GetSerializer();
             var cancellationToken = _cancellationSource.Token;
             var messageId = 0;
             while (messages.IsCompleted)
             {
-                var message = messages.Take(cancellationToken);
+                var message = messages.TakeOrDefault(cancellationToken);
+                if (message == null) break;
                 var bytes = serializer.Serialize(message);
-                var packet = new Packet
-                {
-                    Payload = bytes,
-                    MessageId = ++messageId,
-                    Size = bytes.Length + 10
-                };
+                var packet = Packet.Create(bytes, ++messageId);
                 await packet.WriteTo(stream);
                 await stream.FlushAsync();
             }
         }
         
-        private async Task<NetworkMessage> ReadNetworkMessage(Stream stream, ISerializer serializer)
-        {
-            MemoryStream buffer = new MemoryStream();
-            while (true)
-            {
-                var packet = await Packet.ReadAsync(stream, _cancellationSource.Token);
-                buffer.Write(packet.Payload,0, packet.Payload.Length);
-                if (packet.IsTerminal) break;
-            }
-            buffer.Position = 0;
-            return (NetworkMessage) serializer.ReadObject(buffer);
-        }
-
         public void Stop()
         {
             _log.LogInformation("Closing");
@@ -139,22 +124,47 @@ namespace Memstate.Tcp
     [Flags]
     internal enum PacketInfo : Int16
     {
-        IsTerminal = 1,
-
+        IsPartial = 1,
     }
 
-    internal class CommandRequest : NetworkMessage
+    internal class CommandResponse : Response
     {
+        public CommandResponse(object result, Guid responseTo)
+            :base(responseTo)
+        {
+            Result = result;
+        }
+
+        public object Result { get; }
+    }
+
+    internal class CommandRequest : Request
+    {
+        public CommandRequest(Command command)
+        {
+            Command = command;
+        }
+
         public Command Command { get; set; }
     }
 
-    internal class QueryRequest : NetworkMessage
+    internal abstract class Request : NetworkMessage
     {
-        public Query Query { get; set; }
+        public Guid Id { get; }
+
+        protected Request()
+        {
+            Id = Guid.NewGuid();
+        }
     }
-    
-    internal abstract class NetworkMessage
+    internal class QueryRequest : Request
     {
+        public QueryRequest(Query query)
+        {
+            Query = query;
+        }
+
+        public Query Query { get;}
     }
 
     internal class Ping: NetworkMessage

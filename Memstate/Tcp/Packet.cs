@@ -26,14 +26,17 @@ namespace Memstate.Tcp
         public byte[] Payload;
 
 
-        public bool IsTerminal => Info.HasFlag(PacketInfo.IsTerminal);
+        public bool IsPartial => Info.HasFlag(PacketInfo.IsPartial);
+        public bool IsTerminal => !IsPartial;
 
         public static async Task<Packet> ReadAsync(Stream stream, CancellationToken cancellation)
         {
             const int headerSize = sizeof(PacketInfo) + sizeof(int) + sizeof(long);
 
+            Console.WriteLine("packet.readasync, before await FillBuffer header");
             var buf = new byte[headerSize];
             await FillBuffer(stream, buf, cancellation);
+            Console.WriteLine("packet.readasync, after await FillBuffer header");
 
             var reader = new BinaryReader(new MemoryStream(buf));
 
@@ -44,9 +47,11 @@ namespace Memstate.Tcp
                 MessageId = reader.ReadInt32()
             };
 
+            Console.WriteLine("packet.readasync, before await FillBuffer payload");
             var payloadSize = packet.Size - headerSize;
             packet.Payload = new byte[payloadSize];
             await FillBuffer(stream, packet.Payload, cancellation);
+            Console.WriteLine("packet.readasync, after await FillBuffer payload");
             return packet;
         }
 
@@ -70,6 +75,21 @@ namespace Memstate.Tcp
             writer.Flush();
             ms.Position = 0;
             await ms.CopyToAsync(stream);
+        }
+
+        /// <summary>
+        /// Use static Create to guarantee integrity
+        /// </summary>
+        private Packet(){}
+
+        public static Packet Create(byte[] payload, long messageId)
+        {
+            return new Packet
+            {
+                Payload = payload,
+                Size = payload.Length + 10,
+                MessageId = messageId
+            };
         }
     }
 }

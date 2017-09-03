@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Memstate
 {
@@ -17,49 +18,6 @@ namespace Memstate
         public abstract Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command);
 
         public abstract Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query);
-    }
-
-    public class MemstateTcpClient<TModel> : Client<TModel> where TModel : class
-    {
-
-        public MemstateTcpClient(string endpoint)
-        {
-        }
-
-        internal override object Execute(Query query)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Execute(Command<TModel> command)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override TResult Execute<TResult>(Command<TModel, TResult> command)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override TResult Execute<TResult>(Query<TModel, TResult> query)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task ExecuteAsync(Command<TModel> command)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 
     public class LocalClient<TModel> : Client<TModel> where TModel : class
@@ -104,6 +62,16 @@ namespace Memstate
         public override Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
             return _engine.ExecuteAsync(query);
+        }
+    }
+
+    public class Counter
+    {
+        private long _value;
+
+        public long Next()
+        {
+            return Interlocked.Increment(ref _value);
         }
     }
 }

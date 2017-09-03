@@ -1,7 +1,9 @@
 ﻿using System;
 using Memstate.Models;
+using Memstate.Models.KeyValue;
 using Memstate.Tcp;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Memstate.Host
 {
@@ -24,14 +26,31 @@ namespace Memstate.Host
 
         static void RunClient()
         {
-            Console.WriteLine("Connecting to localhost:3001");
+            Config config = new Config();
+            config.LoggerFactory.AddConsole((category, level) => true);
+
+            Console.Write("Connecting to localhost:3001 ... ");
+            var client = new MemstateClient<KeyValueStore<int>>(config);
+            client.ConnectAsync().Wait();
+            Console.WriteLine("connected!");
+
+            Console.WriteLine("Set 'KEY' = 42");
+            var cmd = new Set<int>("KEY", 42);
+            var version = client.ExecuteAsync(cmd).Result;
+            Console.WriteLine("Version returned: " + version);
+
+            Console.WriteLine("Get 'KEY'");
+            var query = new Get<int>("KEY");
+            var node = client.ExecuteAsync(query).Result;
+            Console.WriteLine($"Value: {node.Value}, version: {node.Version}");
+
         }
 
         static void RunServer()
         {
             Console.WriteLine("Starting server on port 3001, type exit to quit");
             Config config = new Config();
-            config.LoggerFactory.AddConsole();
+            config.LoggerFactory.AddConsole((category,level) => true);
             var engine = new InMemoryEngineBuilder(config).Build<KeyValueStore<int>>();
             var server = new MemstateServer<KeyValueStore<int>>(config, engine);
             server.Start();

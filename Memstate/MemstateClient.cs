@@ -47,6 +47,17 @@ namespace Memstate
 
         private void Handle(NetworkMessage message)
         {
+            if (message is CommandResponse commandResponse) Handle(commandResponse);
+            else if (message is QueryResponse queryResponse) Handle(queryResponse);
+            else _logger.LogError("No handler for message " + message);
+        }
+
+        /// <summary>
+        /// doesn't work, why?
+        /// </summary>
+        /// <param name="message"></param>
+        private void HandleWitReflection_Broken(NetworkMessage message)
+        {
             var messageType = message.GetType();
             try
             {
@@ -60,6 +71,12 @@ namespace Memstate
             }
         }
 
+        private void Handle(CommandResponse response)
+        {
+            var requestId = response.ResponseTo;
+            CompleteRequest(requestId, response);
+        }
+
         private void Handle(QueryResponse response)
         {
             var requestId = response.ResponseTo;
@@ -68,10 +85,12 @@ namespace Memstate
 
         private void CompleteRequest(Guid requestId, Response response)
         {
-            var completionSource = _pendingRequests[requestId];
-            completionSource?.SetResult(response);
-
-            if (!_pendingRequests.Remove(requestId))
+            if (_pendingRequests.TryGetValue(requestId, out var completionSource))
+            {
+                completionSource.SetResult(response);
+                _pendingRequests.Remove(requestId);
+            }
+            else
             {
                 _logger.LogError($"No completion source for {response}, id {response.ResponseTo}");
             }
@@ -80,11 +99,14 @@ namespace Memstate
 
         private async Task ReceiveMessages()
         {
+            _logger.LogTrace("Starting ReceiveMessages task");
             var serializer = _config.GetSerializer();
             var cancellationToken = _cancellationSource.Token;
             while (!cancellationToken.IsCancellationRequested)
             {
+                _logger.LogTrace("awaiting NetworkMessage");
                 var message = await NetworkMessage.ReadAsync(_stream, serializer, cancellationToken);
+                _logger.LogDebug("message received " +  message);
                 if (message == null) break;
                 Handle(message);
             }
@@ -102,7 +124,7 @@ namespace Memstate
             _logger.LogDebug("WriteMessage: serialized message size: " + bytes.Length);
             var messageId = _counter.Next();
             var packet = Packet.Create(bytes, messageId);
-            await packet.WriteTo(_stream);
+            await packet.WriteToAsync(_stream);
             _logger.LogTrace("Packet written");
             await _stream.FlushAsync();
         }
@@ -111,6 +133,7 @@ namespace Memstate
         {
             var completionSource = new TaskCompletionSource<NetworkMessage>();
             _pendingRequests[request.Id] = completionSource;
+            _logger.LogTrace("SendAndReceive: queueing request id {0}, type {1}", request.Id, request.GetType());
             _messageWriter.Enqueue(request);
             return await completionSource.Task;
         }

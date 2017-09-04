@@ -98,6 +98,11 @@ namespace Memstate
             return _kernel.Execute(query);
         }
 
+        internal object Execute(Command command)
+        {
+            return _kernel.Execute(command);    
+        }
+
         public void Dispose()
         {
             _logger.LogDebug("Begin Dispose");

@@ -22,7 +22,7 @@ namespace Memstate.JsonNet
                 TypeNameHandling = TypeNameHandling.All,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 MissingMemberHandling = MissingMemberHandling.Ignore,
-                CheckAdditionalContent = false                
+                CheckAdditionalContent = false
             };
 
             _serializer = JsonSerializer.Create(settings);

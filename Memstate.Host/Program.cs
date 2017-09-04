@@ -3,7 +3,6 @@ using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Memstate.Tcp;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace Memstate.Host
 {
@@ -43,6 +42,9 @@ namespace Memstate.Host
             var query = new Get<int>("KEY");
             var node = client.ExecuteAsync(query).Result;
             Console.WriteLine($"Value: {node.Value}, version: {node.Version}");
+
+            Console.WriteLine("Hit enter to exit");
+            Console.ReadLine();
 
         }
 

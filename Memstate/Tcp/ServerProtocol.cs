@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate.Tcp
 {
     internal class ServerProtocol<T> : IHandle<NetworkMessage> where T : class
     {
         private readonly Engine<T> _engine;
+        private readonly ILogger _logger;
 
-        public ServerProtocol(Engine<T> engine)
+        public ServerProtocol(Config config, Engine<T> engine)
         {
             _engine = engine;
+            _logger = config.LoggerFactory.CreateLogger<ServerProtocol<T>>();
         }
 
         public event Action<NetworkMessage> OnMessage = _ => { };
@@ -21,8 +24,11 @@ namespace Memstate.Tcp
             OnMessage.Invoke(response);
         }
 
-        private void Handle(CommandRequest message)
+        private void Handle(CommandRequest request)
         {
+            var result = _engine.Execute(request.Command);
+            var response = new CommandResponse(result, request.Id);
+            OnMessage.Invoke(response);
         }
 
         private void Handle(Ping message)
@@ -32,10 +38,10 @@ namespace Memstate.Tcp
 
         public void Handle(NetworkMessage message)
         {
-            //using reflection. couldn't get dynamic working and an attempt at generics turned into a mess
-            //todo: redesign or at least cache
-            var methodInfo =  GetType().GetRuntimeMethod("Handle", new[] {message.GetType()});
-            methodInfo.Invoke(this, new object[] {message});
+            if (message is CommandRequest commandRequest) Handle(commandRequest);
+            else if (message is QueryRequest queryRequest) Handle(queryRequest);
+            else if (message is Ping ping) Handle(ping);
+            else _logger.LogError("Ignoring unrecognized message: " + message);
         }
     }
 

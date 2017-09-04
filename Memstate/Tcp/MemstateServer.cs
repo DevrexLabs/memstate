@@ -54,6 +54,7 @@ namespace Memstate.Tcp
             }
         }
 
+        //todo: to extension method
         private static async Task DelayOrCanceled(TimeSpan timeSpan, CancellationToken cancellationToken)
         {
             try
@@ -73,7 +74,7 @@ namespace Memstate.Tcp
 
             var outgoingMessages = new BlockingCollection<NetworkMessage>();
             var writerTask = Task.Run(() => SendMessages(outgoingMessages, stream));
-            var serverProtocol = new ServerProtocol<T>(_engine);
+            var serverProtocol = new ServerProtocol<T>(_config,_engine);
             serverProtocol.OnMessage += outgoingMessages.Add;
 
             while (!_cancellationSource.Token.IsCancellationRequested)
@@ -95,13 +96,13 @@ namespace Memstate.Tcp
             var serializer = _config.GetSerializer();
             var cancellationToken = _cancellationSource.Token;
             var messageId = 0;
-            while (messages.IsCompleted)
+            while (!messages.IsCompleted)
             {
                 var message = messages.TakeOrDefault(cancellationToken);
                 if (message == null) break;
                 var bytes = serializer.Serialize(message);
                 var packet = Packet.Create(bytes, ++messageId);
-                await packet.WriteTo(stream);
+                await packet.WriteToAsync(stream);
                 await stream.FlushAsync();
             }
         }
@@ -150,7 +151,7 @@ namespace Memstate.Tcp
 
     internal abstract class Request : NetworkMessage
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
         protected Request()
         {

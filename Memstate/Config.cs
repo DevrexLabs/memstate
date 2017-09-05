@@ -39,7 +39,7 @@ namespace Memstate
         {
             var typeName = _config["Memstate:Serializers:Default"];
             var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
-            var serializer = (ISerializer) Activator.CreateInstance(type);
+            var serializer = (ISerializer) Activator.CreateInstance(type, this, null);
             return serializer;
         }
 
@@ -53,7 +53,8 @@ namespace Memstate
         static IReadOnlyDictionary<string, string> DefaultConfigurationStrings { get; } =
             new Dictionary<string, string>()
             {
-                ["Memstate:Serializers:Default"] = "Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+                ["Memstate:Serializers:Default"] = "Memstate.Wire.WireSerializerAdapter"
+                    //"Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
             };
     }
 }

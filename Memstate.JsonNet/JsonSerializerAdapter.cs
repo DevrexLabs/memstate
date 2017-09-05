@@ -24,7 +24,6 @@ namespace Memstate.JsonNet
                 MissingMemberHandling = MissingMemberHandling.Ignore,
                 CheckAdditionalContent = false
             };
-
             _serializer = JsonSerializer.Create(settings);
         }
 

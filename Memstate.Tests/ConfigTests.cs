@@ -4,19 +4,6 @@ using Xunit.Abstractions;
 
 namespace Memstate.Tests
 {
-    public class SerializationTests
-    {
-        [Fact]
-        public void Boxed_integer_can_be_cloned()
-        {
-            Config config = new Config();
-            int i = 42;
-            var serializer = config.GetSerializer();
-            var j = serializer.Clone(i);
-            Assert.IsType<int>(j);
-        }
-    }
-
     public class ConfigTests
     {
         private ITestOutputHelper _log;

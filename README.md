@@ -4,16 +4,15 @@ In-memory event-sourced ACID-transactional distributed object graph engine. Mems
 [![CLA assistant](https://cla-assistant.io/readme/badge/DevrexLabs/memstate)](https://cla-assistant.io/DevrexLabs/memstate)
 
 # Why?
-Your data fits in RAM. Moving it back and forth between disk and memory is silly.
+Your data fits in RAM. Moving it back and forth between disk and memory is wasteful. Use Memstate to structure and manage your data in-memory, providing transparent persistence and transactions with strong ACID guarantees.
 
 Memstate has many possible use cases but is designed primarily to handle complex OLTP workloads by replacing the datastore, data access and business logic layer in a typical enterprise application. It's also a great fit for stateful microservices.
 
-The benefits of eliminating the bottom layers of your stack are huge:
+The benefits of using Memstate are huge:
 * Productivity/Cost - *Way* less code to write and maintain, typically less than 50%
 * Quality - strongly typed and compiled C# means less bugs and problems
-* Performance! In-memory is orders of magnitude faster than reading/writing to disk
+* Performance - In-memory is orders of magnitude faster than reading/writing to disk
 * Faster time to market, faster feedback cycles
-* Simple to unit test
 * Point in time debugging
 * Time travel queries
 * Distributed and highly available

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Memstate.Tcp;
@@ -50,25 +49,6 @@ namespace Memstate
             if (message is CommandResponse commandResponse) Handle(commandResponse);
             else if (message is QueryResponse queryResponse) Handle(queryResponse);
             else _logger.LogError("No handler for message " + message);
-        }
-
-        /// <summary>
-        /// doesn't work, why?
-        /// </summary>
-        /// <param name="message"></param>
-        private void HandleWitReflection_Broken(NetworkMessage message)
-        {
-            var messageType = message.GetType();
-            try
-            {
-                var methodInfo = GetType().GetRuntimeMethod("Handle", new[] {messageType});
-                if (methodInfo == null) _logger.LogError("No handler for message of type " + messageType.Name);
-                else methodInfo.Invoke(this, new object[] {message});
-            }
-            catch (TargetException ex)
-            {
-                _logger.LogError( ex, $"Handler for {messageType.Name} failed");
-            }
         }
 
         private void Handle(CommandResponse response)
@@ -140,17 +120,18 @@ namespace Memstate
 
         internal override object Execute(Query query)
         {
-            throw new NotImplementedException();
+            //not sure if we need this method
+           throw new NotImplementedException();
         }
 
         public override void Execute(Command<TModel> command)
         {
-            throw new System.NotImplementedException();
+            ExecuteAsync(command).Wait();
         }
 
         public override TResult Execute<TResult>(Command<TModel, TResult> command)
         {
-            throw new System.NotImplementedException();
+            return ExecuteAsync(command).Result;
         }
 
         public override TResult Execute<TResult>(Query<TModel, TResult> query)
@@ -159,9 +140,10 @@ namespace Memstate
         }
 
 
-        public override Task ExecuteAsync(Command<TModel> command)
+        public override async Task ExecuteAsync(Command<TModel> command)
         {
-            throw new System.NotImplementedException();
+            var request = new CommandRequest(command);
+            await SendAndReceive(request);
         }
 
         public override async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)

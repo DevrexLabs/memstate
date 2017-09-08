@@ -4,7 +4,7 @@ In-memory event-sourced ACID-transactional distributed object graph engine. Mems
 [![CLA assistant](https://cla-assistant.io/readme/badge/DevrexLabs/memstate)](https://cla-assistant.io/DevrexLabs/memstate)
 
 # Why?
-Your data fits in RAM. Moving it back and forth between disk and memory is wasteful. Use Memstate to structure and manage your data in-memory, providing transparent persistence and transactions with strong ACID guarantees.
+Your data fits in RAM. Moving it back and forth between disk and memory is a pointless anachronism. Use Memstate to structure and manage your data in-memory, providing transparent persistence, concurrency control and transactions with strong ACID guarantees.
 
 Memstate has many possible use cases but is designed primarily to handle complex OLTP workloads by replacing the datastore, data access and business logic layer in a typical enterprise application. It's also a great fit for stateful microservices.
 

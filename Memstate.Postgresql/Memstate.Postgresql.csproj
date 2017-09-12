@@ -1,6 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Version>0.1.0-alpha</Version>
+    <Authors>Devrex Labs</Authors>
+    <Company>Devrex Labs</Company>
+    <Product>Memstate.Postgresql backing storage module</Product>
+    <Description>Memstate module for using Postgresql as a backing store.</Description>
+    <Copyright>2017 Devrex Labs</Copyright>
+    <PackageReleaseNotes />
+    <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper">

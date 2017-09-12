@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0-alpha</Version>
+    <Authors>Devrex Labs</Authors>
+    <Company>Devrex Labs</Company>
+    <Product>Memstate EventStore storage driver</Product>
+    <Description>Use the EventStore as a backing store with Memstate.</Description>
+    <Copyright>2017 Devrex Labs</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

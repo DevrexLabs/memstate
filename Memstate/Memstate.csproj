@@ -28,6 +28,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Logging.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.2" />
@@ -37,10 +38,5 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.0" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
     <PackageReference Include="Wire" Version="0.8.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Configuration">
-      <HintPath>..\..\..\..\Users\rober\.nuget\packages\microsoft.extensions.configuration\1.1.2\lib\netstandard1.1\Microsoft.Extensions.Configuration.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

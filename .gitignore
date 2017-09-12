@@ -8,6 +8,10 @@
 .vs
 .vscode
 
+# cake
+tools/*
+!tools/packages.config
+
 # Build results
 
 [Dd]ebug/

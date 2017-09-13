@@ -24,7 +24,7 @@ namespace Memstate.Tcp
         {
             _engine = engine;
             _config = config;
-            var ip = IPAddress.Parse("127.0.0.1");
+            var ip = IPAddress.Any;
             var endPoint = new IPEndPoint(ip, 3001);
             _tcpListener = new TcpListener(endPoint);
             _log = config.LoggerFactory.CreateLogger(typeof(MemstateServer<>));

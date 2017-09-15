@@ -74,15 +74,15 @@ namespace Memstate.Tcp
 
             var outgoingMessages = new BlockingCollection<NetworkMessage>();
             var writerTask = Task.Run(() => SendMessages(outgoingMessages, stream));
-            var serverProtocol = new ServerProtocol<T>(_config,_engine);
-            serverProtocol.OnMessage += outgoingMessages.Add;
+            var session = new Session<T>(_config,_engine);
+            session.OnMessage += outgoingMessages.Add;
 
             while (!_cancellationSource.Token.IsCancellationRequested)
             {
                 _log.LogDebug("Waiting for message");
                 var message = await NetworkMessage.ReadAsync(stream, serializer, _cancellationSource.Token);
                 _log.LogDebug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
-                serverProtocol.Handle(message);
+                session.Handle(message);
             }
             //Assuming all methods are sync, then the following is not necessary
             //serverProtocol.Dispose();

@@ -47,6 +47,11 @@ namespace Memstate.Models
             _store.Remove(key);
         }
 
+        public int Count()
+        {
+            return _store.Count;
+        }
+
         public class Node
         {
             public int Version { get; private set; }

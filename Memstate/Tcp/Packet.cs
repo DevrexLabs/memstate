@@ -1,9 +1,16 @@
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Memstate.Tcp
 {
+    [Flags]
+    internal enum PacketInfo : Int16
+    {
+        IsPartial = 1,
+    }
+
     /// <summary>
     /// A packet is the atomic unit of data transferred server and client over tcp 
     /// </summary>

@@ -1,14 +1,13 @@
 using System;
-using Memstate;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate.Tcp
 {
     /// <summary>
-    /// Processes and reacts to messages from
+    /// Handles incoming messages and emits outgoing messages 
+    /// for a given client connection.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class Session<T> : IHandle<NetworkMessage> where T : class
+    internal class Session<T> : IHandle<Message> where T : class
     {
         private readonly Engine<T> _engine;
         private readonly ILogger _logger;
@@ -19,38 +18,38 @@ namespace Memstate.Tcp
             _logger = config.LoggerFactory.CreateLogger<Session<T>>();
         }
 
-        public event Action<NetworkMessage> OnMessage = _ => { };
+        public event Action<Message> OnMessage = _ => { };
 
-        public void Handle(QueryRequest request)
+        private void HandleImpl(QueryRequest request)
         {
             var result = _engine.Execute(request.Query);
             var response = new QueryResponse(result, request.Id);
             OnMessage.Invoke(response);
         }
 
-        private void Handle(CommandRequest request)
+        private void HandleImpl(CommandRequest request)
         {
             var result = _engine.Execute(request.Command);
             var response = new CommandResponse(result, request.Id);
             OnMessage.Invoke(response);
         }
 
-        private void Handle(Ping message)
-        {
-            OnMessage.Invoke(new Pong(message.Id));
+        private void HandleImpl(Ping ping)
+        { 
+            OnMessage.Invoke(new Pong(ping));
         }
 
-        public void Handle(NetworkMessage message)
+        public void Handle(Message message)
         {
             try
             {
                 dynamic d = message;
-                Handle(d);
+                HandleImpl(d);
             }
             catch (Exception ex)
             {
-                LoggerExtensions.LogError(_logger, ex, "Failed to handle message of type " + message.GetType());
-                throw;
+                _logger.LogError(ex, "Error handling message: " + message);
+                OnMessage.Invoke(new ExceptionResponse(message, ex));
             }
         }
     }

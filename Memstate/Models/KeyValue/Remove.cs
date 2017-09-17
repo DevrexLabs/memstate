@@ -2,7 +2,7 @@
 {
     public class Remove<T> : Command<KeyValueStore<T>>
     {
-        public Remove(string key, int? expectedVersion)
+        public Remove(string key, int? expectedVersion = null)
         {
             Key = key;
             ExpectedVersion = expectedVersion;

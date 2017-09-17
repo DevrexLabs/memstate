@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,11 +6,18 @@ using System.Threading.Tasks;
 namespace Memstate.Tcp
 {
     /// <summary>
-    /// 
+    /// Base class for messages passed between client and server
     /// </summary>
-    internal abstract class NetworkMessage
+    internal abstract class Message
     {
-        public static async Task<NetworkMessage> ReadAsync(
+        protected Message()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        public Guid Id { get; set; }
+
+        public static async Task<Message> ReadAsync(
             Stream stream, 
             ISerializer serializer, 
             CancellationToken cancellationToken)
@@ -22,7 +30,7 @@ namespace Memstate.Tcp
                 if (packet.IsTerminal) break;
             }
             buffer.Position = 0;
-            return (NetworkMessage)serializer.ReadObject(buffer);
+            return (Message)serializer.ReadObject(buffer);
         }
     }
 }

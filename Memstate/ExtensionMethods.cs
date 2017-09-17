@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    public static class ExtensionMethods
+    internal static class ExtensionMethods
     {
         public static T TakeOrDefault<T>(this BlockingCollection<T> collection, CancellationToken cancellationToken)
         {
@@ -16,6 +17,18 @@ namespace Memstate
             catch (OperationCanceledException)
             {
                 return default(T);
+            }
+        }
+
+        public static async Task Wait(this TimeSpan timeSpan, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await Task.Delay(timeSpan, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+
             }
         }
     }

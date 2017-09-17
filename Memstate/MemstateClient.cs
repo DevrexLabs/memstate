@@ -17,8 +17,8 @@ namespace Memstate
         private readonly ISerializer _serializer;
         private NetworkStream _stream;
 
-        private readonly Dictionary<Guid, TaskCompletionSource<NetworkMessage>> _pendingRequests;
-        private MessageProcessor<NetworkMessage> _messageWriter;
+        private readonly Dictionary<Guid, TaskCompletionSource<Message>> _pendingRequests;
+        private MessageProcessor<Message> _messageWriter;
         private Task _messageReader;
         
 
@@ -29,7 +29,7 @@ namespace Memstate
         {
             _config = config;
             _serializer = config.GetSerializer();
-            _pendingRequests = new Dictionary<Guid, TaskCompletionSource<NetworkMessage>>();
+            _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
             _logger = _config.LoggerFactory.CreateLogger<MemstateClient<TModel>>();
             _cancellationSource = new CancellationTokenSource();
         }
@@ -40,11 +40,11 @@ namespace Memstate
             await _tcpClient.ConnectAsync(host, port);
             _stream = _tcpClient.GetStream();
             _logger.LogInformation($"Connected to {host}:{port}");
-            _messageWriter = new MessageProcessor<NetworkMessage>(WriteMessage);
+            _messageWriter = new MessageProcessor<Message>(WriteMessage);
             _messageReader = Task.Run(ReceiveMessages);
         }
 
-        private void Handle(NetworkMessage message)
+        private void Handle(Message message)
         {
             if (message is CommandResponse commandResponse) Handle(commandResponse);
             else if (message is QueryResponse queryResponse) Handle(queryResponse);
@@ -85,7 +85,7 @@ namespace Memstate
             while (!cancellationToken.IsCancellationRequested)
             {
                 _logger.LogTrace("awaiting NetworkMessage");
-                var message = await NetworkMessage.ReadAsync(_stream, serializer, cancellationToken);
+                var message = await Message.ReadAsync(_stream, serializer, cancellationToken);
                 _logger.LogDebug("message received " +  message);
                 if (message == null) break;
                 Handle(message);
@@ -97,7 +97,7 @@ namespace Memstate
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task WriteMessage(NetworkMessage message)
+        private async Task WriteMessage(Message message)
         {
             _logger.LogDebug("WriteMessage: invoked with " + message);
             var bytes = _serializer.Serialize(message);
@@ -109,9 +109,9 @@ namespace Memstate
             await _stream.FlushAsync();
         }
 
-        private async Task<NetworkMessage> SendAndReceive(Request request)
+        private async Task<Message> SendAndReceive(Request request)
         {
-            var completionSource = new TaskCompletionSource<NetworkMessage>();
+            var completionSource = new TaskCompletionSource<Message>();
             _pendingRequests[request.Id] = completionSource;
             _logger.LogTrace("SendAndReceive: queueing request id {0}, type {1}", request.Id, request.GetType());
             _messageWriter.Enqueue(request);

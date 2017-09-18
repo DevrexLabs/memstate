@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace Memstate
 {
     /// <summary>
-    /// Encapsulates the in-memory object graph,
+    /// Provides thread safe access to the in-memory object graph,
     /// executes commands and queries
     /// </summary>
     public class Kernel

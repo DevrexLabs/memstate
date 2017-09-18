@@ -19,18 +19,6 @@ namespace Memstate
                 return default(T);
             }
         }
-
-        public static async Task Wait(this TimeSpan timeSpan, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await Task.Delay(timeSpan, cancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
-
-            }
-        }
     }
 
     public static class LoggerExtensions

@@ -10,6 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate.Tcp
 {
+
+    /// <summary>
+    /// TCP Server implementation. Listens for tcp connections and 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class MemstateServer<T> where T: class
     {
         private readonly Engine<T> _engine;
@@ -44,13 +49,9 @@ namespace Memstate.Tcp
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (_tcpListener.Pending())
-                {
-                    var tcpClient = await _tcpListener.AcceptTcpClientAsync();
-                    _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
-                    _log.LogInformation("Connection from {0}", tcpClient.Client.RemoteEndPoint);
-                }
-                else await TimeSpan.FromMilliseconds(40).Wait(cancellationToken);
+                var tcpClient = await _tcpListener.AcceptTcpClientAsync();
+                _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
+                _log.LogInformation("Connection from {0}", tcpClient.Client.RemoteEndPoint);
             }
         }
 

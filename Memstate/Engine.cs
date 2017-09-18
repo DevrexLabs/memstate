@@ -31,6 +31,9 @@ namespace Memstate
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
         }
 
+        /// <summary>
+        /// Handler for records obtained through the subscription
+        /// </summary>
         private void ApplyRecord(JournalRecord record)
         {
             TaskCompletionSource<object> completion = null;

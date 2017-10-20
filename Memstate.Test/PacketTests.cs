@@ -24,7 +24,7 @@ namespace Memstate.Tests
             Assert.True(packet.IsTerminal);
         }
 
-        private static IEnumerable<object[]> PayloadSizes()
+        public static IEnumerable<object[]> PayloadSizes()
         {
             yield return new object[] { 0 };
             yield return new object[] { 127 };

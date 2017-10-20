@@ -26,7 +26,7 @@ namespace Memstate.Tests
     public class CommandTests
     {
 
-        private static IEnumerable<object[]> Serializers()
+        public static IEnumerable<object[]> Serializers()
         {
             yield return new object[] {new JsonSerializerAdapter()};
         } 

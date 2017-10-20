@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.EventStore", "MemS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStore.Tests", "EventStore.Tests\EventStore.Tests.csproj", "{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
@@ -35,10 +33,6 @@ Global
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E6F8072-FFB2-44A2-B824-C1900C538F3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80799DE3-50A6-43AE-A0C9-205ACC78C4EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}.Release|Any CPU.ActiveCfg = Release|Any CPU

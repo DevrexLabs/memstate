@@ -15,9 +15,8 @@ namespace Memstate
         {
             _config = new ConfigurationBuilder()
                 .AddInMemoryCollection(DefaultConfigurationStrings)
-                .AddJsonFile("memstate.json", true)
-                .AddJsonFile("memstate.prod.json", true)
-                .AddEnvironmentVariables("MEMSTATE_")
+                .AddJsonFile("appsettings.json", true)
+                .AddEnvironmentVariables()
                 .AddCommandLine(args ?? Array.Empty<string>())
                 .Build();
         }

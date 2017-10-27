@@ -27,13 +27,12 @@ namespace Memstate.Tests.DispatchProxy
             {
                 _proxy.ModifyAndThrow(new CommandAbortedException());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //Assert.IsType<CommandAbortedException>(ex);
                 Assert.Equal(1, _callsToExecuting);
                 Assert.Equal(0, _callsToExecuted);
 
-                //verify that the model wasn't rolled back
+                // verify that the model wasn't rolled back
                 Assert.Equal(1, _proxy.GetState());
                 return;
             }

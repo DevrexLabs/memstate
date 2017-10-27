@@ -1,9 +1,9 @@
-using System;
-using Memstate.Models;
-using Xunit;
-
-namespace Memstate.Tests.Models
+namespace Memstate.Test.Models
 {
+    using System;
+    using Memstate.Models;
+    using Xunit;
+
     public class KeyValueStoreProxyTests
     {
         private readonly IKeyValueStore<int> _keyValueStore;
@@ -11,8 +11,9 @@ namespace Memstate.Tests.Models
         public KeyValueStoreProxyTests()
         {
             Settings config = new Settings();
+            config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
             IKeyValueStore<int> model = new KeyValueStore<int>();
-            var engine = new InMemoryEngineBuilder(config).Build(model);
+            var engine = new EngineBuilder(config).Build(model);
             var client = new LocalClient<IKeyValueStore<int>>(engine);
             _keyValueStore = client.GetDispatchProxy();
         }

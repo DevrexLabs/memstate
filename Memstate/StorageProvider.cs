@@ -2,18 +2,18 @@ namespace Memstate
 {
     using System;
 
-    public abstract class Provider : IDisposable
+    public abstract class StorageProvider : IDisposable
     {
         protected readonly Settings Config;
 
-        protected Provider(Settings config)
+        protected StorageProvider(Settings config)
         {
             Config = config;
         }
 
         public abstract IJournalReader CreateJournalReader();
 
-        public abstract IJournalWriter CreateJournalWriter();
+        public abstract IJournalWriter CreateJournalWriter(long nextRecordNumber);
 
         public abstract IJournalSubscriptionSource CreateJournalSubscriptionSource();
 

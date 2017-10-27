@@ -29,11 +29,8 @@ namespace Memstate.Examples.TodoMvc
             services.AddSingleton(provider =>
             {
                 var settings = new Settings();
-                
-                var engineBuilder = new InMemoryEngineBuilder(settings);
-                //var engineBuilder = new PostgresEngineBuilder(config);
 
-                return engineBuilder.Build<TodoModel>();
+                return new EngineBuilder(settings).Build<TodoModel>();
             });
         }
 

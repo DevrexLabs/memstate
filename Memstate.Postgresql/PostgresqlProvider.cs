@@ -4,7 +4,7 @@ using Npgsql;
 namespace Memstate.Postgresql
 {
 
-    public class PostgresqlProvider : Provider
+    public class PostgresqlProvider : StorageProvider
     {
         public const string ConfigurationSection = "StorageProviders:pgsql";
 
@@ -63,8 +63,10 @@ CREATE TRIGGER ""{1}_notify_command""
             return new PostgresJournalReader(Config, _settings);
         }
 
-        public override IJournalWriter CreateJournalWriter()
+        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
+            // todo: nextRecordNumber unused
+
             return new PostgresqlWriter(Config, _settings);
         }
 

@@ -1,10 +1,8 @@
-
-using System.Linq;
-using FakeItEasy;
-using Xunit;
-
 namespace Memstate.Tests.DispatchProxy
 {
+    using System.Linq;
+    using Xunit;
+
     public class OperationAttributeMapToTests
     {
         internal class SetCustomerCommand : Command<ITestModel>
@@ -44,13 +42,14 @@ namespace Memstate.Tests.DispatchProxy
         public void MapsToCommand()
         {
             var config  = new Settings();
-            var commandStore = new InMemoryCommandStore(config);
-            var builder = new InMemoryEngineBuilder(config, commandStore);
+            config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
+            var storageProvider = config.CreateStorageProvider();
+            var builder = new EngineBuilder(config, storageProvider);
             var engine = builder.Build<ITestModel>(new TestModel());
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();
             proxy.SetCustomer(new Customer());
-            var journalEntry = commandStore.GetRecords().FirstOrDefault();
+            var journalEntry = storageProvider.CreateJournalReader().GetRecords().FirstOrDefault();
             Assert.NotNull(journalEntry);
             Assert.IsType(typeof(SetCustomerCommand), journalEntry.Command);
         }

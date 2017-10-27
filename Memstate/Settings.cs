@@ -31,19 +31,18 @@ namespace Memstate
 
         public string StreamName { get; set; } = "memstate";
 
-        public string Serializer { get; set; } = "wire";
+        public string StorageProvider { get; set; }
+
+        public string Serializer { get; set; } = "Memstate.Wire.WireSerializerAdapter";
 
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
         public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
 
+        public ISerializer GetSerializer() => Resolve<ISerializer>(Serializer);
 
-        public ISerializer GetSerializer()
-        {
-            var serializerName = _config["Memstate:Serializer"];
-            var typeName = _config["Memstate:Serializers:" + serializerName];
-            return (ISerializer)CreateUsingReflection(typeName);
-        }
+        public StorageProvider CreateStorageProvider() => Resolve<StorageProvider>(StorageProvider);
+        
 
         public ILogger<T> CreateLogger<T>()
         {
@@ -55,10 +54,10 @@ namespace Memstate
             _config.Bind(target);
         }
 
-        protected object CreateUsingReflection(string typeName)
+        private T Resolve<T>(string typeName)
         {
-            var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
-            return Activator.CreateInstance(type, this);
+            var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
+            return (T)Activator.CreateInstance(type, this);
         }
     }
 }

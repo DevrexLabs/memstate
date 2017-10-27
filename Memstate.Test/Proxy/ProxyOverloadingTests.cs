@@ -6,10 +6,15 @@ namespace Memstate.Tests.DispatchProxy
 {
     public class ProxyOverloadingTests
     {
-        private ModelWithOverloads _db;
+        private readonly ModelWithOverloads _db = new ModelWithOverloads();
 
         public ProxyOverloadingTests()
         {
+            var settings = new Settings().WithInmemoryStorage();
+            var storageProvider = settings.CreateStorageProvider();
+            var engine = new EngineBuilder(settings, storageProvider).Build<ModelWithOverloads>();
+            var client = new LocalClient<ModelWithOverloads>(engine);
+            _db = client.GetDispatchProxy();
         }
 
         [Fact]

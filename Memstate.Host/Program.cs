@@ -52,8 +52,9 @@ namespace Memstate.Host
         {
             Console.WriteLine("Starting server on port 3001, type exit to quit");
             Settings config = new Settings();
+            config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
             config.LoggerFactory.AddConsole((category,level) => true);
-            var engine = new InMemoryEngineBuilder(config).Build<KeyValueStore<int>>();
+            var engine = new EngineBuilder(config).Build<KeyValueStore<int>>();
             var server = new MemstateServer<KeyValueStore<int>>(config, engine);
             server.Start();
             while (Console.ReadLine() != "exit")

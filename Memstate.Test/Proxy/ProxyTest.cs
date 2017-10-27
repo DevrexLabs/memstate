@@ -1,62 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-
-
-namespace Memstate.Tests.Proxy
+﻿namespace Memstate.Tests.Proxy
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Xunit;
 
-    public class ProxyTest 
-	{
+    public class ProxyTest : IDisposable
+    {
+        private readonly ITestModel _proxy;
+        private readonly Engine<ITestModel> _engine;
 
-	    readonly ITestModel _proxy;
-	    readonly Client<ITestModel> _client;
-
-	    public ProxyTest()
-	    {
-	        var config = new Settings();
+        public ProxyTest()
+        {
+            var config = new Settings().WithInmemoryStorage();
             ITestModel model = new TestModel();
-            var engine = new InMemoryEngineBuilder(config).Build(model);
-             _client = new LocalClient<ITestModel>(engine);
-            _proxy = _client.GetDispatchProxy();
+            _engine = new EngineBuilder(config).Build(model);
+            _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 
-	    [Fact]
-	    public void CanSetProperty()
-	    {
-	        int expected = _proxy.CommandsExecuted + 1;
-	        _proxy.MyProperty = 42;
+        [Fact]
+        public void CanSetProperty()
+        {
+            int expected = _proxy.CommandsExecuted + 1;
+            _proxy.MyProperty = 42;
             Assert.Equal(expected, _proxy.CommandsExecuted);
-	    }
+        }
 
-		[Fact]
-		public void CanExecuteCommandMethod()
-		{
-			_proxy.IncreaseNumber();
-			Assert.Equal(1, _proxy.CommandsExecuted);
-		}
+        [Fact]
+        public void CanExecuteCommandMethod()
+        {
+            _proxy.IncreaseNumber();
+            Assert.Equal(1, _proxy.CommandsExecuted);
+        }
 
-		[Fact]
-		public void CanExecuteCommandWithResultMethod()
-		{
-			Assert.Equal(_proxy.Uppercase("livedb"), "LIVEDB");
-			Assert.Equal(1, _proxy.CommandsExecuted);
-		}
+        [Fact]
+        public void CanExecuteCommandWithResultMethod()
+        {
+            Assert.Equal(_proxy.Uppercase("livedb"), "LIVEDB");
+            Assert.Equal(1, _proxy.CommandsExecuted);
+        }
 
-		[Fact]
-		public void ThrowsExceptionOnYieldQuery()
-		{
-		    Assert.ThrowsAny<Exception>(() => _proxy.GetNames().Count());
-		}
+        [Fact]
+        public void ThrowsExceptionOnYieldQuery()
+        {
+            Assert.ThrowsAny<Exception>(() => _proxy.GetNames().Count());
+        }
 
-		[Fact]
-		public void CanExecuteQueryMethod()
-		{
-			var number = _proxy.GetCommandsExecuted();
-			Assert.Equal(0, number);
-		}
+        [Fact]
+        public void CanExecuteQueryMethod()
+        {
+            var number = _proxy.GetCommandsExecuted();
+            Assert.Equal(0, number);
+        }
 
         [Fact]
         public void QueryResultsAreCloned()
@@ -67,7 +62,7 @@ namespace Memstate.Tests.Proxy
             Assert.NotEqual(robert, robert2);
         }
 
-	    [Fact]
+        [Fact]
         public void SafeQueryResultsAreNotCloned()
         {
             _proxy.AddCustomer("Robert");
@@ -80,9 +75,9 @@ namespace Memstate.Tests.Proxy
         public void ResultIsIsolated_attribute_is_recognized()
         {
             var map = MethodMap.MapFor<MethodMapTests.TestModel>();
-            var signature = typeof (MethodMapTests.TestModel).GetMethod("GetCustomersCloned").ToString();
-            var opInfo = map.GetOperationInfo(signature);
-            Assert.True(opInfo.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
+            var signature = typeof(MethodMapTests.TestModel).GetMethod("GetCustomersCloned").ToString();
+            var operationInfo = map.GetOperationInfo(signature);
+            Assert.True(operationInfo.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
         }
 
         [Fact]
@@ -90,7 +85,7 @@ namespace Memstate.Tests.Proxy
         {
             var customer = new Customer();
             var clone = _proxy.GenericQuery(customer);
-            Assert.NotSame(clone,customer);
+            Assert.NotSame(clone, customer);
             Assert.IsType<Customer>(clone);
         }
 
@@ -132,7 +127,7 @@ namespace Memstate.Tests.Proxy
             Assert.Equal(62, result);
 
             result = _proxy.DefaultArgs(10, 10, 10);
-            Assert.Equal(30,result);
+            Assert.Equal(30, result);
         }
 
         [Fact]
@@ -157,7 +152,11 @@ namespace Memstate.Tests.Proxy
             {
                 _proxy.ThrowCommandAborted();
             });
+        }
 
+        public void Dispose()
+        {
+            _engine.Dispose();
         }
     }
 }

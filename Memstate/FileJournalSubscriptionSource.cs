@@ -36,6 +36,7 @@ namespace Memstate
             {
                 _subscriptions.Add(sub.Id, sub);
             }
+
             return sub;
         }
 

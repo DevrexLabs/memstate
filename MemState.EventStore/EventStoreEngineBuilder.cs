@@ -4,7 +4,7 @@ namespace Memstate.EventStore
 {
     using Microsoft.Extensions.Logging;
 
-    public class EventStoreEngineBuilder : IEngineBuilder
+    public class EventStoreEngineBuilder
     {
         private readonly Settings _config;
         private readonly IEventStoreConnection _connection;

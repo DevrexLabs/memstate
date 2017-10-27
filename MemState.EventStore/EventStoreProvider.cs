@@ -2,7 +2,7 @@ namespace Memstate.EventStore
 {
     using global::EventStore.ClientAPI;
 
-    public class EventStoreProvider : Provider
+    public class EventStoreProvider : StorageProvider
     {
         private const string DefaultConnectionString = "ConnectTo=tcp://admin:changeit@localhost:1113";
 
@@ -16,16 +16,16 @@ namespace Memstate.EventStore
                 connection = EventStoreConnection.Create(DefaultConnectionString);
                 connection.ConnectAsync().Wait();
             }
+
             _connection = connection;
         }
 
         public override IJournalReader CreateJournalReader()
         {
             return new EventStoreReader(Config, _connection, Config.GetSerializer(), Config.StreamName);
-
         }
 
-        public override IJournalWriter CreateJournalWriter()
+        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             return new EventStoreWriter(Config, _connection, Config.GetSerializer(), Config.StreamName);
         }

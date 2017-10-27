@@ -48,13 +48,14 @@ namespace Memstate.Tests
         {
             _log = log;
         }
+
         [Fact]
         public void Test1()
         {
             var config = new Settings();
-            var model = new List<String>();
+            var model = new List<string>();
             Kernel k = new Kernel(config,model);
-            int numStrings = (int) k.Execute(new AddStringCommand(String.Empty));
+            var numStrings = (int) k.Execute(new AddStringCommand(string.Empty));
             Assert.Equal(1,numStrings);
             _log.WriteLine("hello test");
         }
@@ -64,14 +65,18 @@ namespace Memstate.Tests
         {
             var config = new Settings();
             var initialModel = new List<string>();
-            var commandStore = new InMemoryCommandStore(config);
+            var commandStore = new InMemoryStorageProvider(config);
             var engine = new Engine<List<string>>(config, initialModel,commandStore, commandStore, 0);
             var tasks = Enumerable.Range(10, 10000)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(n.ToString())))
                 .ToArray();
 
             int expected = 1;
-            foreach(var task in tasks) Assert.Equal(expected++, task.Result);
+
+            foreach (var task in tasks)
+            {
+                Assert.Equal(expected++, task.Result);
+            }
         }
 
         [Fact]
@@ -79,8 +84,7 @@ namespace Memstate.Tests
         {
             var config = new Settings();
             var fileName = Path.GetTempFileName();
-            var serializer = new JsonSerializerAdapter();
-            var journalWriter = new FileJournalWriter(config, serializer, fileName, 0);
+            var journalWriter = new FileJournalWriter(config, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
             var sub = subSource.Subscribe(0, records.Add);
@@ -95,8 +99,7 @@ namespace Memstate.Tests
 
             Assert.Equal(1000, records.Count);
 
-           
-
+            var serializer = new JsonSerializerAdapter();
             var reader = new FileJournalReader(fileName, serializer);
             records.Clear();
             foreach (var record in reader.GetRecords())

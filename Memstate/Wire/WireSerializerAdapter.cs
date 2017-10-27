@@ -10,7 +10,7 @@ namespace Memstate.Wire
 
         public WireSerializerAdapter(Settings config)
         {
-            var options = new SerializerOptions(versionTolerance:false, preserveObjectReferences: true);
+            var options = new SerializerOptions(versionTolerance: false, preserveObjectReferences: true);
             _serializer = new Serializer(options);
         }
 

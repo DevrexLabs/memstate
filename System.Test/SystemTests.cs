@@ -7,6 +7,9 @@ namespace System.Test
 
     using Memstate;
     using Memstate.EventStore;
+    using Memstate.JsonNet;
+    using Memstate.Postgresql;
+    using Memstate.Wire;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -20,37 +23,43 @@ namespace System.Test
             _testOutputHelper = log;
         }
 
-        public static IEnumerable<object[]> GetEngineBuilders()
+        public static IEnumerable<object[]> Configurations()
         {
-            foreach (var serializerName in new[] { "Json", "Wire" })
-            {
-                var config = new Settings();
-                config.Serializer = serializerName;
-                config.StreamName = "test-" + Guid.NewGuid();
-                yield return new object[] { new EventStoreEngineBuilder(config) };
+            return GetConfigurations().Select(c => new object[] { c });
+        } 
 
-                // todo: yield return new PgsqlProvider()
+        public static IEnumerable<Settings> GetConfigurations()
+        {
+            foreach (var serializerName in Serializers())
+            {
+                var config = new Settings().WithRandomStreamName().WithInmemoryStorage();
+                config.Serializer = serializerName;
+                yield return config;
+
+                config.StorageProvider = typeof(EventStoreProvider).AssemblyQualifiedName;
+                yield return config;
+
+                config.StorageProvider = typeof(FileStorageProvider).FullName;
+                yield return config;
+
+                config.StorageProvider = typeof(PostgresqlProvider).AssemblyQualifiedName;
+                yield return config;
             }
         }
 
-        public static IEnumerable<object[]> GetConfigurations()
+        public static IEnumerable<object[]> StorageProviders()
         {
-            foreach (var serializerName in new[] { "Json", "Wire" })
-            {
-                var config = new Settings();
-                config.Serializer = serializerName;
-                config.StreamName = "test-" + Guid.NewGuid();
-                yield return new object[] { new EventStoreProvider(config) };
-
-                // todo: yield return new PgsqlProvider()
-            }
+            return GetConfigurations()
+                .Select(s => s.CreateStorageProvider())
+                .Select(sp => new object[] { sp });
         }
 
         [Theory]
-        [MemberData(nameof(GetConfigurations))]
-        public void CanWriteOne(Provider provider)
+        [MemberData(nameof(Configurations))]
+        public void CanWriteOne(Settings settings)
         {
-            var writer = provider.CreateJournalWriter();
+            var provider = settings.CreateStorageProvider();
+            var writer = provider.CreateJournalWriter(1);
 
             writer.Send(new AddStringCommand());
             writer.Dispose();
@@ -62,10 +71,10 @@ namespace System.Test
         }
 
         [Theory]
-        [MemberData(nameof(GetConfigurations))]
-        public void CanWriteMany(Provider provider)
+        [MemberData(nameof(StorageProviders))]
+        public void CanWriteMany(StorageProvider provider)
         {
-            var journalWriter = provider.CreateJournalWriter();
+            var journalWriter = provider.CreateJournalWriter(1);
             for(var i = 0; i < 10000; i++)
             {
                 journalWriter.Send(new AddStringCommand());
@@ -79,12 +88,13 @@ namespace System.Test
         }
 
         [Theory]
-        public async Task SubscriptionFiresEventAppeared(Provider provider)
+        [MemberData(nameof(StorageProviders))]
+        public async Task SubscriptionFiresEventAppeared(StorageProvider provider)
         {
             using (provider)
             {
                 const int NumRecords = 50;
-                var journalWriter = provider.CreateJournalWriter();
+                var journalWriter = provider.CreateJournalWriter(1);
                 for (var i = 0; i < NumRecords; i++)
                 {
                     journalWriter.Send(new AddStringCommand());
@@ -99,23 +109,9 @@ namespace System.Test
             }
         }
 
-        private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)
-        {
-            checkInterval = checkInterval ?? TimeSpan.FromMilliseconds(50);
-
-            while (!condition.Invoke())
-            {
-                await Task.Delay(checkInterval.Value).ConfigureAwait(false);
-                if (numberOfTries-- == 0)
-                {
-                    throw new TimeoutException();
-                }
-            }
-        }
-
         [Theory]
-        [MemberData(nameof(GetConfigurations))]
-        public void EventsBatchWrittenAppearOnCatchUpSubscription(Provider provider)
+        [MemberData(nameof(StorageProviders))]
+        public void EventsBatchWrittenAppearOnCatchUpSubscription(StorageProvider provider)
         {
             const int NumRecords = 5;
 
@@ -123,7 +119,7 @@ namespace System.Test
             var records = new List<JournalRecord>();
             var subSource = provider.CreateJournalSubscriptionSource();
             var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter();
+            var writer = provider.CreateJournalWriter(1);
 
             // act
             for (int i = 0; i < NumRecords; i++)
@@ -138,14 +134,14 @@ namespace System.Test
         }
 
         [Theory]
-        [MemberData(nameof(GetConfigurations))]
-        public async Task EventsWrittenAppearOnCatchUpSubscription(Provider provider)
+        [MemberData(nameof(Configurations))]
+        public async Task EventsWrittenAppearOnCatchUpSubscription(StorageProvider provider)
         {
             // Arrange
             var records = new List<JournalRecord>();
             var subSource = provider.CreateJournalSubscriptionSource();
             var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter();
+            var writer = provider.CreateJournalWriter(1);
 
             // Act
             writer.Send(new AddStringCommand());
@@ -161,37 +157,33 @@ namespace System.Test
             Assert.Equal(5, records.Count);
         }
 
-        public class Reverse : Command<List<string>>
-        {
-            public override void Execute(List<string> model)
-            {
-                model.Reverse();
-            }
-        }
-
         [Theory]
-        [MemberData(nameof(GetEngineBuilders))]
-        public void Can_execute_void_commands(IEngineBuilder builder)
+        [MemberData(nameof(Configurations))]
+        public void Can_execute_void_commands(Settings settings)
         {
-            Engine<List<string>> engine = builder.Build<List<string>>();
-
+            var builder = new EngineBuilder(settings);
+            var engine = builder.Build<List<string>>();
             engine.ExecuteAsync(new Reverse());
             engine.Dispose();
         }
 
         [Theory]
-        [MemberData(nameof(GetEngineBuilders))]
-        public void Smoke(IEngineBuilder builder)
+        [MemberData(nameof(Configurations))]
+        public async Task Smoke(Settings settings)
         {
             const int numRecords = 1;
+
+            var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();
 
             var tasks = Enumerable.Range(10, numRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
                 .ToArray();
-            //Task.WaitAll(tasks);
             int expected = 1;
-            foreach (var task in tasks) Assert.Equal(expected++, task.Result);
+            foreach (var task in tasks)
+            {
+                Assert.Equal(expected++, await task.ConfigureAwait(false));
+            }
             //foreach (var number in Enumerable.Range(1,100))
             //{
             //    var command = new AddStringCommand() {StringToAdd = number.ToString()};
@@ -208,6 +200,34 @@ namespace System.Test
             var strings = engine.Execute(new GetStringsQuery());
             Assert.Equal(numRecords, strings.Count);
             engine.Dispose();
+        }
+
+        private static IEnumerable<string> Serializers()
+        {
+            yield return typeof(JsonSerializerAdapter).FullName;
+            yield return typeof(WireSerializerAdapter).FullName;
+        }
+
+        private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)
+        {
+            checkInterval = checkInterval ?? TimeSpan.FromMilliseconds(50);
+
+            while (!condition.Invoke())
+            {
+                await Task.Delay(checkInterval.Value).ConfigureAwait(false);
+                if (numberOfTries-- == 0)
+                {
+                    throw new TimeoutException();
+                }
+            }
+        }
+
+        public class Reverse : Command<List<string>>
+        {
+            public override void Execute(List<string> model)
+            {
+                model.Reverse();
+            }
         }
     }
 }

@@ -1,29 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace Memstate
+﻿namespace Memstate
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
     public class FileJournalWriter : BatchingJournalWriter
     {
-        private long _nextRecord;
         private readonly Stream _journalStream;
         private readonly ISerializer _serializer;
+        private long _nextRecord;
 
-        public event RecordsWrittenHandler RecordsWritten = delegate { };
 
-        public FileJournalWriter(Settings config, ISerializer serializer, string fileName, long nextRecord) 
-            : base(config)
+        public FileJournalWriter(Settings settings, string fileName, long nextRecord) 
+            : base(settings)
         {
             _nextRecord = nextRecord;
             _journalStream = File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.None);
-            _serializer = serializer;
+            _serializer = settings.GetSerializer();
         }
 
-        private JournalRecord ToJournalRecord(Command command)
+        public event RecordsWrittenHandler RecordsWritten = delegate { };
+
+        public override void Dispose()
         {
-            return new JournalRecord(_nextRecord++, DateTime.Now, command);
+            base.Dispose();
+            _journalStream.Flush();
+            _journalStream.Dispose();
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
@@ -33,11 +36,9 @@ namespace Memstate
             RecordsWritten.Invoke(records);
         }
 
-        public override void Dispose()
+        private JournalRecord ToJournalRecord(Command command)
         {
-            base.Dispose();
-            _journalStream.Flush();
-            _journalStream.Dispose();
+            return new JournalRecord(_nextRecord++, DateTime.Now, command);
         }
     }
 }

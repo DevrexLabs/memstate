@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
 namespace Memstate
 {
-    internal static class ExtensionMethods
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
+
+    public static class ExtensionMethods
     {
         public static T TakeOrDefault<T>(this BlockingCollection<T> collection, CancellationToken cancellationToken)
         {
@@ -19,15 +17,17 @@ namespace Memstate
                 return default(T);
             }
         }
-    }
 
-    public static class LoggerExtensions
-    {
-        private static readonly EventId DefaultEventId = new EventId();
-
-        public static void LogError(this ILogger logger, Exception ex, String message, params object[] args)
+        public static Settings WithInmemoryStorage(this Settings settings)
         {
-            logger.LogError(DefaultEventId, ex, message, args);
+            settings.StorageProvider = typeof(InMemoryStorageProvider).FullName;
+            return settings;
+        }
+
+        public static Settings WithRandomStreamName(this Settings settings)
+        {
+            settings.StreamName = "stream-" + Guid.NewGuid();
+            return settings;
         }
     }
 }

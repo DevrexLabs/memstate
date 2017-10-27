@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Memstate.Models;
-using Memstate.Models.KeyValue;
-using Memstate.Tcp;
-using Microsoft.CSharp.RuntimeBinder;
-using Xunit;
-
 namespace Memstate.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Memstate.Models;
+    using Memstate.Models.KeyValue;
+    using Memstate.Tcp;
+    using Microsoft.CSharp.RuntimeBinder;
+    using Xunit;
+
     public class SessionTests
     {
         private readonly Session<KeyValueStore<int>> _session;
@@ -19,7 +19,7 @@ namespace Memstate.Tests
         {
             var config = new Settings();
             _testModel = new KeyValueStore<int>();
-            var engine = new InMemoryEngineBuilder(config).Build(_testModel);
+            var engine = new EngineBuilder(config).Build(_testModel);
             _session = new Session<KeyValueStore<int>>(config, engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;
@@ -28,7 +28,7 @@ namespace Memstate.Tests
         [Fact]
         public void Incompatible_command_emits_ExceptionResponse()
         {
-            var command = new ProxyCommand<String>("dummy", null, null);
+            var command = new ProxyCommand<string>("dummy", null, null);
             var request = new CommandRequest(command);
             _session.Handle(request);
             var response = AssertAndGetSingle<ExceptionResponse>();
@@ -63,19 +63,16 @@ namespace Memstate.Tests
         [Fact]
         public void QueryRequest_happy_path()
         {
-            //Arrange
             _testModel.Set("KEY", 42);
             var query = new Get<int>("KEY");
             var queryRequest = new QueryRequest(query);
 
-            //Act
             _session.Handle(queryRequest);
 
-            //Assert
             Assert.Equal(1, _messagesEmitted.Count);
             var response = (QueryResponse)_messagesEmitted.Single();
             Assert.Equal(queryRequest.Id, response.ResponseTo);
-            var node = (KeyValueStore<int>.Node) response.Result;
+            var node = (KeyValueStore<int>.Node)response.Result;
             Assert.Equal(42, node.Value);
         }
 
@@ -92,14 +89,11 @@ namespace Memstate.Tests
         [Fact]
         public void Void_command_happy_path()
         {
-            //Arrange
             _testModel.Set("KEY", 100);
             var request = new CommandRequest(new Remove<int>("KEY"));
 
-            //Act
             _session.Handle(request);
 
-            //Assert
             Assert.Equal(0, _testModel.Count());
 
             var response = AssertAndGetSingle<CommandResponse>();
@@ -113,7 +107,7 @@ namespace Memstate.Tests
             var request  = new Ping();
             _session.Handle(request);
             var pong = AssertAndGetSingle<Pong>();
-            Assert.Equal(request.Id , pong.ResponseTo);
+            Assert.Equal(request.Id, pong.ResponseTo);
         }
 
         [Fact]
@@ -132,9 +126,10 @@ namespace Memstate.Tests
             Assert.Equal(1, _messagesEmitted.Count);
             var message = _messagesEmitted.Single();
             Assert.IsType<T>(message);
-            return (T) message;
+            return (T)message;
         }
     }
+
     internal class UnknownMessage : Message
     {
 

@@ -5,8 +5,6 @@ namespace System.Test
     using System.Threading;
     using System.Threading.Tasks;
 
-    using EventStore.ClientAPI;
-
     using Memstate;
     using Memstate.EventStore;
 
@@ -22,71 +20,13 @@ namespace System.Test
             _testOutputHelper = log;
         }
 
-        public abstract class Provider : IDisposable
-        {
-            protected readonly Config Config;
-
-            protected Provider(Config config)
-            {
-                Config = config;
-            }
-
-            public abstract IJournalReader CreateJournalReader();
-
-            public abstract IJournalWriter CreateJournalWriter();
-
-            public abstract IJournalSubscriptionSource CreateJournalSubscriptionSource();
-
-            public abstract void Dispose();
-        }
-
-        public class EventStoreProvider : Provider
-        {
-            private const string DefaultConnectionString = "ConnectTo=tcp://admin:changeit@localhost:1113";
-
-            private readonly IEventStoreConnection _connection;
-
-            public EventStoreProvider(Config config, IEventStoreConnection connection = null)
-                : base(config)
-            {
-                if (connection == null)
-                {
-                    connection = EventStoreConnection.Create(DefaultConnectionString);
-                    connection.ConnectAsync().Wait();
-                }
-                _connection = connection;
-            }
-
-            public override IJournalReader CreateJournalReader()
-            {
-                return new EventStoreReader(Config, _connection, Config.GetSerializer(), Config.StreamName);
-
-            }
-
-            public override IJournalWriter CreateJournalWriter()
-            {
-                return new EventStoreWriter(Config, _connection, Config.GetSerializer(), Config.StreamName);
-            }
-
-            public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-            {
-                return new EventStoreSubscriptionSource(Config, _connection, Config.GetSerializer(), Config.StreamName);
-            }
-
-            public override void Dispose()
-            {
-                _connection.Close();
-            }
-        }
-
-
         public static IEnumerable<object[]> GetEngineBuilders()
         {
             foreach (var serializerName in new[] { "Json", "Wire" })
             {
-                var config = new Config();
-                config["Serializer"] = serializerName;
-                config["StreamName"] = "test-" + Guid.NewGuid();
+                var config = new Settings();
+                config.Serializer = serializerName;
+                config.StreamName = "test-" + Guid.NewGuid();
                 yield return new object[] { new EventStoreEngineBuilder(config) };
 
                 // todo: yield return new PgsqlProvider()
@@ -97,9 +37,9 @@ namespace System.Test
         {
             foreach (var serializerName in new[] { "Json", "Wire" })
             {
-                var config = new Config();
-                config["Serializer"] = serializerName;
-                config["StreamName"] = "test-" + Guid.NewGuid();
+                var config = new Settings();
+                config.Serializer = serializerName;
+                config.StreamName = "test-" + Guid.NewGuid();
                 yield return new object[] { new EventStoreProvider(config) };
 
                 // todo: yield return new PgsqlProvider()
@@ -154,10 +94,8 @@ namespace System.Test
                 var records = new List<JournalRecord>();
                 var subSource = provider.CreateJournalSubscriptionSource();
                 var subscription = subSource.Subscribe(0, records.Add);
-                await WaitForConditionOrThrow(() => records.Count < NumRecords).ConfigureAwait(false);
-                Assert.True(
-                    records.Select(r => (int)r.RecordNumber)
-                        .SequenceEqual(Enumerable.Range(0, NumRecords)));
+                await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
+                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
             }
         }
 

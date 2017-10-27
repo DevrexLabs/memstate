@@ -45,7 +45,7 @@ namespace Memstate.Tests
 
         public KernelConcurrencyTests(ITestOutputHelper testOutputHelper)
         {
-            var config = new Config();
+            var config = new Settings();
             _bank = new AccountModel();
             _kernel = new Kernel(config, _bank);
         }

@@ -16,7 +16,7 @@ namespace Memstate.Tests
         [Fact]
         public void CanGetDefaultSerializer()
         {
-            Config config = new Config();
+            Settings config = new Settings();
             var serializer = config.GetSerializer();
             Assert.NotNull(serializer);
         }

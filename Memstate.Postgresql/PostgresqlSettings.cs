@@ -1,4 +1,6 @@
-﻿namespace Memstate.Postgresql
+﻿using System;
+
+namespace Memstate.Postgresql
 {
     public class PostgresqlSettings
     {
@@ -8,19 +10,24 @@
 
         public string SubscriptionStream { get; set; } = "commands_stream";
 
-        protected void CopyFrom(PostgresqlSettings settings)
+
+        public void Validate()
         {
-            ConnectionString = settings.ConnectionString;
-            Table = settings.Table;
-        }
+            if (string.IsNullOrWhiteSpace(ConnectionString))
+            {
+                throw new ArgumentException("Property must have a value.", nameof(ConnectionString));
+            }
 
-        public T Upgrade<T>() where T : PostgresqlSettings, new()
-        {
-            var settings = new T();
+            if (string.IsNullOrWhiteSpace(Table))
+            {
+                throw new ArgumentException("Property must have a value.", nameof(Table));
+            }
 
-            settings.CopyFrom(this);
+            if (string.IsNullOrWhiteSpace(SubscriptionStream))
+            {
+                throw new ArgumentException("Property must have a value.", nameof(Table));
+            }
 
-            return settings;
         }
     }
 }

@@ -5,9 +5,9 @@ namespace Memstate
     public class FileJournalEngineBuilder : IEngineBuilder
     {
         private readonly string _journalFile;
-        private readonly Config _config;
+        private readonly Settings _config;
 
-        public FileJournalEngineBuilder(Config config, string journalFile)
+        public FileJournalEngineBuilder(Settings config, string journalFile)
         {
             _journalFile = journalFile;
             _config = config;

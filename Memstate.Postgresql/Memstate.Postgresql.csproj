@@ -12,12 +12,9 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper">
-      <Version>1.50.2</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.3</Version>
-    </PackageReference>
+    <Compile Remove="PostgresEngineBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Npgsql">
       <Version>3.2.4.1</Version>
     </PackageReference>

@@ -6,8 +6,6 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlWriter : BatchingJournalWriter
     {
-        private const string ConfigurationSection = "Journal:Providers:Npgsql";
-
         private const string InsertSql = @"
 INSERT INTO {0}
 (
@@ -22,35 +20,21 @@ VALUES
     @data
 );";
 
-        private readonly string _connectionString;
-        private readonly string _tableName;
         private readonly ISerializer _serializer;
+        private readonly PostgresqlSettings _settings;
 
-        public PostgresqlWriter(Config config)
+        public PostgresqlWriter(Settings config, PostgresqlSettings settings)
             : base(config)
         {
-            _connectionString = config[$"{ConfigurationSection}:ConnectionString"];
-
-            if (string.IsNullOrWhiteSpace(_connectionString))
-            {
-                throw new ArgumentException("Property ConnectionString must have a value.", nameof(config));
-            }
-
-            _tableName = config[$"{ConfigurationSection}:TableName"];
-
-            if (string.IsNullOrWhiteSpace(_tableName))
-            {
-                throw new ArgumentException("Property TableName must have a value.", nameof(config));
-            }
-
+            _settings = settings;
             _serializer = config.GetSerializer();
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
-            using (var connection = new NpgsqlConnection(_connectionString))
+            using (var connection = new NpgsqlConnection(_settings.ConnectionString))
             {
-                var sql = string.Format(InsertSql, _tableName);
+                var sql = string.Format(InsertSql, _settings.Table);
 
                 foreach (var command in commands)
                 {

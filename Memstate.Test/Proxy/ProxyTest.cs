@@ -16,7 +16,7 @@ namespace Memstate.Tests.Proxy
 
 	    public ProxyTest()
 	    {
-	        var config = new Config();
+	        var config = new Settings();
             ITestModel model = new TestModel();
             var engine = new InMemoryEngineBuilder(config).Build(model);
              _client = new LocalClient<ITestModel>(engine);

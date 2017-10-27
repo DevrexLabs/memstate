@@ -7,7 +7,7 @@ namespace Memstate.EventStore
 {
     public class EventStoreSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly Config _config;
+        private readonly Settings _config;
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
@@ -15,7 +15,7 @@ namespace Memstate.EventStore
 
         private readonly ILogger _logger;
 
-        public EventStoreSubscriptionSource(Config config, IEventStoreConnection connection, 
+        public EventStoreSubscriptionSource(Settings config, IEventStoreConnection connection, 
             ISerializer serializer, 
             string streamName,
             CatchUpSubscriptionSettings subscriptionSettings = null

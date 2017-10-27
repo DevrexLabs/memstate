@@ -7,14 +7,15 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly PostgresqlSubscriptionSourceSettings _settings;
-        
+        private readonly PostgresqlSettings _settings;
+        private readonly ISerializer _serializer;
         private readonly RingBuffer<JournalRecord> _buffer = new RingBuffer<JournalRecord>(1024);
         
         private Thread _listenerThread;
 
-        public PostgresqlSubscriptionSource(PostgresqlSubscriptionSourceSettings settings)
+        public PostgresqlSubscriptionSource(Settings config, PostgresqlSettings settings)
         {
+            _serializer = config.GetSerializer();
             _settings = settings;
         }
 

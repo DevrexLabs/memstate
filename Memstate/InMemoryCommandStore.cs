@@ -12,7 +12,7 @@ namespace Memstate
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
       
 
-        public InMemoryCommandStore(Config config, long nextRecord = 0)
+        public InMemoryCommandStore(Settings config, long nextRecord = 0)
         {
             _batchingLogger = new Batcher<Command>(config, 100);
             _batchingLogger.OnBatch += OnCommandBatch;

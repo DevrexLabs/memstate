@@ -25,7 +25,7 @@ namespace Memstate.Host
 
         static void RunClient()
         {
-            Config config = new Config();
+            Settings config = new Settings();
             config.LoggerFactory.AddConsole((category, level) => true);
 
             Console.Write("Connecting to localhost:3001 ... ");
@@ -51,7 +51,7 @@ namespace Memstate.Host
         static void RunServer()
         {
             Console.WriteLine("Starting server on port 3001, type exit to quit");
-            Config config = new Config();
+            Settings config = new Settings();
             config.LoggerFactory.AddConsole((category,level) => true);
             var engine = new InMemoryEngineBuilder(config).Build<KeyValueStore<int>>();
             var server = new MemstateServer<KeyValueStore<int>>(config, engine);

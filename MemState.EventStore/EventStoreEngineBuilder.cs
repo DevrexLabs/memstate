@@ -6,14 +6,14 @@ namespace Memstate.EventStore
 
     public class EventStoreEngineBuilder : IEngineBuilder
     {
-        private readonly Config _config;
+        private readonly Settings _config;
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
 
         private readonly ILogger<EventStoreEngineBuilder> _logger;
 
-        public EventStoreEngineBuilder(Config config, IEventStoreConnection connection = null)
+        public EventStoreEngineBuilder(Settings config, IEventStoreConnection connection = null)
         {
             _logger = config.CreateLogger<EventStoreEngineBuilder>();
             _config = config;

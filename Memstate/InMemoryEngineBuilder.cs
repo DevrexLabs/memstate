@@ -4,15 +4,15 @@ namespace Memstate
 {
     public class InMemoryEngineBuilder : IEngineBuilder
     {
-        private readonly Config _config;
+        private readonly Settings _config;
         private readonly InMemoryCommandStore _commandStore;
 
-        public InMemoryEngineBuilder(Config config)
+        public InMemoryEngineBuilder(Settings config)
             : this(config, new InMemoryCommandStore(config))
         {
         }
 
-        public InMemoryEngineBuilder(Config config, InMemoryCommandStore commandStore)
+        public InMemoryEngineBuilder(Settings config, InMemoryCommandStore commandStore)
         {
             _config = config;
             _commandStore = commandStore;

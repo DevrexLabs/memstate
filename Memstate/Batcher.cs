@@ -19,7 +19,7 @@ namespace Memstate
 
         private readonly ILogger _logger;
 
-        public Batcher(Config config, int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
+        public Batcher(Settings config, int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
         {
             _logger = config.CreateLogger<Batcher<T>>();
             _maxBatchSize = maxBatchSize;

@@ -1,62 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using Xunit;
-using Memstate.Postgresql.Tests.Domain;
-using Npgsql;
-
-namespace Memstate.Postgresql.Tests
+﻿namespace Memstate.Postgresql.Tests
 {
-    public class JournalReaderTests
+    using System;
+    using System.Collections.Generic;
+    using Memstate.Postgresql.Tests.Domain;
+    using Npgsql;
+    using Xunit;
+
+    public class JournalReaderTests : IDisposable
     {
         private const string ConnectionString = "Host=localhost; Username=hagbard; Database=postgres";
 
-        private readonly Config _config;
-
-        private PostgresCommandStore _commandStore;
+        private readonly PostgresJournalReader _journalReader;
+        private readonly ISerializer _serializer;
+        private readonly IJournalWriter _journalWriter;
 
         public JournalReaderTests()
         {
-            var config = new Config
-            {
-                ["Providers:Postgresql:ConnectionString"] = ConnectionString
-            };
+            var config = new Settings();
+            var pgsqlSettings = new PostgresqlSettings { ConnectionString = ConnectionString };
 
-            var commandStore = new PostgresCommandStore(config);
-
-            _config = config;
-            _commandStore = commandStore;
+            _journalReader = new PostgresJournalReader(config, pgsqlSettings);
+            _journalWriter = new PostgresqlWriter(config, pgsqlSettings);
+            _serializer = config.GetSerializer();
+            ClearDatabase();
         }
 
         [Fact]
         public void CanRead()
         {
-            ClearDatabase();
-            
-            var serializer = _config.GetSerializer();
-
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
-
-            InsertCommand(serializer.Serialize(create));
-
-            var journalRecords = _commandStore.GetRecords();
-            
-            Assert.Equal(1, journalRecords.Count());
+            InsertCommand(_serializer.Serialize(create));
+            var journalRecords = _journalReader.GetRecords();
+            Assert.Single(journalRecords);
         }
 
         [Fact]
         public void CanWrite()
         {
-            ClearDatabase();
-            
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
-            
-            _commandStore.Send(create);
-
+            _journalWriter.Send(create);
             var journalRecords = GetJournalRecords();
-            
-            Assert.Equal(1, journalRecords.Count);
+            Assert.Single(journalRecords);
+        }
+
+        public void Dispose()
+        {
+            _journalReader.Dispose();
+            _journalWriter.Dispose();
         }
 
         private static void ClearDatabase()
@@ -65,9 +55,7 @@ namespace Memstate.Postgresql.Tests
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-
                 command.CommandText = "TRUNCATE TABLE commands;";
-
                 command.ExecuteNonQuery();
             }
         }
@@ -78,7 +66,6 @@ namespace Memstate.Postgresql.Tests
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-
                 command.CommandText = @"
 INSERT INTO
     commands
@@ -91,7 +78,6 @@ VALUES
 );";
 
                 command.Parameters.AddWithValue("@command", data);
-
                 Assert.Equal(1, command.ExecuteNonQuery());
             }
         }
@@ -104,7 +90,6 @@ VALUES
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-
                 command.CommandText = @"
 SELECT
     id,
@@ -118,7 +103,7 @@ ORDER BY
                 {
                     while (reader.Read())
                     {
-                        var journalRecord = new JournalRecord((long) reader[0], (DateTime) reader[1], null);
+                        var journalRecord = new JournalRecord((long)reader[0], (DateTime)reader[1], null);
                         
                         journalRecords.Add(journalRecord);
                     }

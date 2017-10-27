@@ -12,7 +12,7 @@ namespace Memstate.Tcp
         private readonly Engine<T> _engine;
         private readonly ILogger _logger;
 
-        public Session(Config config, Engine<T> engine)
+        public Session(Settings config, Engine<T> engine)
         {
             _engine = engine;
             _logger = config.LoggerFactory.CreateLogger<Session<T>>();

@@ -23,9 +23,9 @@ namespace Memstate.Tcp
         private readonly ILogger _log;
         private readonly CancellationTokenSource _cancellationSource;
         private readonly ISet<Task> _connections = new HashSet<Task>();
-        private readonly Config _config;
+        private readonly Settings _config;
 
-        public MemstateServer(Config config, Engine<T> engine)
+        public MemstateServer(Settings config, Engine<T> engine)
         {
             _engine = engine;
             _config = config;

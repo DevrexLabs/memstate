@@ -10,7 +10,7 @@ namespace Memstate.Tests.Models
 
         public KeyValueStoreProxyTests()
         {
-            Config config = new Config();
+            Settings config = new Settings();
             IKeyValueStore<int> model = new KeyValueStore<int>();
             var engine = new InMemoryEngineBuilder(config).Build(model);
             var client = new LocalClient<IKeyValueStore<int>>(engine);

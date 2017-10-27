@@ -13,7 +13,7 @@ namespace Memstate.EventStore
 
         public bool Ready() => _ready.Invoke();
             
-        public EventStoreSubscriptionAdapter(Config config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
+        public EventStoreSubscriptionAdapter(Settings config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
         {
             _logger = config.CreateLogger<EventStoreSubscriptionAdapter>();
             _subscription = subscription;

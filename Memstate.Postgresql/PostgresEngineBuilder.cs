@@ -4,14 +4,14 @@
     {
         private readonly Config _config;
 
-        private readonly PostgresCommandStore _commandStore;
+        private readonly PostgresJournalReader _commandStore;
 
         public PostgresEngineBuilder(Config config)
-            : this(config, new PostgresCommandStore(config))
+            : this(config, new PostgresJournalReader(config))
         {
         }
 
-        public PostgresEngineBuilder(Config config, PostgresCommandStore commandStore)
+        public PostgresEngineBuilder(Config config, PostgresJournalReader commandStore)
         {
             _config = config;
             _commandStore = commandStore;

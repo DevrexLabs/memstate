@@ -17,7 +17,7 @@ namespace Memstate
         private long _lastRecordNumber;
 
         public Engine(
-            Config config,
+            Settings config,
             TModel model,
             IJournalSubscriptionSource subscriptionSource,
             IJournalWriter journalWriter,

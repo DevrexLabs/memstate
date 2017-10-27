@@ -43,7 +43,7 @@ namespace Memstate.Tests.DispatchProxy
         [Fact]
         public void MapsToCommand()
         {
-            var config  = new Config();
+            var config  = new Settings();
             var commandStore = new InMemoryCommandStore(config);
             var builder = new InMemoryEngineBuilder(config, commandStore);
             var engine = builder.Build<ITestModel>(new TestModel());

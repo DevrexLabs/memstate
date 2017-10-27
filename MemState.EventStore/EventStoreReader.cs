@@ -17,7 +17,7 @@ namespace Memstate.EventStore
         private readonly ILogger _logger;
 
 
-        public EventStoreReader(Config config, IEventStoreConnection connection, ISerializer serializer, String streamName, int eventsPerSlice = 1024)
+        public EventStoreReader(Settings config, IEventStoreConnection connection, ISerializer serializer, String streamName, int eventsPerSlice = 1024)
         {
             _logger = config.CreateLogger<EventStoreReader>();
             _connection = connection;

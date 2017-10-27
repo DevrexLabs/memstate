@@ -9,7 +9,7 @@ namespace Memstate.Tests
         [Fact]
         public void Batcher_terminates_when_disposed()
         {
-            var config = new Config();
+            var config = new Settings();
             var batcher = new Batcher<int>(config, 200);
             batcher.Dispose();
         }

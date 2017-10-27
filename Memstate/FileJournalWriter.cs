@@ -13,7 +13,7 @@ namespace Memstate
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };
 
-        public FileJournalWriter(Config config, ISerializer serializer, string fileName, long nextRecord) 
+        public FileJournalWriter(Settings config, ISerializer serializer, string fileName, long nextRecord) 
             : base(config)
         {
             _nextRecord = nextRecord;

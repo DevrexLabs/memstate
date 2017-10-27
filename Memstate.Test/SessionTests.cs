@@ -17,7 +17,7 @@ namespace Memstate.Tests
 
         public SessionTests()
         {
-            var config = new Config();
+            var config = new Settings();
             _testModel = new KeyValueStore<int>();
             var engine = new InMemoryEngineBuilder(config).Build(_testModel);
             _session = new Session<KeyValueStore<int>>(config, engine);

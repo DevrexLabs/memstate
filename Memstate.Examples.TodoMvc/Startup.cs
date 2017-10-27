@@ -1,5 +1,4 @@
 ﻿using Memstate.Examples.TodoMvc.Domain;
-using Memstate.Postgresql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,10 +28,10 @@ namespace Memstate.Examples.TodoMvc
 
             services.AddSingleton(provider =>
             {
-                var config = new Config();
+                var settings = new Settings();
                 
-                //var engineBuilder = new InMemoryEngineBuilder(config);
-                var engineBuilder = new PostgresEngineBuilder(config);
+                var engineBuilder = new InMemoryEngineBuilder(settings);
+                //var engineBuilder = new PostgresEngineBuilder(config);
 
                 return engineBuilder.Build<TodoModel>();
             });

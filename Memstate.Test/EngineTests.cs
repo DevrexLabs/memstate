@@ -23,7 +23,7 @@ namespace Memstate.Tests
             A.CallTo(() => _fakeSubscriptionSource.Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
                 .Returns(_fakeSubscription);
 
-            var config = new Config();
+            var config = new Settings();
             _engine = new Engine<Object>(config, new Object(), _fakeSubscriptionSource, _fakeJournalWriter, _nextRecordNumber);
         }
 

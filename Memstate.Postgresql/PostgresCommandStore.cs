@@ -31,15 +31,19 @@ namespace Memstate.Postgresql
             {
                 command.CommandText = @"
 SELECT
-    recordNumber,
+    id,
     written,
-    commandData
+    command
 FROM
     commands
 WHERE
-    recordNumber >= @fromRecord
+    id >= @id
 ORDER BY
-    recordNumber ASC";
+    id ASC";
+
+                command.Parameters.AddWithValue("@id", fromRecord);
+                
+                connection.Open();
 
                 using (var reader = command.ExecuteReader())
                 {

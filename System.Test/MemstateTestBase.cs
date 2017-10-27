@@ -1,8 +1,8 @@
-using Memstate;
-using Xunit.Abstractions;
-
-namespace EventStore.Tests
+namespace System.Test
 {
+    using Memstate;
+    using Xunit.Abstractions;
+
     public abstract class MemstateTestBase
     {
         protected readonly Config Config;
@@ -13,6 +13,8 @@ namespace EventStore.Tests
             Log = testOutputHelper;
             Config = new Config();
             Config.LoggerFactory.AddProvider(new TestOutputLoggingProvider(testOutputHelper));
+            string streamName = "test-stream-" + Guid.NewGuid();
+            Config["StreamName"] = streamName;
         }
     }
 }

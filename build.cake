@@ -15,7 +15,7 @@ Task("Build")
 Task("Test")
   .IsDependentOn("Build")
   .Does(() =>{
-    XUnit2("./**/*.Tests.dll");
+    XUnit2("./**/*.Test.dll");
   });
 
 Task("Clean")

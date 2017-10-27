@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{437BA763-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Test", "System.Test\System.Test.csproj", "{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Postgresql.Tests", "Memstate.Postgresql.Tests\Memstate.Postgresql.Tests.csproj", "{9EBD979B-00EE-472B-9D7F-94E4E72C5202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,14 @@ Global
 		{370CF2A7-3E4F-4314-BED9-043BF8555E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{370CF2A7-3E4F-4314-BED9-043BF8555E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{370CF2A7-3E4F-4314-BED9-043BF8555E2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}.Release|Any CPU.ActiveCfg = Release|Any CPU

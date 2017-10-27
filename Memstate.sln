@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Test", "Memstate.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.Test", "EventStore.Test\EventStore.Test.csproj", "{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Postgresql.Tests", "Memstate.Postgresql.Tests\Memstate.Postgresql.Tests.csproj", "{9EBD979B-00EE-472B-9D7F-94E4E72C5202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F6B2D8C-2B1A-47D0-8C80-82E330DC388B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EBD979B-00EE-472B-9D7F-94E4E72C5202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

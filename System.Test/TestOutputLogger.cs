@@ -1,9 +1,11 @@
-using System;
-using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
-
-namespace EventStore.Tests
+namespace System.Test
 {
+    using System;
+
+    using Microsoft.Extensions.Logging;
+
+    using Xunit.Abstractions;
+
     public class TestOutputLogger : ILogger
     {
         private readonly LogLevel _minimumLevel;
@@ -16,20 +18,25 @@ namespace EventStore.Tests
             _category = category;
             _testOutputHelper = testOutputHelper;
         }
+
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            const string template = "{0} - {1} - {2} - {3}";
+            const string Template = "{0} - {1} - {2} - {3}";
 
             if (logLevel >= _minimumLevel)
             {
                 try
                 {
-                    _testOutputHelper.WriteLine(template, DateTime.Now.ToString("O"), logLevel.ToString(), _category,
+                    _testOutputHelper.WriteLine(
+                        Template,
+                        DateTime.Now.ToString("O"),
+                        logLevel.ToString(),
+                        _category,
                         formatter.Invoke(state, exception));
                 }
                 catch
                 {
-                    //ignored
+                    // ignored
                 }
             }
         }

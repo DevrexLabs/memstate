@@ -26,19 +26,27 @@ namespace Memstate
             _config = config;
         }
 
+        public string StreamName
+        {
+            get => this["StreamName"];
+            set => this["StreamName"] = value;
+        }
+
+        public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
+
         public string this[string key]
         {
             get => _config[$"Memstate:{key}"];
             set => _config[$"Memstate:{key}"] = value;
         }
 
-        public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
         public ISerializer GetSerializer()
         {
-            var typeName = _config["Memstate:Serializers:Default"];
+            var serializerName = _config["Memstate:Serializer"];
+            var typeName = _config["Memstate:Serializers:" + serializerName];
             var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
-            var serializer = (ISerializer) Activator.CreateInstance(type, this, null);
+            var serializer = (ISerializer)Activator.CreateInstance(type, this);
             return serializer;
         }
 
@@ -52,8 +60,9 @@ namespace Memstate
         static IReadOnlyDictionary<string, string> DefaultConfigurationStrings { get; } =
             new Dictionary<string, string>()
             {
-                ["Memstate:Serializers:Default"] = "Memstate.Wire.WireSerializerAdapter"
-                    //"Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+                ["Memstate:Serializers:Wire"] = "Memstate.Wire.WireSerializerAdapter",
+                ["Memstate:Serializers:Json"] = "Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+                ["Memstate:Serializer"] = "Wire"
             };
     }
 }

@@ -4,13 +4,13 @@ using Wire;
 
 namespace Memstate.Wire
 {
-    class WireSerializerAdapter : ISerializer
+    public class WireSerializerAdapter : ISerializer
     {
         private readonly Serializer _serializer;
 
-        public WireSerializerAdapter(Config config, SerializerOptions options = null)
+        public WireSerializerAdapter(Config config)
         {
-            options = options ?? new SerializerOptions(versionTolerance:false, preserveObjectReferences: true);
+            var options = new SerializerOptions(versionTolerance:false, preserveObjectReferences: true);
             _serializer = new Serializer(options);
         }
 

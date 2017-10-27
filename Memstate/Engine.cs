@@ -31,39 +31,12 @@ namespace Memstate
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
         }
 
-        /// <summary>
-        /// Handler for records obtained through the subscription
-        /// </summary>
-        private void ApplyRecord(JournalRecord record)
-        {
-            TaskCompletionSource<object> completion = null;
-            try
-            {
-                var command = record.Command;
-                var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
-                if (isLocalCommand) _pendingCommandsChanged.Set();
-                _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
-                long expected = Interlocked.Increment(ref _lastRecordNumber);
-                if (expected != record.RecordNumber)
-                {
-                    _logger.LogError("ApplyRecord: RecordNumber out of order. Expected {0}, got {1}", expected, record.RecordNumber);
-                }
-                object result = _kernel.Execute(record.Command);
-                completion?.SetResult(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
-                completion?.SetException(ex);   
-            }
-        }
-
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
-            return (TResult) await completionSource.Task;
+            return (TResult)await completionSource.Task.ConfigureAwait(false);
         }
 
         public Task ExecuteAsync(Command<TModel> command)
@@ -78,7 +51,7 @@ namespace Memstate
 
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
-            return await Task.Run(() => Execute(query));
+            return await Task.Run(() => Execute(query)).ConfigureAwait(false);
         }
 
         public TResult Execute<TResult>(Command<TModel, TResult> command)
@@ -96,6 +69,19 @@ namespace Memstate
             return (TResult) _kernel.Execute(query);
         }
 
+        public void Dispose()
+        {
+            _logger.LogDebug("Begin Dispose");
+            _journalWriter.Dispose();
+            while (!_pendingLocalCommands.IsEmpty)
+            {
+                _pendingCommandsChanged.WaitOne();
+            }
+
+            _commandSubscription.Dispose();
+            _logger.LogDebug("End Dispose");
+        }
+
         internal object Execute(Query query)
         {
             return _kernel.Execute(query);
@@ -103,16 +89,38 @@ namespace Memstate
 
         internal object Execute(Command command)
         {
-            return _kernel.Execute(command);    
+            return _kernel.Execute(command);
         }
 
-        public void Dispose()
+        /// <summary>
+        /// Handler for records obtained through the subscription
+        /// </summary>
+        private void ApplyRecord(JournalRecord record)
         {
-            _logger.LogDebug("Begin Dispose");
-            _journalWriter.Dispose();
-            while (!_pendingLocalCommands.IsEmpty) _pendingCommandsChanged.WaitOne();
-            _commandSubscription.Dispose();
-            _logger.LogDebug("End Dispose");
+            TaskCompletionSource<object> completion = null;
+            try
+            {
+                var command = record.Command;
+                var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
+                if (isLocalCommand)
+                {
+                    _pendingCommandsChanged.Set();
+                }
+
+                _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
+                long expected = Interlocked.Increment(ref _lastRecordNumber);
+                if (expected != record.RecordNumber)
+                {
+                    _logger.LogError("ApplyRecord: RecordNumber out of order. Expected {0}, got {1}", expected, record.RecordNumber);
+                }
+                object result = _kernel.Execute(record.Command);
+                completion?.SetResult(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+                completion?.SetException(ex);
+            }
         }
     }
 }

@@ -1,37 +1,38 @@
-using System;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
 namespace Memstate
 {
+    using System;
+    using System.Reflection;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+
     public class Settings
     {
-        //https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
-        private readonly IConfiguration _config;
+        // https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
+        private readonly IConfiguration _configuration;
 
         public Settings(string[] args = null)
         {
-            _config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true)
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args ?? Array.Empty<string>())
                 .Build()
                 .GetSection("Memstate");
 
-            _config.Bind(this);
+            _configuration.Bind(this);
         }
 
         public Settings(IConfiguration config)
         {
-            _config = config;
+            _configuration = config;
+            _configuration.Bind(this);
         }
 
-        public IConfiguration Configuration => _config;
+        public IConfiguration Configuration => _configuration;
 
         public string StreamName { get; set; } = "memstate";
 
-        public string StorageProvider { get; set; }
+        public string StorageProvider { get; set; } = "Memstate.FileStorageProvider";
 
         public string Serializer { get; set; } = "Memstate.Wire.WireSerializerAdapter";
 
@@ -42,16 +43,17 @@ namespace Memstate
         public ISerializer GetSerializer() => Resolve<ISerializer>(Serializer);
 
         public StorageProvider CreateStorageProvider() => Resolve<StorageProvider>(StorageProvider);
-        
+
+        /// <summary>
+        /// Ensure the configuration is valid or throw an InvalidConfigurationException
+        /// </summary>
+        public virtual void Validate()
+        {
+        }
 
         public ILogger<T> CreateLogger<T>()
         {
             return LoggerFactory.CreateLogger<T>();
-        }
-
-        public void Bind(object target, string section)
-        {
-            _config.Bind(target);
         }
 
         private T Resolve<T>(string typeName)

@@ -12,7 +12,12 @@
 
         private long _nextRecord;
 
-        public InMemoryStorageProvider(Settings settings, long nextRecord = 0) : base(settings)
+        public InMemoryStorageProvider(Settings settings) : this(settings, 0)
+        {
+        }
+
+        public InMemoryStorageProvider(Settings settings, long nextRecord = 0) 
+            : base(settings)
         {
             _batchingLogger = new Batcher<Command>(settings, 100);
             _batchingLogger.OnBatch += OnCommandBatch;

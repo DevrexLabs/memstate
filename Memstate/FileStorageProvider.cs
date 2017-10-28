@@ -12,8 +12,7 @@
             : base(settings)
         {
             _settings = settings;
-            _fileStorageSettings = new FileStorageSettings();
-            settings.Bind(_fileStorageSettings, "StorageProviders:FileStorage");
+            _fileStorageSettings = new FileStorageSettings(settings);
         }
 
         public override IJournalReader CreateJournalReader()

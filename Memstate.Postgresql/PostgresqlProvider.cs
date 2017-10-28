@@ -11,11 +11,9 @@ namespace Memstate.Postgresql
         private readonly PostgresqlSettings _settings;
 
 
-        public PostgresqlProvider(Settings config) : base(config)
+        public PostgresqlProvider(Settings memstateSettings) : base(memstateSettings)
         {
-            _settings = new PostgresqlSettings();
-            Config.Bind(_settings, ConfigurationSection);
-            _settings.Validate();
+            _settings = new PostgresqlSettings(memstateSettings.Configuration);
         }
 
         public PostgresqlSettings Settings => _settings;

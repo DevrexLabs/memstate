@@ -32,18 +32,13 @@ namespace System.Test
         {
             foreach (var serializerName in Serializers())
             {
-                var config = new Settings().WithRandomStreamName().WithInmemoryStorage();
-                config.Serializer = serializerName;
-                yield return config;
-
-                config.StorageProvider = typeof(EventStoreProvider).AssemblyQualifiedName;
-                yield return config;
-
-                config.StorageProvider = typeof(FileStorageProvider).FullName;
-                yield return config;
-
-                config.StorageProvider = typeof(PostgresqlProvider).AssemblyQualifiedName;
-                yield return config;
+                foreach (var providerType in ProviderTypes())
+                {
+                    var config = new Settings().WithRandomStreamName();
+                    config.Serializer = serializerName;
+                    config.StorageProvider = providerType.AssemblyQualifiedName;
+                    yield return config;
+                }
             }
         }
 
@@ -208,6 +203,14 @@ namespace System.Test
             yield return typeof(WireSerializerAdapter).FullName;
         }
 
+        private static IEnumerable<Type> ProviderTypes()
+        {
+            yield return typeof(InMemoryStorageProvider);
+            yield return typeof(FileStorageProvider);
+            yield return typeof(EventStoreProvider);
+            yield return typeof(PostgresqlProvider);
+        }
+
         private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)
         {
             checkInterval = checkInterval ?? TimeSpan.FromMilliseconds(50);
@@ -221,6 +224,7 @@ namespace System.Test
                 }
             }
         }
+        
 
         public class Reverse : Command<List<string>>
         {

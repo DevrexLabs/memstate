@@ -1,9 +1,22 @@
-﻿using System;
-
-namespace Memstate.Postgresql
+﻿namespace Memstate.Postgresql
 {
-    public class PostgresqlSettings
+    using System;
+    using Microsoft.Extensions.Configuration;
+
+    public class PostgresqlSettings : Settings
     {
+        public const string ConfigurationKey = "StorageProviders:Postgresql";
+
+        public PostgresqlSettings(IConfiguration configuration)
+            : base(configuration.GetSection(ConfigurationKey))
+        {
+        }
+
+        public PostgresqlSettings(Settings settings)
+            : this(settings.Configuration)
+        {
+        }
+
         public string ConnectionString { get; set; }
         
         public string Table { get; set; } = "commands";
@@ -11,7 +24,7 @@ namespace Memstate.Postgresql
         public string SubscriptionStream { get; set; } = "commands_stream";
 
 
-        public void Validate()
+        public override void Validate()
         {
             if (string.IsNullOrWhiteSpace(ConnectionString))
             {
@@ -27,7 +40,6 @@ namespace Memstate.Postgresql
             {
                 throw new ArgumentException("Property must have a value.", nameof(Table));
             }
-
         }
     }
 }

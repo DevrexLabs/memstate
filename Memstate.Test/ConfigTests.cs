@@ -20,5 +20,6 @@ namespace Memstate.Tests
             var serializer = config.GetSerializer();
             Assert.NotNull(serializer);
         }
+
     }
 }

@@ -8,8 +8,13 @@ namespace Memstate.EventStore
 
         private readonly IEventStoreConnection _connection;
 
-        public EventStoreProvider(Settings config, IEventStoreConnection connection = null)
-            : base(config)
+        public EventStoreProvider(Settings settings)
+            : this(settings, null)
+        {
+        }
+
+        public EventStoreProvider(Settings settings, IEventStoreConnection connection)
+            : base(settings)
         {
             if (connection == null)
             {

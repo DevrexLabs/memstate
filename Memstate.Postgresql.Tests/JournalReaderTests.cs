@@ -17,7 +17,7 @@
         public JournalReaderTests()
         {
             var config = new Settings();
-            var pgsqlSettings = new PostgresqlSettings { ConnectionString = ConnectionString };
+            var pgsqlSettings = new PostgresqlSettings(config) { ConnectionString = ConnectionString };
 
             _journalReader = new PostgresJournalReader(config, pgsqlSettings);
             _journalWriter = new PostgresqlWriter(config, pgsqlSettings);

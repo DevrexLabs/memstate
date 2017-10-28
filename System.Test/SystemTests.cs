@@ -199,7 +199,7 @@ namespace System.Test
 
         private static IEnumerable<string> Serializers()
         {
-            yield return typeof(JsonSerializerAdapter).FullName;
+            yield return typeof(JsonSerializerAdapter).AssemblyQualifiedName;
             yield return typeof(WireSerializerAdapter).FullName;
         }
 

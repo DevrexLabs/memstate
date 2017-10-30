@@ -38,7 +38,7 @@
 
             if (string.IsNullOrWhiteSpace(SubscriptionStream))
             {
-                throw new ArgumentException("Property must have a value.", nameof(Table));
+                throw new ArgumentException("Property must have a value.", nameof(SubscriptionStream));
             }
         }
     }

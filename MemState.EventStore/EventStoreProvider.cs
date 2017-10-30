@@ -27,17 +27,17 @@ namespace Memstate.EventStore
 
         public override IJournalReader CreateJournalReader()
         {
-            return new EventStoreReader(Config, _connection, Config.GetSerializer(), Config.StreamName);
+            return new EventStoreReader(Config, _connection, Config.CreateSerializer(), Config.StreamName);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
-            return new EventStoreWriter(Config, _connection, Config.GetSerializer(), Config.StreamName);
+            return new EventStoreWriter(Config, _connection, Config.CreateSerializer(), Config.StreamName);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new EventStoreSubscriptionSource(Config, _connection, Config.GetSerializer(), Config.StreamName);
+            return new EventStoreSubscriptionSource(Config, _connection, Config.CreateSerializer(), Config.StreamName);
         }
 
         public override void Dispose()

@@ -27,7 +27,7 @@ VALUES
             : base(config)
         {
             _settings = settings;
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)

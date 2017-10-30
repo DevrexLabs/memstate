@@ -15,7 +15,7 @@ namespace Memstate.Postgresql
 
         public PostgresqlSubscriptionSource(Settings config, PostgresqlSettings settings)
         {
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
             _settings = settings;
         }
 

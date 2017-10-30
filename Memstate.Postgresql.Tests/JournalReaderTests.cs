@@ -21,7 +21,7 @@
 
             _journalReader = new PostgresJournalReader(config, pgsqlSettings);
             _journalWriter = new PostgresqlWriter(config, pgsqlSettings);
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
             ClearDatabase();
         }
 

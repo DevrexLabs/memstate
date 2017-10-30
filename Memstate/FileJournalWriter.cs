@@ -17,7 +17,7 @@
         {
             _nextRecord = nextRecord;
             _journalStream = File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.None);
-            _serializer = settings.GetSerializer();
+            _serializer = settings.CreateSerializer();
         }
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };

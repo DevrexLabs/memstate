@@ -18,7 +18,7 @@
         public override IJournalReader CreateJournalReader()
         {
             var fileName = _fileStorageSettings.FileName;
-            var serializer = _settings.GetSerializer();
+            var serializer = _settings.CreateSerializer();
             return new FileJournalReader(fileName, serializer);
         }
 

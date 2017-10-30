@@ -12,7 +12,7 @@ namespace Memstate.Postgresql
 
         public PostgresJournalReader(Settings config, PostgresqlSettings settings)
         {
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
             _settings = settings;
         }
 

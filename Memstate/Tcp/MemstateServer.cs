@@ -57,7 +57,7 @@ namespace Memstate.Tcp
 
         private async Task HandleConnection(TcpClient tcpClient)
         {
-            var serializer = _config.GetSerializer();
+            var serializer = _config.CreateSerializer();
             var stream = tcpClient.GetStream();
 
             var outgoingMessages = new BlockingCollection<Message>();
@@ -79,7 +79,7 @@ namespace Memstate.Tcp
         private async Task SendMessages(BlockingCollection<Message> messages, Stream stream)
         {
             //todo: consider using MessageProcessor
-            var serializer = _config.GetSerializer();
+            var serializer = _config.CreateSerializer();
             var cancellationToken = _cancellationSource.Token;
             var messageId = 0;
             while (!messages.IsCompleted)

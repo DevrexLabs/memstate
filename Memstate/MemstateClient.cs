@@ -28,7 +28,7 @@ namespace Memstate
         public MemstateClient(Settings config)
         {
             _config = config;
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
             _logger = _config.LoggerFactory.CreateLogger<MemstateClient<TModel>>();
             _cancellationSource = new CancellationTokenSource();
@@ -80,7 +80,7 @@ namespace Memstate
         private async Task ReceiveMessages()
         {
             _logger.LogTrace("Starting ReceiveMessages task");
-            var serializer = _config.GetSerializer();
+            var serializer = _config.CreateSerializer();
             var cancellationToken = _cancellationSource.Token;
             while (!cancellationToken.IsCancellationRequested)
             {

@@ -18,7 +18,7 @@ namespace Memstate.EventStore
             _logger = config.CreateLogger<EventStoreEngineBuilder>();
             _config = config;
             _connection = connection ?? ConnectToLocalhost();
-            _serializer = config.GetSerializer();
+            _serializer = config.CreateSerializer();
             _streamName = config.StreamName;
         }
 

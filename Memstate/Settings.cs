@@ -40,7 +40,7 @@ namespace Memstate
 
         public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
 
-        public ISerializer GetSerializer() => Resolve<ISerializer>(Serializer);
+        public ISerializer CreateSerializer() => Resolve<ISerializer>(Serializer);
 
         public StorageProvider CreateStorageProvider() => Resolve<StorageProvider>(StorageProvider);
 

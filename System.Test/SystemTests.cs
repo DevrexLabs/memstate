@@ -67,10 +67,11 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(StorageProviders))]
-        public void CanWriteMany(StorageProvider provider)
+        public void WriteAndReadCommands(StorageProvider provider)
         {
             var journalWriter = provider.CreateJournalWriter(1);
-            for(var i = 0; i < 10000; i++)
+
+            for (var i = 0; i < 10000; i++)
             {
                 journalWriter.Send(new AddStringCommand());
             }
@@ -84,7 +85,7 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(StorageProviders))]
-        public async Task SubscriptionFiresEventAppeared(StorageProvider provider)
+        public async Task SubscriptionDeliversPreExistingCommands(StorageProvider provider)
         {
             using (provider)
             {
@@ -106,47 +107,23 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(StorageProviders))]
-        public void EventsBatchWrittenAppearOnCatchUpSubscription(StorageProvider provider)
+        public async void SubscriptionDeliversFutureCommands(StorageProvider provider)
         {
             const int NumRecords = 5;
 
-            // arrange
             var records = new List<JournalRecord>();
             var subSource = provider.CreateJournalSubscriptionSource();
             var sub = subSource.Subscribe(0, records.Add);
             var writer = provider.CreateJournalWriter(1);
 
-            // act
-            for (int i = 0; i < NumRecords; i++)
+            for (var i = 0; i < NumRecords; i++)
             {
                 writer.Send(new AddStringCommand());
             }
-            writer.Dispose();
-            while(records.Count < 5) Thread.Sleep(0);
-            sub.Dispose();
 
-            Assert.Equal(5, records.Count);
-        }
-
-        [Theory]
-        [MemberData(nameof(Configurations))]
-        public async Task EventsWrittenAppearOnCatchUpSubscription(StorageProvider provider)
-        {
-            // Arrange
-            var records = new List<JournalRecord>();
-            var subSource = provider.CreateJournalSubscriptionSource();
-            var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter(1);
-
-            // Act
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
-            writer.Send(new AddStringCommand());
             writer.Dispose();
 
-            await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
+            await WaitForConditionOrThrow(() => records.Count < 5).ConfigureAwait(false);
             sub.Dispose();
 
             Assert.Equal(5, records.Count);
@@ -166,12 +143,12 @@ namespace System.Test
         [MemberData(nameof(Configurations))]
         public async Task Smoke(Settings settings)
         {
-            const int numRecords = 1;
+            const int NumRecords = 1;
 
             var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();
 
-            var tasks = Enumerable.Range(10, numRecords)
+            var tasks = Enumerable.Range(10, NumRecords)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
                 .ToArray();
             int expected = 1;
@@ -193,7 +170,7 @@ namespace System.Test
             //can we load when there are existing commands in the stream
             engine = builder.Build<List<string>>();
             var strings = engine.Execute(new GetStringsQuery());
-            Assert.Equal(numRecords, strings.Count);
+            Assert.Equal(NumRecords, strings.Count);
             engine.Dispose();
         }
 
@@ -224,7 +201,6 @@ namespace System.Test
                 }
             }
         }
-        
 
         public class Reverse : Command<List<string>>
         {

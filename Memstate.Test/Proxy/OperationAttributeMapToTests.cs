@@ -34,7 +34,7 @@ namespace Memstate.Tests.DispatchProxy
 
             public void SetCustomer(Customer c)
             {
-                Customer = Customer;
+                Customer = c;
             }
         }
 

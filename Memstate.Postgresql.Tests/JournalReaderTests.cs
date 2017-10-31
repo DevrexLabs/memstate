@@ -1,36 +1,50 @@
-﻿namespace Memstate.Postgresql.Tests
+﻿using System.Threading;
+
+namespace Memstate.Postgresql.Tests
 {
     using System;
     using System.Collections.Generic;
-    using Memstate.Postgresql.Tests.Domain;
+    using Domain;
     using Npgsql;
     using Xunit;
 
     public class JournalReaderTests : IDisposable
     {
-        private const string ConnectionString = "Host=localhost; Username=hagbard; Database=postgres";
+        private const string ConnectionString = "Host=localhost; Database=postgres;";
 
-        private readonly PostgresJournalReader _journalReader;
-        private readonly ISerializer _serializer;
+        private readonly PostgresqlProvider _provider;
+        private readonly IJournalReader _journalReader;
         private readonly IJournalWriter _journalWriter;
+        private readonly ISerializer _serializer;
 
         public JournalReaderTests()
         {
-            var config = new Settings();
-            var pgsqlSettings = new PostgresqlSettings(config) { ConnectionString = ConnectionString };
+            var settings = new PostgresqlSettings(new Settings())
+            {
+                ConnectionString = ConnectionString,
+                Table = $"memstate_{Guid.NewGuid():N}",
+                SubscriptionStream = $"memstate_{Guid.NewGuid():N}_notifications"
+            };
+            
+            _provider = new PostgresqlProvider(settings);
+            
+            _provider.Initialize();
 
-            _journalReader = new PostgresJournalReader(config, pgsqlSettings);
-            _journalWriter = new PostgresqlWriter(config, pgsqlSettings);
-            _serializer = config.CreateSerializer();
-            ClearDatabase();
+            _journalReader = _provider.CreateJournalReader();
+            _journalWriter = _provider.CreateJournalWriter(0);
+
+            _serializer = settings.CreateSerializer();
         }
 
         [Fact]
         public void CanRead()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
+            
             InsertCommand(_serializer.Serialize(create));
+            
             var journalRecords = _journalReader.GetRecords();
+            
             Assert.Single(journalRecords);
         }
 
@@ -38,8 +52,13 @@
         public void CanWrite()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
+            
             _journalWriter.Send(create);
+            
+            Thread.Sleep(500);
+            
             var journalRecords = GetJournalRecords();
+            
             Assert.Single(journalRecords);
         }
 
@@ -49,40 +68,31 @@
             _journalWriter.Dispose();
         }
 
-        private static void ClearDatabase()
+        private void InsertCommand(byte[] data)
         {
             using (var connection = new NpgsqlConnection(ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                command.CommandText = "TRUNCATE TABLE commands;";
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private static void InsertCommand(byte[] data)
-        {
-            using (var connection = new NpgsqlConnection(ConnectionString))
-            using (var command = connection.CreateCommand())
-            {
-                connection.Open();
-                command.CommandText = @"
-INSERT INTO
-    commands
+                
+                command.CommandText = string.Format(@"
+INSERT INTO {0}
 (
     command
 )
 VALUES
 (
     @command
-);";
+);",
+                    _provider.Settings.Table);
 
                 command.Parameters.AddWithValue("@command", data);
+                
                 Assert.Equal(1, command.ExecuteNonQuery());
             }
         }
 
-        private static List<JournalRecord> GetJournalRecords()
+        private IEnumerable<JournalRecord> GetJournalRecords()
         {
             var journalRecords = new List<JournalRecord>();
             
@@ -90,14 +100,16 @@ VALUES
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                command.CommandText = @"
+                
+                command.CommandText = string.Format(@"
 SELECT
     id,
     written
 FROM
-    commands
+    {0}
 ORDER BY
-    id ASC;";
+    id ASC;",
+                    _provider.Settings.Table);
 
                 using (var reader = command.ExecuteReader())
                 {

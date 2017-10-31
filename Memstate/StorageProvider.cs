@@ -11,6 +11,10 @@ namespace Memstate
             Config = config;
         }
 
+        public virtual void Initialize()
+        {
+        }
+
         public abstract IJournalReader CreateJournalReader();
 
         public abstract IJournalWriter CreateJournalWriter(long nextRecordNumber);

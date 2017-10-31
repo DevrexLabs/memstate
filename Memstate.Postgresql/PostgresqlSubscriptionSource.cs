@@ -10,7 +10,7 @@ namespace Memstate.Postgresql
         private readonly PostgresqlSettings _settings;
         private readonly ISerializer _serializer;
         private readonly RingBuffer<JournalRecord> _buffer = new RingBuffer<JournalRecord>(1024);
-        
+
         private Thread _listenerThread;
 
         public PostgresqlSubscriptionSource(Settings config, PostgresqlSettings settings)
@@ -34,31 +34,41 @@ namespace Memstate.Postgresql
 
         private void Listen(Action<JournalRecord> handler)
         {
-            var thread = new Thread(() =>
-            {
-                using (var connection = new NpgsqlConnection(_settings.ConnectionString))
+            _listenerThread = new Thread(
+                () =>
                 {
-                    connection.Open();
+                    var serializser = _settings.CreateSerializer();
 
-                    connection.Notification += (sender, arguments) =>
+                    using (var connection = new NpgsqlConnection(_settings.ConnectionString))
                     {
-                        var storedCommand = JsonConvert.DeserializeObject<StoredCommand>(arguments.AdditionalInformation);
+                        connection.Open();
 
-                        //var command = _settings.Serializer.Deserialize<Command>(storedCommand.Data);
-                        
-                       //var journalRecord = new JournalRecord(storedCommand.Id, storedCommand.);
-                    };
+                        connection.Notification += (sender, arguments) =>
+                        {
+                            var row = JsonConvert.DeserializeObject<Row>(arguments.AdditionalInformation);
 
-                    while (_listenerThread.IsAlive)
-                    {
-                        connection.Wait();
+                            var command = (Command) serializser.Deserialize(row.Data);
+
+                            var record = new JournalRecord(row.Id, row.Written, command);
+
+                            try
+                            {
+                                handler(record);
+                            }
+                            catch (Exception)
+                            {
+                                // TODO: Log the exception.
+                            }
+                        };
+
+                        while (_listenerThread.IsAlive)
+                        {
+                            connection.Wait();
+                        }
                     }
-                }
-            });
+                });
 
-            thread.Start();
-
-            _listenerThread = thread;
+            _listenerThread.Start();
         }
 
         public class PostgresqlCommandSubscription : IJournalSubscription
@@ -74,16 +84,13 @@ namespace Memstate.Postgresql
             }
         }
 
-        public class StoredCommand
+        public class Row
         {
             [JsonProperty("id")]
             public long Id { get; set; }
 
-            [JsonProperty("command_id")]
-            public Guid CommandId { get; set; }
-
-            [JsonProperty("type")]
-            public string Type { get; set; }
+            [JsonProperty("written")]
+            public DateTime Written { get; set; }
 
             [JsonProperty("data")]
             public byte[] Data { get; set; }

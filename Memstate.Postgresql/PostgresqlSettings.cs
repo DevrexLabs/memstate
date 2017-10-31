@@ -19,9 +19,9 @@
 
         public string ConnectionString { get; set; }
         
-        public string Table { get; set; } = "commands";
+        public string Table { get; set; } = "memstate_commands";
 
-        public string SubscriptionStream { get; set; } = "commands_stream";
+        public string SubscriptionStream { get; set; } = "memstate_notifications";
 
 
         public override void Validate()

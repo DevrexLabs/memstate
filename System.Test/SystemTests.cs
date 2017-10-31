@@ -4,13 +4,11 @@ namespace System.Test
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Memstate;
     using Memstate.EventStore;
     using Memstate.JsonNet;
     using Memstate.Postgresql;
     using Memstate.Wire;
-
     using Xunit;
     using Xunit.Abstractions;
 
@@ -25,8 +23,8 @@ namespace System.Test
 
         public static IEnumerable<object[]> Configurations()
         {
-            return GetConfigurations().Select(c => new object[] { c });
-        } 
+            return GetConfigurations().Select(c => new object[] {c});
+        }
 
         public static IEnumerable<Settings> GetConfigurations()
         {
@@ -37,6 +35,12 @@ namespace System.Test
                     var config = new Settings().WithRandomStreamName();
                     config.Serializer = serializerName;
                     config.StorageProvider = providerType.AssemblyQualifiedName;
+
+                    // NOTE: Not sure if this value should be set here.
+                    config.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; Database=postgres;";
+                    config.Configuration["StorageProviders:Postgresql:Table"] = $"memstate_commands_{Guid.NewGuid():N}";
+                    config.Configuration["StorageProviders:Postgresql:SubscriptionStream"] = $"memstate_notifications_{Guid.NewGuid():N}";
+
                     yield return config;
                 }
             }
@@ -45,8 +49,16 @@ namespace System.Test
         public static IEnumerable<object[]> StorageProviders()
         {
             return GetConfigurations()
-                .Select(s => s.CreateStorageProvider())
-                .Select(sp => new object[] { sp });
+                .Select(
+                    s =>
+                    {
+                        var provider = s.CreateStorageProvider();
+
+                        provider.Initialize();
+
+                        return provider;
+                    })
+                .Select(sp => new object[] {sp});
         }
 
         [Theory]
@@ -54,6 +66,7 @@ namespace System.Test
         public void CanWriteOne(Settings settings)
         {
             var provider = settings.CreateStorageProvider();
+            provider.Initialize();
             var writer = provider.CreateJournalWriter(1);
 
             writer.Send(new AddStringCommand());
@@ -69,12 +82,14 @@ namespace System.Test
         [MemberData(nameof(StorageProviders))]
         public void CanWriteMany(StorageProvider provider)
         {
+            provider.Initialize();
+            
             var journalWriter = provider.CreateJournalWriter(1);
-            for(var i = 0; i < 10000; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 journalWriter.Send(new AddStringCommand());
             }
-            
+
             journalWriter.Dispose();
             var journalReader = provider.CreateJournalReader();
             var records = journalReader.GetRecords().ToArray();
@@ -100,7 +115,7 @@ namespace System.Test
                 var subSource = provider.CreateJournalSubscriptionSource();
                 var subscription = subSource.Subscribe(0, records.Add);
                 await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
+                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int) r.RecordNumber));
             }
         }
 
@@ -122,7 +137,7 @@ namespace System.Test
                 writer.Send(new AddStringCommand());
             }
             writer.Dispose();
-            while(records.Count < 5) Thread.Sleep(0);
+            while (records.Count < 5) Thread.Sleep(0);
             sub.Dispose();
 
             Assert.Equal(5, records.Count);
@@ -172,7 +187,7 @@ namespace System.Test
             var engine = builder.Build<List<string>>();
 
             var tasks = Enumerable.Range(10, numRecords)
-                .Select(n => engine.ExecuteAsync(new AddStringCommand(){StringToAdd = n.ToString()}))
+                .Select(n => engine.ExecuteAsync(new AddStringCommand() {StringToAdd = n.ToString()}))
                 .ToArray();
             int expected = 1;
             foreach (var task in tasks)
@@ -224,7 +239,7 @@ namespace System.Test
                 }
             }
         }
-        
+
 
         public class Reverse : Command<List<string>>
         {

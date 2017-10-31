@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    public class PostgresqlWriter : BatchingJournalWriter
+    public class PostgresqlJournalWriter : BatchingJournalWriter
     {
         private const string InsertSql = @"
 INSERT INTO {0}
 (
-    ""command_id"",
-    ""type"",
-    ""data""
+    ""command""
 )
 VALUES
 (
-    @commandId,
-    @type,
-    @data
+    @command
 );";
 
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
-        public PostgresqlWriter(Settings config, PostgresqlSettings settings)
+        public PostgresqlJournalWriter(Settings config, PostgresqlSettings settings)
             : base(config)
         {
             _settings = settings;
@@ -34,18 +29,20 @@ VALUES
         {
             using (var connection = new NpgsqlConnection(_settings.ConnectionString))
             {
+                connection.Open();
+                
                 var sql = string.Format(InsertSql, _settings.Table);
 
                 foreach (var command in commands)
                 {
                     using (var sqlCommand = connection.CreateCommand())
                     {
-                        var data = _serializer.Serialize(command);
+                        var commandData = _serializer.Serialize(command);
                         
                         sqlCommand.CommandText = sql;
-                        sqlCommand.Parameters.AddWithValue("commandId", command.Id);
-                        sqlCommand.Parameters.AddWithValue("type", command.GetType().ToString());
-                        sqlCommand.Parameters.AddWithValue("data", data);
+                        sqlCommand.Parameters.AddWithValue("@command", commandData);
+
+                        sqlCommand.ExecuteNonQuery();
                     }
                 }
             }

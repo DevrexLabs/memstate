@@ -5,45 +5,45 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    public class PostgresJournalReader : IJournalReader
+    public class PostgresqlJournalReader : IJournalReader
     {
+        private const string SelectSql = @"
+SELECT
+    id,
+    written,
+    command
+FROM
+    {0}
+WHERE
+    id >= @id
+ORDER BY
+    id ASC";
+
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
-        public PostgresJournalReader(Settings config, PostgresqlSettings settings)
+        public PostgresqlJournalReader(Settings config, PostgresqlSettings settings)
         {
             _serializer = config.CreateSerializer();
             _settings = settings;
         }
-
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
             using (var connection = CreateConnection())
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = @"
-SELECT
-    id,
-    written,
-    command
-FROM
-    commands
-WHERE
-    id >= @id
-ORDER BY
-    id ASC";
+                command.CommandText = string.Format(SelectSql, _settings.Table);
 
                 command.Parameters.AddWithValue("@id", fromRecord);
-                
+
                 connection.Open();
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        var journalRecord = ReadRecord(reader);
-                        yield return journalRecord;
+                        yield return ReadRecord(reader);
                     }
                 }
             }
@@ -51,10 +51,11 @@ ORDER BY
 
         private JournalRecord ReadRecord(IDataRecord reader)
         {
-            var recordNumber = (long)reader[0];
-            var written = (DateTime)reader[1];
-            var commandData = (byte[])reader[2];
-            var command = (Command)_serializer.Deserialize(commandData);
+            var recordNumber = (long) reader[0];
+            var written = (DateTime) reader[1];
+            var commandData = (byte[]) reader[2];
+            var command = (Command) _serializer.Deserialize(commandData);
+
             return new JournalRecord(recordNumber, written, command);
         }
 

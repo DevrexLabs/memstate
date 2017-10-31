@@ -66,7 +66,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult) _kernel.Execute(query);
+            return (TResult)_kernel.Execute(query);
         }
 
         public void Dispose()
@@ -113,6 +113,7 @@ namespace Memstate
                 {
                     _logger.LogError("ApplyRecord: RecordNumber out of order. Expected {0}, got {1}", expected, record.RecordNumber);
                 }
+
                 object result = _kernel.Execute(record.Command);
                 completion?.SetResult(result);
             }

@@ -1,6 +1,5 @@
 namespace System.Test
 {
-    using System;
     using System.Collections.Generic;
 
     using Memstate;
@@ -13,14 +12,6 @@ namespace System.Test
         {
             model.Add(StringToAdd);
             return model.Count;
-        }
-    }
-
-    public class GetStringsQuery : Query<List<string>, List<string>>
-    {
-        public override List<string> Execute(List<string> model)
-        {
-            return model;
         }
     }
 }

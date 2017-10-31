@@ -2,12 +2,12 @@ namespace Memstate
 {
     public class EngineBuilder
     {
-        private readonly Settings _config;
+        private readonly Settings _settings;
         private readonly StorageProvider _storageProvider;
 
         public EngineBuilder(Settings settings, StorageProvider storageProvider = null)
         {
-            _config = settings;
+            _settings = settings;
             _storageProvider = storageProvider ?? settings.CreateStorageProvider();
         }
 
@@ -18,14 +18,13 @@ namespace Memstate
 
         public Engine<T> Build<T>(T initialModel) where T : class
         {
-
             var reader = _storageProvider.CreateJournalReader();
             var loader = new ModelLoader();
             var model = loader.Load(reader, initialModel);
             var nextRecordNumber = loader.LastRecordNumber + 1;
             var writer = _storageProvider.CreateJournalWriter(nextRecordNumber);
             var subscriptionSource = _storageProvider.CreateJournalSubscriptionSource();
-            return new Engine<T>(_config, model, subscriptionSource, writer, nextRecordNumber);
+            return new Engine<T>(_settings, model, subscriptionSource, writer, nextRecordNumber);
         }
     }
 }

@@ -188,13 +188,12 @@ namespace System.Test
                 Assert.Equal(number, count);
             }
 
-            // todo: call to dispose hangs inmemorystorageprovider
-            //engine.Dispose();
+            engine.Dispose();
 
             engine = builder.Build<List<string>>();
             var strings = engine.Execute(new GetStringsQuery());
             Assert.Equal(NumRecords, strings.Count);
-            //engine.Dispose();
+            engine.Dispose();
         }
 
         private static IEnumerable<string> Serializers()
@@ -205,10 +204,11 @@ namespace System.Test
 
         private static IEnumerable<Type> ProviderTypes()
         {
-            yield return typeof(InMemoryStorageProvider);
-            //yield return typeof(FileStorageProvider);
-            //yield return typeof(EventStoreProvider);
-            //yield return typeof(PostgresqlProvider);
+            //todo: broken provider, Engine.Dispose hangs
+            //yield return typeof(InMemoryStorageProvider);
+            yield return typeof(FileStorageProvider);
+            yield return typeof(EventStoreProvider);
+            yield return typeof(PostgresqlProvider);
         }
 
         private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)

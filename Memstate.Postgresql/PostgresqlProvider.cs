@@ -59,19 +59,19 @@ CREATE TRIGGER ""{1}_notify_command""
 
         public override IJournalReader CreateJournalReader()
         {
-            return new PostgresqlJournalReader(Config, _settings);
+            return new PostgresqlJournalReader(_settings);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             // todo: nextRecordNumber unused
 
-            return new PostgresqlJournalWriter(Config, _settings);
+            return new PostgresqlJournalWriter(_settings);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new PostgresqlSubscriptionSource(Config, _settings);
+            return new PostgresqlSubscriptionSource(_settings);
         }
 
         public override void Dispose()

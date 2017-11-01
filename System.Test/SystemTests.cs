@@ -117,7 +117,7 @@ namespace System.Test
                 var subSource = provider.CreateJournalSubscriptionSource();
                 subSource.Subscribe(0, records.Add);
                 await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int) r.RecordNumber));
+                Assert.Equal(Enumerable.Range(1, NumRecords).ToArray(), records.Select(r => (int) r.RecordNumber).ToArray());
             }
         }
 

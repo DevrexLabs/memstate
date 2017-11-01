@@ -22,10 +22,10 @@ ORDER BY
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
-        public PostgresqlJournalReader(Settings config, PostgresqlSettings settings)
+        public PostgresqlJournalReader(PostgresqlSettings settings)
         {
-            _serializer = config.CreateSerializer();
             _settings = settings;
+            _serializer = _settings.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

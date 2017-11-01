@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="benchmarkdotnet" Version="0.10.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MemState.EventStore\Memstate.EventStore.csproj" />
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgresql.csproj" />
+    <ProjectReference Include="..\Memstate\Memstate.csproj" />
+  </ItemGroup>
+
+</Project>

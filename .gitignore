@@ -12,6 +12,9 @@
 tools/*
 !tools/packages.config
 
+#benchmark artifacts
+BenchmarkDoNet.Artifacts/
+
 # Build results
 
 [Dd]ebug/

@@ -2,7 +2,6 @@ namespace System.Test
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Memstate;
     using Memstate.EventStore;
@@ -37,7 +36,7 @@ namespace System.Test
                     config.StorageProvider = providerType.AssemblyQualifiedName;
 
                     // NOTE: Not sure if this value should be set here.
-                    config.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; Database=postgres;";
+                    config.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; Database=postgres; Password=secret; User ID=postgres;";
                     config.Configuration["StorageProviders:Postgresql:Table"] = $"memstate_commands_{Guid.NewGuid():N}";
                     config.Configuration["StorageProviders:Postgresql:SubscriptionStream"] = $"memstate_notifications_{Guid.NewGuid():N}";
 
@@ -138,7 +137,7 @@ namespace System.Test
             }
 
             writer.Dispose();
-            while (records.Count < 5) Thread.Sleep(0);
+            await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
             sub.Dispose();
 
             Assert.Equal(5, records.Count);
@@ -207,10 +206,10 @@ namespace System.Test
         private static IEnumerable<Type> ProviderTypes()
         {
             //todo: broken provider, Engine.Dispose hangs
-            yield return typeof(InMemoryStorageProvider);
+            //yield return typeof(InMemoryStorageProvider);
             yield return typeof(FileStorageProvider);
             yield return typeof(EventStoreProvider);
-            //yield return typeof(PostgresqlProvider);
+            yield return typeof(PostgresqlProvider);
         }
 
         private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)

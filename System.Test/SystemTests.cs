@@ -176,6 +176,8 @@ namespace System.Test
         [MemberData(nameof(Configurations))]
         public async Task Smoke(Settings settings)
         {
+            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+
             const int NumRecords = 100;
 
             var builder = new EngineBuilder(settings);
@@ -205,10 +207,10 @@ namespace System.Test
         private static IEnumerable<Type> ProviderTypes()
         {
             //todo: broken provider, Engine.Dispose hangs
-            //yield return typeof(InMemoryStorageProvider);
+            yield return typeof(InMemoryStorageProvider);
             yield return typeof(FileStorageProvider);
             yield return typeof(EventStoreProvider);
-            yield return typeof(PostgresqlProvider);
+            //yield return typeof(PostgresqlProvider);
         }
 
         private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)

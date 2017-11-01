@@ -16,7 +16,7 @@
         {
         }
 
-        public InMemoryStorageProvider(Settings settings, long nextRecord = 0) 
+        public InMemoryStorageProvider(Settings settings, long nextRecord  = 0) 
             : base(settings)
         {
             _batchingLogger = new Batcher<Command>(settings, 100);

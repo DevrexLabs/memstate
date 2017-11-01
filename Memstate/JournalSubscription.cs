@@ -1,14 +1,14 @@
-﻿using System;
-
-namespace Memstate
+﻿namespace Memstate
 {
-    public class JournalSubscription :  IJournalSubscription
+    using System;
+
+    public class JournalSubscription : IJournalSubscription
     {
         public readonly Guid Id = Guid.NewGuid();
         private readonly Action<JournalRecord> _callback;
-        private long _nextRecord;
         private readonly Action<JournalSubscription> _onDisposed;
-
+        private long _nextRecord;
+        
         public JournalSubscription(Action<JournalRecord> callback, long nextRecord, Action<JournalSubscription> onDisposed)
         {
             _nextRecord = nextRecord;
@@ -28,7 +28,11 @@ namespace Memstate
 
         public void Handle(JournalRecord record)
         {
-            if (record.RecordNumber != _nextRecord) throw new InvalidOperationException("expected version " + _nextRecord + ", got " + record.RecordNumber);
+            if (record.RecordNumber != _nextRecord)
+            {
+                throw new InvalidOperationException("expected version " + _nextRecord + ", got " + record.RecordNumber);
+            }
+
             _nextRecord++;
             _callback.Invoke(record);
         }

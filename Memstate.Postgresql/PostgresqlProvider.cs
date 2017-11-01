@@ -38,7 +38,7 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE IF NOT EXISTS ""{1}"" (
     ""id"" BIGSERIAL NOT NULL PRIMARY KEY,
     ""written"" TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
-    ""command"" BYTEA NOT NULL
+    ""command"" VARCHAR NOT NULL
 );
 
 DROP TRIGGER IF EXISTS ""{1}_notify_command"" ON ""{1}"";

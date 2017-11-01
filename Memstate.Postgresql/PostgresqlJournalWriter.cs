@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Npgsql;
 
 namespace Memstate.Postgresql
@@ -38,9 +39,11 @@ VALUES
                     using (var sqlCommand = connection.CreateCommand())
                     {
                         var commandData = _serializer.Serialize(command);
+
+                        var commandDataString = Convert.ToBase64String(commandData);
                         
                         sqlCommand.CommandText = sql;
-                        sqlCommand.Parameters.AddWithValue("@command", commandData);
+                        sqlCommand.Parameters.AddWithValue("@command", commandDataString);
 
                         sqlCommand.ExecuteNonQuery();
                     }

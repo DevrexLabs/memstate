@@ -9,6 +9,9 @@ namespace Memstate
         {
             _settings = settings;
             _storageProvider = storageProvider ?? settings.CreateStorageProvider();
+            
+            // TODO: Figure out what to do if initialization has already been executed.
+            _storageProvider.Initialize();
         }
 
         public Engine<T> Build<T>() where T : class, new()

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Diagnostics;
 using System.Threading;
 using Newtonsoft.Json;
 using Npgsql;
@@ -28,6 +30,8 @@ namespace Memstate.Postgresql
             // Read buffered commands
             // Ready
             // Process incoming
+            
+            return new PostgresqlJournalSubscription();
 
             throw new NotImplementedException();
         }
@@ -37,41 +41,58 @@ namespace Memstate.Postgresql
             _listenerThread = new Thread(
                 () =>
                 {
-                    var serializser = _settings.CreateSerializer();
-
                     using (var connection = new NpgsqlConnection(_settings.ConnectionString))
                     {
                         connection.Open();
 
+                        SendListenCommand(connection);
+
                         connection.Notification += (sender, arguments) =>
                         {
-                            var row = JsonConvert.DeserializeObject<Row>(arguments.AdditionalInformation);
-
-                            var command = (Command) serializser.Deserialize(row.Data);
-
-                            var record = new JournalRecord(row.Id, row.Written, command);
+                            Debug.WriteLine("Received a notification from Postgres");
 
                             try
                             {
+                                var row = JsonConvert.DeserializeObject<Row>(arguments.AdditionalInformation);
+
+                                var command = (Command) _serializer.Deserialize(row.Command);
+
+                                var record = new JournalRecord(row.Id, row.Written, command);
+                                
                                 handler(record);
                             }
-                            catch (Exception)
+                            catch (Exception exception)
                             {
                                 // TODO: Log the exception.
+                                Debug.WriteLine($"Exception: {exception.Message}");
                             }
                         };
 
                         while (_listenerThread.IsAlive)
                         {
+                            Debug.WriteLine("Waiting for incoming Postgres connections...");
+                            
                             connection.Wait();
                         }
                     }
                 });
 
+            _listenerThread.Name = "Memstate:Postgresql:NotificationsListener";
+
             _listenerThread.Start();
         }
 
-        public class PostgresqlCommandSubscription : IJournalSubscription
+        private void SendListenCommand(IDbConnection connection)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = $"LISTEN {_settings.SubscriptionStream};";
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public class PostgresqlJournalSubscription : IJournalSubscription
         {
             public void Dispose()
             {
@@ -92,8 +113,8 @@ namespace Memstate.Postgresql
             [JsonProperty("written")]
             public DateTime Written { get; set; }
 
-            [JsonProperty("data")]
-            public byte[] Data { get; set; }
+            [JsonProperty("command")]
+            public byte[] Command { get; set; }
         }
     }
 }

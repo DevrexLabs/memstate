@@ -53,7 +53,7 @@ ORDER BY
         {
             var recordNumber = (long) reader[0];
             var written = (DateTime) reader[1];
-            var commandData = (byte[]) reader[2];
+            var commandData = Convert.FromBase64String((string) reader[2]);
             var command = (Command) _serializer.Deserialize(commandData);
 
             return new JournalRecord(recordNumber, written, command);

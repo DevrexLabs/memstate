@@ -21,7 +21,7 @@
         private Set<int> _setCommand;
 
         [Params(
-            typeof(InMemoryStorageProvider), 
+            typeof(InMemoryStorageProvider),
             // todo: eventstore hangs, investigate. looks like recordnumber problem
             // typeof(EventStoreProvider),
             typeof(PostgresqlProvider))]
@@ -30,7 +30,6 @@
         [GlobalSetup]
         public void Setup()
         {
-
             var settings = new Settings().WithRandomStreamName();
 
             /* 
@@ -46,6 +45,12 @@
             var engineBuilder = new EngineBuilder(settings);
             _engine = engineBuilder.Build(new KeyValueStore<int>());
             _setCommand = new Set<int>("Key", 42);
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            _engine.Dispose();
         }
 
         [Benchmark]

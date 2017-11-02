@@ -17,8 +17,10 @@
         {
         }
 
-        public string ConnectionString { get; set; }
-        
+        public string ConnectionString { get; set; } =
+            "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
+
+
         public string Table { get; set; } = "memstate_commands";
 
         public string SubscriptionStream { get; set; } = "memstate_notifications";

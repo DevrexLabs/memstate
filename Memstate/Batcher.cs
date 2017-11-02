@@ -36,7 +36,7 @@
         {
             _logger.LogDebug("Begin Dispose");
             _items.CompleteAdding();
-            _batchTask.Wait();
+            _batchTask.Wait(TimeSpan.FromSeconds(1));
             _logger.LogDebug("End Dispose");
         }
 

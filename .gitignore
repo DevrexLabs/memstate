@@ -166,3 +166,6 @@ $RECYCLE.BIN/
 
 # Ignore IntelliJ files
 .idea/
+
+# Ignore Benchmark.NET artifacts
+*/BenchmarkDotNet.Artifacts/

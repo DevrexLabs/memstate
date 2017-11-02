@@ -145,24 +145,6 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(Configurations))]
-        public async Task EventsWrittenAppearOnCatchUpSubscription(StorageProvider provider)
-        {
-            // Arrange
-            var records = new List<JournalRecord>();
-            var subSource = provider.CreateJournalSubscriptionSource();
-            var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter(1);
-
-            writer.Dispose();
-
-            await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
-            sub.Dispose();
-
-            Assert.Equal(5, records.Count);
-        }
-
-        [Theory]
-        [MemberData(nameof(Configurations))]
         public void Can_execute_void_commands(Settings settings)
         {
             var builder = new EngineBuilder(settings);

@@ -66,7 +66,7 @@ namespace System.Test
         {
             var provider = settings.CreateStorageProvider();
             provider.Initialize();
-            var writer = provider.CreateJournalWriter(1);
+            var writer = provider.CreateJournalWriter(0);
 
             writer.Send(new AddStringCommand());
             writer.Dispose();
@@ -83,7 +83,7 @@ namespace System.Test
         {
             provider.Initialize();
             
-            var journalWriter = provider.CreateJournalWriter(1);
+            var journalWriter = provider.CreateJournalWriter(0);
 
             for (var i = 0; i < 10000; i++)
             {
@@ -104,7 +104,7 @@ namespace System.Test
             using (provider)
             {
                 const int NumRecords = 50;
-                var journalWriter = provider.CreateJournalWriter(1);
+                var journalWriter = provider.CreateJournalWriter(0);
                 for (var i = 0; i < NumRecords; i++)
                 {
                     journalWriter.Send(new AddStringCommand());
@@ -116,7 +116,7 @@ namespace System.Test
                 var subSource = provider.CreateJournalSubscriptionSource();
                 subSource.Subscribe(0, records.Add);
                 await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.Equal(Enumerable.Range(1, NumRecords).ToArray(), records.Select(r => (int) r.RecordNumber).ToArray());
+                Assert.Equal(Enumerable.Range(0, NumRecords).ToArray(), records.Select(r => (int) r.RecordNumber).ToArray());
             }
         }
 
@@ -129,7 +129,7 @@ namespace System.Test
             var records = new List<JournalRecord>();
             var subSource = provider.CreateJournalSubscriptionSource();
             var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter(1);
+            var writer = provider.CreateJournalWriter(0);
 
             for (var i = 0; i < NumRecords; i++)
             {

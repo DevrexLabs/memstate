@@ -36,10 +36,14 @@ CREATE OR REPLACE FUNCTION {1}_notify_command() RETURNS TRIGGER AS $$
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS ""{1}"" (
-    ""id"" BIGSERIAL NOT NULL PRIMARY KEY,
+    ""id"" BIGINT NOT NULL PRIMARY KEY,
     ""written"" TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
     ""command"" VARCHAR NOT NULL
 );
+
+CREATE SEQUENCE IF NOT EXISTS ""{1}_id_seq"" MINVALUE 0 OWNED BY ""{1}"".""id"";
+
+ALTER TABLE ""{1}"" ALTER ""id"" SET DEFAULT nextval('{1}_id_seq');
 
 DROP TRIGGER IF EXISTS ""{1}_notify_command"" ON ""{1}"";
 

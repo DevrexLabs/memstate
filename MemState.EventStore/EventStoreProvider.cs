@@ -9,7 +9,7 @@ namespace Memstate.EventStore
         private readonly IEventStoreConnection _connection;
 
         public EventStoreProvider(Settings settings)
-            : this(settings, null)
+            : this(new EventStoreSettings(settings))
         {
         }
 
@@ -23,6 +23,13 @@ namespace Memstate.EventStore
             }
 
             _connection = connection;
+        }
+
+        public EventStoreProvider(EventStoreSettings settings)
+            : base(settings)
+        {
+            _connection = EventStoreConnection.Create(settings.ConnectionString);
+            _connection.ConnectAsync().Wait();
         }
 
         public override IJournalReader CreateJournalReader()

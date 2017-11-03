@@ -11,19 +11,19 @@ namespace Memstate.EventStore
     {
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
-        private readonly String _streamName;
+        private readonly string _streamName;
         private readonly int _eventsPerSlice;
 
         private readonly ILogger _logger;
 
 
-        public EventStoreReader(MemstateSettings config, IEventStoreConnection connection, ISerializer serializer, String streamName, int eventsPerSlice = 1024)
+        public EventStoreReader(MemstateSettings config, EventStoreSettings eventStoreSettings, IEventStoreConnection connection)
         {
             _logger = config.CreateLogger<EventStoreReader>();
             _connection = connection;
-            _serializer = serializer;
-            _streamName = streamName;
-            _eventsPerSlice = eventsPerSlice;
+            _serializer = config.CreateSerializer();
+            _streamName = eventStoreSettings.StreamName;
+            _eventsPerSlice = eventStoreSettings.EventsPerSlice;
         }
 
         public void Dispose()
@@ -42,9 +42,14 @@ namespace Memstate.EventStore
                 {
                     yield return @event.ToJournalRecord(_serializer);
                 }
-                if (slice.IsEndOfStream) break;
+                if (slice.IsEndOfStream)
+                {
+                    break;
+                }
+
                 nextRecord = slice.NextEventNumber;
             }
+
             _logger.LogInformation("GetRecords completed");
         }
     }

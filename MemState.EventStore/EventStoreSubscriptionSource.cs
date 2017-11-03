@@ -15,17 +15,16 @@ namespace Memstate.EventStore
 
         private readonly ILogger _logger;
 
-        public EventStoreSubscriptionSource(MemstateSettings config, IEventStoreConnection connection, 
-            ISerializer serializer, 
-            string streamName,
-            CatchUpSubscriptionSettings subscriptionSettings = null
-        )
+        public EventStoreSubscriptionSource(
+            MemstateSettings config, 
+            IEventStoreConnection connection, 
+            CatchUpSubscriptionSettings subscriptionSettings = null)
         {
             _logger = config.CreateLogger<EventStoreSubscriptionSource>();
             _config = config;
             _connection = connection;
-            _serializer = serializer;
-            _streamName = streamName;
+            _serializer = config.CreateSerializer();
+            _streamName = new EventStoreSettings(config).StreamName;
             _settings = subscriptionSettings 
                         ?? new CatchUpSubscriptionSettings(10000, 4096, false, false);
         }
@@ -33,7 +32,10 @@ namespace Memstate.EventStore
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
             long? checkPoint = null;
-            if (from > 0) checkPoint = from - 1;
+            if (from > 0)
+            {
+                checkPoint = from - 1;
+            }
 
             var ready = false;
             var sub = _connection.SubscribeToStreamFrom(

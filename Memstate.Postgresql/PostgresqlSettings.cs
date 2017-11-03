@@ -1,19 +1,13 @@
 ﻿namespace Memstate.Postgresql
 {
     using System;
-    using Microsoft.Extensions.Configuration;
 
-    public class PostgresqlSettings : MemstateSettings
+    public class PostgresqlSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
 
-        public PostgresqlSettings(IConfiguration configuration)
-            : base(configuration.GetSection(ConfigurationKey))
-        {
-        }
-
         public PostgresqlSettings(MemstateSettings settings)
-            : this(settings.Configuration)
+            : base(settings, ConfigurationKey)
         {
         }
 
@@ -28,20 +22,9 @@
 
         public override void Validate()
         {
-            if (string.IsNullOrWhiteSpace(ConnectionString))
-            {
-                throw new ArgumentException("Property must have a value.", nameof(ConnectionString));
-            }
-
-            if (string.IsNullOrWhiteSpace(Table))
-            {
-                throw new ArgumentException("Property must have a value.", nameof(Table));
-            }
-
-            if (string.IsNullOrWhiteSpace(SubscriptionStream))
-            {
-                throw new ArgumentException("Property must have a value.", nameof(SubscriptionStream));
-            }
+            Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
+            Ensure.NotNullOrEmpty(Table, nameof(Table));
+            Ensure.NotNullOrEmpty(SubscriptionStream, nameof(SubscriptionStream));
         }
     }
 }

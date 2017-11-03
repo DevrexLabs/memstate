@@ -8,21 +8,24 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlJournalSubscription : IJournalSubscription
     {
+        private static readonly object Lock = new object();
         private readonly Thread _listenerThread;
         private readonly PostgresqlSettings _settings;
+        private readonly MemstateSettings _memstateSettings;
         private readonly Action<JournalRecord> _handler;
         private readonly ILogger _log;
         private readonly RingBuffer<JournalRecord> _buffer = new RingBuffer<JournalRecord>(4096);
-        private static readonly object Lock = new object();
+
         private bool _shouldListen;
         private bool _ready;
 
-        public PostgresqlJournalSubscription(PostgresqlSettings settings, Action<JournalRecord> handler)
+        public PostgresqlJournalSubscription(MemstateSettings memstateSettings, Action<JournalRecord> handler)
         {
-            _settings = settings;
+            _memstateSettings = memstateSettings;
+            _settings = new PostgresqlSettings(memstateSettings);
             _handler = handler;
 
-            _log = _settings.LoggerFactory.CreateLogger("Memstate:Postgresql");
+            _log = memstateSettings.LoggerFactory.CreateLogger("Memstate:Postgresql");
 
             _listenerThread = new Thread(Listen)
             {
@@ -39,7 +42,7 @@ namespace Memstate.Postgresql
 
         public void CatchUp(long from)
         {
-            var reader = new PostgresqlJournalReader(_settings);
+            var reader = new PostgresqlJournalReader(_memstateSettings);
 
             while (true)
             {
@@ -125,7 +128,7 @@ namespace Memstate.Postgresql
 
         private void HandleNotification(object sender, NpgsqlNotificationEventArgs arguments)
         {
-            var serializer = _settings.CreateSerializer();
+            var serializer = _memstateSettings.CreateSerializer();
 
             try
             {

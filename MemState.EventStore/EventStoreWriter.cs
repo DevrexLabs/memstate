@@ -1,28 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
 namespace Memstate.EventStore
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using global::EventStore.ClientAPI;
+    using Microsoft.Extensions.Logging;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
+
     public class EventStoreWriter : BatchingJournalWriter
     {
         private readonly IEventStoreConnection _eventStore;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
-
         private readonly ILogger _logger;
 
-        public EventStoreWriter(MemstateSettings config, IEventStoreConnection connection, ISerializer serializer, String streamName) 
-            : base(config)
+        public EventStoreWriter(MemstateSettings settings, IEventStoreConnection connection) 
+            : base(settings)
         {
-            _logger = config.CreateLogger<EventStoreWriter>();
-            _serializer = serializer;
+            _logger = settings.CreateLogger<EventStoreWriter>();
+            _serializer = settings.CreateSerializer();
             _eventStore = connection;
-            _streamName = streamName;
+            _streamName = new EventStoreSettings(settings).StreamName;
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)

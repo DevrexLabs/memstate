@@ -9,7 +9,6 @@
         private FileJournalWriter _currentWriter;
 
         public FileStorageProvider(MemstateSettings settings)
-            : base(settings)
         {
             _settings = settings;
             _fileStorageSettings = new FileStorageSettings(settings);

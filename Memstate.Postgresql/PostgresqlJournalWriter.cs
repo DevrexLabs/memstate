@@ -19,11 +19,11 @@ VALUES
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
-        public PostgresqlJournalWriter(PostgresqlSettings settings)
+        public PostgresqlJournalWriter(MemstateSettings settings)
             : base(settings)
         {
-            _settings = settings;
-            _serializer = _settings.CreateSerializer();
+            _serializer = settings.CreateSerializer();
+            _settings = new PostgresqlSettings(settings);
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)

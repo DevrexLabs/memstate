@@ -14,7 +14,7 @@ namespace Memstate
             Register("InmemoryStorage", settings => new InMemoryStorageProvider(settings));
         }
 
-        public static StorageProvider Create(Settings settings)
+        public static StorageProvider Create(MemstateSettings settings)
         {
             var providerName = settings.StorageProvider;
             if (RegisteredProviders.TryGetValue(providerName, out var providerConstructor))
@@ -25,12 +25,12 @@ namespace Memstate
             throw new ArgumentException("Unrecognized StorageProvider", providerName);
         }
 
-        public static void Register(string name, Func<Settings, StorageProvider> constructor)
+        public static void Register(string name, Func<MemstateSettings, StorageProvider> constructor)
         {
             RegisteredProviders[name] = constructor;
         }
 
-        private class Registry : Dictionary<string, Func<Settings, StorageProvider>>
+        private class Registry : Dictionary<string, Func<MemstateSettings, StorageProvider>>
         {
             public Registry() : base(StringComparer.OrdinalIgnoreCase)
             {

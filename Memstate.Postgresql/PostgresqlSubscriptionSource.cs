@@ -4,9 +4,9 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly PostgresqlSettings _settings;
+        private readonly MemstateSettings _settings;
 
-        public PostgresqlSubscriptionSource(PostgresqlSettings settings)
+        public PostgresqlSubscriptionSource(MemstateSettings settings)
         {
             _settings = settings;
         }

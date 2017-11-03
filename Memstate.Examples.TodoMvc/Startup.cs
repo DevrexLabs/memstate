@@ -28,7 +28,7 @@ namespace Memstate.Examples.TodoMvc
 
             services.AddSingleton(provider =>
             {
-                var settings = new Settings();
+                var settings = new MemstateSettings();
 
                 return new EngineBuilder(settings).Build<TodoModel>();
             });

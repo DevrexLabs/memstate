@@ -6,7 +6,7 @@ namespace Memstate.EventStore
 {
     public class EventStoreConnectionMonitor
     {
-        public EventStoreConnectionMonitor(Settings config, IEventStoreConnection connection)
+        public EventStoreConnectionMonitor(MemstateSettings config, IEventStoreConnection connection)
         {
             ILogger logger = config.CreateLogger<EventStoreConnectionMonitor>();
             string connectionName = connection.ConnectionName;

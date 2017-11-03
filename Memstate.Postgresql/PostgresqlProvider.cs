@@ -4,20 +4,17 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlProvider : StorageProvider
     {
-        private readonly PostgresqlSettings _settings;
+        private readonly MemstateSettings _settings;
 
-        public PostgresqlProvider(PostgresqlSettings settings)
-            : base(settings)
+        private readonly PostgresqlSettings _pgSettings;
+
+        public PostgresqlProvider(MemstateSettings settings)
         {
             _settings = settings;
+            _pgSettings = new PostgresqlSettings(settings);
         }
 
-        public PostgresqlProvider(Settings memstateSettings)
-            : this(new PostgresqlSettings(memstateSettings))
-        {
-        }
-
-        public PostgresqlSettings Settings => _settings;
+        public PostgresqlSettings Settings => _pgSettings;
 
         public override void Initialize()
         {
@@ -52,11 +49,11 @@ CREATE TRIGGER ""{1}_notify_command""
     FOR EACH ROW EXECUTE PROCEDURE {1}_notify_command();
             ";
 
-            using (var connection = new NpgsqlConnection(_settings.ConnectionString))
+            using (var connection = new NpgsqlConnection(_pgSettings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                command.CommandText = string.Format(sql, _settings.SubscriptionStream, _settings.Table);
+                command.CommandText = string.Format(sql, _pgSettings.SubscriptionStream, _pgSettings.Table);
                 command.ExecuteNonQuery();
             }
         }

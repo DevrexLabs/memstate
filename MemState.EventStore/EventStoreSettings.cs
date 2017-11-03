@@ -1,30 +1,23 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-
-namespace Memstate.EventStore
+﻿namespace Memstate.EventStore
 {
     public class EventStoreSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:EventStore";
 
-        public EventStoreSettings(IConfiguration configuration)
-            : base(configuration.GetSection(ConfigurationKey))
-        {
-        }
-
-        public EventStoreSettings(Settings settings)
-            : this(settings.Configuration)
+        public EventStoreSettings(MemstateSettings settings)
+            : base(settings, ConfigurationKey)
         {
         }
 
         public string ConnectionString { get; set; } = "ConnectTo=tcp://admin:changeit@localhost:1113";
 
+        public string StreamName { get; set; } = "memstate";
+
+        public int EventsPerSlice { get; set; } = 1024;
+
         public override void Validate()
         {
-            if (string.IsNullOrEmpty(ConnectionString))
-            {
-                throw new ArgumentException("Property must have a value.", nameof(ConnectionString));
-            }
+            Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
         }
     }
 }

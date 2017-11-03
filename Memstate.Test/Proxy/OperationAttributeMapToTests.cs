@@ -41,7 +41,7 @@ namespace Memstate.Tests.DispatchProxy
         [Fact]
         public void MapsToCommand()
         {
-            var config  = new Settings();
+            var config  = new MemstateSettings();
             config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
             var storageProvider = config.CreateStorageProvider();
             var builder = new EngineBuilder(config, storageProvider);

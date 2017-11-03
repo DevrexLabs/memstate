@@ -9,7 +9,7 @@ namespace Memstate.JsonNet
     {
         private readonly JsonSerializer _serializer;
 
-        public JsonSerializerAdapter(Settings config = null)
+        public JsonSerializerAdapter(MemstateSettings config = null)
         {
             var settings = new JsonSerializerSettings
             {

@@ -1,65 +1,41 @@
 namespace Memstate
 {
     using System;
-    using System.Reflection;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
 
-    public class Settings
+    public abstract class Settings
     {
-        // https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
-        private readonly IConfiguration _configuration;
-
-        public Settings(string[] args = null)
+        protected Settings(Settings parent, string configurationKey)
         {
-            _configuration = new ConfigurationBuilder()
+            Ensure.NotNull(parent, nameof(parent));
+            Ensure.NotNullOrEmpty(configurationKey, nameof(configurationKey));
+
+            Configuration = parent.Configuration.GetSection(configurationKey);
+            Configuration.Bind(this);
+        }
+
+        protected Settings(IConfiguration configuration)
+        {
+            Configuration = configuration;
+            Configuration.Bind(this);
+        }
+
+        protected Settings(string configurationKey, params string[] commandLineArguments)
+        {
+            Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddEnvironmentVariables()
-                .AddCommandLine(args ?? Array.Empty<string>())
+                .AddCommandLine(commandLineArguments ?? Array.Empty<string>())
                 .Build()
-                .GetSection("Memstate");
-
-            _configuration.Bind(this);
+                .GetSection(configurationKey);
+            Configuration.Bind(this);
         }
 
-        public Settings(IConfiguration config)
-        {
-            _configuration = config;
-            _configuration.Bind(this);
-        }
+        // https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
+        public IConfiguration Configuration { get; protected set; }
 
-        public IConfiguration Configuration => _configuration;
-
-        public string StreamName { get; set; } = "memstate";
-
-        public string StorageProvider { get; set; } = "Memstate.FileStorageProvider";
-
-        public string Serializer { get; set; } = "Memstate.Wire.WireSerializerAdapter";
-
-        public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
-
-        public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
-
-        public ISerializer CreateSerializer() => Resolve<ISerializer>(Serializer);
-
-        public StorageProvider CreateStorageProvider() => Resolve<StorageProvider>(StorageProvider);
-
-        /// <summary>
-        /// Ensure the configuration is valid or throw an InvalidConfigurationException
-        /// </summary>
         public virtual void Validate()
         {
-        }
-
-        public ILogger<T> CreateLogger<T>()
-        {
-            return LoggerFactory.CreateLogger<T>();
-        }
-
-        private T Resolve<T>(string typeName)
-        {
-            var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
-            return (T)Activator.CreateInstance(type, this);
         }
     }
 }

@@ -2,10 +2,10 @@ namespace Memstate
 {
     public class EngineBuilder
     {
-        private readonly Settings _settings;
+        private readonly MemstateSettings _settings;
         private readonly StorageProvider _storageProvider;
 
-        public EngineBuilder(Settings settings, StorageProvider storageProvider = null)
+        public EngineBuilder(MemstateSettings settings, StorageProvider storageProvider = null)
         {
             _settings = settings;
             _storageProvider = storageProvider ?? settings.CreateStorageProvider();

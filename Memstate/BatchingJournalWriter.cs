@@ -6,7 +6,7 @@ namespace Memstate
     {
         private readonly Batcher<Command> _batcher;
 
-        protected BatchingJournalWriter(Settings config)
+        protected BatchingJournalWriter(MemstateSettings config)
         {
             _batcher = new Batcher<Command>(config);
             _batcher.OnBatch += OnCommandBatch;

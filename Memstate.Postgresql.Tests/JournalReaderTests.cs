@@ -10,8 +10,6 @@ namespace Memstate.Postgresql.Tests
 
     public class JournalReaderTests : IDisposable
     {
-        private const string ConnectionString = "Host=localhost; Database=postgres;";
-
         private readonly PostgresqlProvider _provider;
         private readonly IJournalReader _journalReader;
         private readonly IJournalWriter _journalWriter;
@@ -19,12 +17,10 @@ namespace Memstate.Postgresql.Tests
 
         public JournalReaderTests()
         {
-            var settings = new PostgresqlSettings(new Settings())
-            {
-                ConnectionString = ConnectionString,
-                Table = $"memstate_{Guid.NewGuid():N}",
-                SubscriptionStream = $"memstate_{Guid.NewGuid():N}_notifications"
-            };
+            var settings = new MemstateSettings();
+
+                //Table = $"memstate_{Guid.NewGuid():N}",
+                //SubscriptionStream = $"memstate_{Guid.NewGuid():N}_notifications"
             
             _provider = new PostgresqlProvider(settings);
             
@@ -70,7 +66,7 @@ namespace Memstate.Postgresql.Tests
 
         private void InsertCommand(byte[] data)
         {
-            using (var connection = new NpgsqlConnection(ConnectionString))
+            using (var connection = new NpgsqlConnection(_provider.Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
@@ -96,7 +92,7 @@ VALUES
         {
             var journalRecords = new List<JournalRecord>();
             
-            using (var connection = new NpgsqlConnection(ConnectionString))
+            using (var connection = new NpgsqlConnection(_provider.Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();

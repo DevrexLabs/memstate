@@ -22,10 +22,10 @@ ORDER BY
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
-        public PostgresqlJournalReader(PostgresqlSettings settings)
+        public PostgresqlJournalReader(MemstateSettings memstateSettings)
         {
-            _settings = settings;
-            _serializer = _settings.CreateSerializer();
+            _settings = new PostgresqlSettings(memstateSettings);
+            _serializer = memstateSettings.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
@@ -49,6 +49,10 @@ ORDER BY
             }
         }
 
+        public void Dispose()
+        {
+        }
+
         private JournalRecord ReadRecord(IDataRecord reader)
         {
             var recordNumber = (long) reader[0];
@@ -62,10 +66,6 @@ ORDER BY
         private NpgsqlConnection CreateConnection()
         {
             return new NpgsqlConnection(_settings.ConnectionString);
-        }
-
-        public void Dispose()
-        {
         }
     }
 }

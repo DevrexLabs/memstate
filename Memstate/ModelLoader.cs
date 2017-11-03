@@ -1,7 +1,7 @@
-using System;
-
 namespace Memstate
 {
+    using System;
+
     public class ModelLoader
     {
         public ModelLoader()
@@ -11,7 +11,8 @@ namespace Memstate
 
         public long LastRecordNumber { get; private set; }
 
-        public TModel Load<TModel>(IJournalReader reader) where TModel:new()
+        public TModel Load<TModel>(IJournalReader reader)
+            where TModel : new()
         {
             TModel model = new TModel();
 
@@ -27,7 +28,10 @@ namespace Memstate
                     journalRecord.Command.ExecuteImpl(model);
                     LastRecordNumber = journalRecord.RecordNumber;
                 }
-                catch {}
+                catch
+                {
+                    // ignored
+                }
             }
             return model;
         }

@@ -4,13 +4,6 @@ namespace Memstate
 
     public abstract class StorageProvider : IDisposable
     {
-        protected readonly Settings Config;
-
-        protected StorageProvider(Settings config)
-        {
-            Config = config;
-        }
-
         public virtual void Initialize()
         {
         }

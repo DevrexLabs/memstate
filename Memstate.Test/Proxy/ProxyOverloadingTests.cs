@@ -10,7 +10,7 @@ namespace Memstate.Tests.DispatchProxy
 
         public ProxyOverloadingTests()
         {
-            var settings = new Settings().WithInmemoryStorage();
+            var settings = new MemstateSettings().WithInmemoryStorage();
             var storageProvider = settings.CreateStorageProvider();
             var engine = new EngineBuilder(settings, storageProvider).Build<ModelWithOverloads>();
             var client = new LocalClient<ModelWithOverloads>(engine);

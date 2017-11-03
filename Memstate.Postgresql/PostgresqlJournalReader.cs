@@ -24,6 +24,7 @@ ORDER BY
 
         public PostgresqlJournalReader(MemstateSettings memstateSettings)
         {
+            Ensure.NotNull(memstateSettings, nameof(memstateSettings));
             _settings = new PostgresqlSettings(memstateSettings);
             _serializer = memstateSettings.CreateSerializer();
         }

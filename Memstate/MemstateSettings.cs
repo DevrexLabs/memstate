@@ -38,7 +38,7 @@ namespace Memstate
 
         public override string ToString()
         {
-            return $"[MemstateSettings -> Name:{StreamName}, Provider:{StorageProvider}, Serializer: {Serializer}]";
+            return $"[Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}]";
         }
 
         private T CreateInstanceFromTypeName<T>(string typeName)

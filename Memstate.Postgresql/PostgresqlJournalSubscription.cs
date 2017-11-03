@@ -21,6 +21,7 @@ namespace Memstate.Postgresql
 
         public PostgresqlJournalSubscription(MemstateSettings memstateSettings, Action<JournalRecord> handler)
         {
+            Ensure.NotNull(memstateSettings, nameof(memstateSettings));
             _memstateSettings = memstateSettings;
             _settings = new PostgresqlSettings(memstateSettings);
             _handler = handler;

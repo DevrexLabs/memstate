@@ -9,6 +9,7 @@
         public PostgresqlSettings(MemstateSettings settings)
             : base(settings, ConfigurationKey)
         {
+            Ensure.NotNull(settings, nameof(settings));
             _memstateSettings = settings;
         }
 
@@ -18,9 +19,9 @@
 
         public string SubscriptionStreamSuffix { get; set; } = "_notifications";
 
-        public string Table => _memstateSettings.StreamName + TableSuffix;
+        public string Table => _memstateSettings?.StreamName + TableSuffix;
 
-        public string SubscriptionStream => _memstateSettings.StreamName + SubscriptionStreamSuffix;
+        public string SubscriptionStream => _memstateSettings?.StreamName + SubscriptionStreamSuffix;
 
         public override void Validate()
         {

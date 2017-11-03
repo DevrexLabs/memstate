@@ -15,6 +15,7 @@ namespace Memstate.Postgresql
         public PostgresqlJournalWriter(MemstateSettings settings)
             : base(settings)
         {
+            Ensure.NotNull(settings, nameof(settings));
             _serializer = settings.CreateSerializer();
             _settings = new PostgresqlSettings(settings);
         }

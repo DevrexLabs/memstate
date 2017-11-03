@@ -16,12 +16,15 @@ namespace Memstate
 
         protected Settings(IConfiguration configuration)
         {
+            Ensure.NotNull(configuration, nameof(configuration));
             Configuration = configuration;
             Configuration.Bind(this);
         }
 
         protected Settings(string configurationKey, params string[] commandLineArguments)
         {
+            Ensure.NotNullOrEmpty(configurationKey, nameof(configurationKey));
+
             Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddEnvironmentVariables()

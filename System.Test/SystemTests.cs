@@ -181,8 +181,7 @@ namespace System.Test
 
         private static IEnumerable<Type> ProviderTypes()
         {
-            //todo: broken provider, Engine.Dispose hangs
-            //yield return typeof(InMemoryStorageProvider);
+            yield return typeof(InMemoryStorageProvider);
             yield return typeof(FileStorageProvider);
             yield return typeof(EventStoreProvider);
             yield return typeof(PostgresqlProvider);

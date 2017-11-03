@@ -8,6 +8,8 @@ namespace Memstate
 
         protected BatchingJournalWriter(MemstateSettings config)
         {
+            Ensure.NotNull(config, nameof(config));
+
             _batcher = new Batcher<Command>(config);
             _batcher.OnBatch += OnCommandBatch;
 
@@ -18,12 +20,12 @@ namespace Memstate
             _batcher.Add(command);
         }
 
-        protected abstract void OnCommandBatch(IEnumerable<Command> commands);
-
         public virtual void Dispose()
         {
             _batcher.Dispose();
             _batcher.OnBatch -= OnCommandBatch;
         }
+
+        protected abstract void OnCommandBatch(IEnumerable<Command> commands);
     }
 }

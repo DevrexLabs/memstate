@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Npgsql;
 
 namespace Memstate.Postgresql
 {
     public class PostgresqlJournalWriter : BatchingJournalWriter
     {
-        private const string InsertSql = @"
-INSERT INTO {0}
-(
-    ""command""
-)
-VALUES
-(
-    @command
-);";
+        private const string InsertSql = @"INSERT INTO {0} (""command"") VALUES {1};";
 
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
@@ -31,22 +24,22 @@ VALUES
             using (var connection = new NpgsqlConnection(_settings.ConnectionString))
             {
                 connection.Open();
-                
-                var sql = string.Format(InsertSql, _settings.Table);
 
-                foreach (var command in commands)
+                commands = commands.ToList();
+
+                var count = commands.Count();
+
+                var values = string.Join(",", Enumerable.Range(0, count).Select(i => $"(@{i})"));
+
+                using (var command = connection.CreateCommand())
                 {
-                    using (var sqlCommand = connection.CreateCommand())
-                    {
-                        var commandData = _serializer.Serialize(command);
+                    command.CommandText = string.Format(InsertSql, _settings.Table, values);
+                    
+                    commands.Select((c,i) => new { Index = i, Value = Convert.ToBase64String(_serializer.Serialize(command))})
+                        .ToList()
+                        .ForEach(item => command.Parameters.AddWithValue($"@{item.Index}", item.Value));
 
-                        var commandDataString = Convert.ToBase64String(commandData);
-                        
-                        sqlCommand.CommandText = sql;
-                        sqlCommand.Parameters.AddWithValue("@command", commandDataString);
-
-                        sqlCommand.ExecuteNonQuery();
-                    }
+                    command.ExecuteNonQuery();
                 }
             }
         }

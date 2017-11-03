@@ -34,7 +34,6 @@ namespace Memstate
             Configuration.Bind(this);
         }
 
-        // https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
         public IConfiguration Configuration { get; protected set; }
 
         public virtual void Validate()

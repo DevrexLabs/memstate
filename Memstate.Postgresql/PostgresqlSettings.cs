@@ -3,6 +3,7 @@
     public class PostgresqlSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
+        public const string DefaultConnectionString = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
 
         private readonly MemstateSettings _memstateSettings;
 
@@ -13,7 +14,7 @@
             _memstateSettings = settings;
         }
 
-        public string ConnectionString { get; set; } = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
+        public string ConnectionString { get; set; } = DefaultConnectionString;
 
         public string TableSuffix { get; set; } = "_commands";
 

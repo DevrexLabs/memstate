@@ -18,10 +18,6 @@ namespace Memstate.Postgresql.Tests
         public JournalReaderTests()
         {
             var settings = new MemstateSettings();
-
-                //Table = $"memstate_{Guid.NewGuid():N}",
-                //SubscriptionStream = $"memstate_{Guid.NewGuid():N}_notifications"
-            
             _provider = new PostgresqlProvider(settings);
             
             _provider.Initialize();

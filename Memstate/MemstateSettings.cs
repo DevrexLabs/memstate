@@ -2,34 +2,36 @@ namespace Memstate
 {
     using System;
     using System.Reflection;
+
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
     public class MemstateSettings : Settings
     {
-        public MemstateSettings(params string[] args) : base("Memstate", args)
+        public MemstateSettings(params string[] args) 
+            : base(Build(args))
         {
+            Memstate = this;
         }
 
         public string StreamName { get; set; } = "memstate";
 
-        public string StorageProvider { get; set; } = "Memstate.FileStorageProvider";
+        public string StorageProvider { get; set; } = "file";
 
-        public string Serializer { get; set; } = "Memstate.Wire.WireSerializerAdapter";
+        public string Serializer { get; set; } = "Wire";
 
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
         public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
 
-        public ISerializer CreateSerializer() => CreateInstanceFromTypeName<ISerializer>(Serializer);
+        public StorageProviders StorageProviders { get; set; } = new StorageProviders();
 
-        public StorageProvider CreateStorageProvider() => CreateInstanceFromTypeName<StorageProvider>(StorageProvider);
+        public Serializers Serializers { get; set; } = new Serializers();
 
-        /// <summary>
-        /// Ensure the configuration is valid or throw an InvalidConfigurationException
-        /// </summary>
-        public override void Validate()
-        {
-        }
+        public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
+
+        public StorageProvider CreateStorageProvider() => StorageProviders.Create(StorageProvider, this);
+
 
         public ILogger<T> CreateLogger<T>()
         {
@@ -41,10 +43,14 @@ namespace Memstate
             return $"[Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}]";
         }
 
-        private T CreateInstanceFromTypeName<T>(string typeName)
+        private static IConfiguration Build(params string[] commandLineArguments)
         {
-            var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
-            return (T)Activator.CreateInstance(type, this);
+            return new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(commandLineArguments ?? Array.Empty<string>())
+                .Build()
+                .GetSection("Memstate");
         }
     }
 }

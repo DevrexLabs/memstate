@@ -21,7 +21,7 @@ namespace Memstate.EventStore
         {
             _logger = config.CreateLogger<EventStoreReader>();
             _connection = connection;
-            _serializer = config.CreateSerializer();
+            _serializer = config.Serializers.Create(eventStoreSettings.Serializer, config);
             _streamName = eventStoreSettings.StreamName;
             _eventsPerSlice = eventStoreSettings.EventsPerSlice;
         }

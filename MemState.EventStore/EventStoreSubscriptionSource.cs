@@ -7,26 +7,21 @@ namespace Memstate.EventStore
 {
     public class EventStoreSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly MemstateSettings _config;
+        private readonly MemstateSettings _memstateSettings;
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
-        private readonly CatchUpSubscriptionSettings _settings;
 
         private readonly ILogger _logger;
 
-        public EventStoreSubscriptionSource(
-            MemstateSettings config, 
-            IEventStoreConnection connection, 
-            CatchUpSubscriptionSettings subscriptionSettings = null)
+        public EventStoreSubscriptionSource(MemstateSettings settings, IEventStoreConnection connection)
         {
-            _logger = config.CreateLogger<EventStoreSubscriptionSource>();
-            _config = config;
+            _logger = settings.CreateLogger<EventStoreSubscriptionSource>();
+            _memstateSettings = settings;
             _connection = connection;
-            _serializer = config.CreateSerializer();
-            _streamName = new EventStoreSettings(config).StreamName;
-            _settings = subscriptionSettings 
-                        ?? new CatchUpSubscriptionSettings(10000, 4096, false, false);
+            var eventStoreSettings = new EventStoreSettings(settings);
+            _serializer = eventStoreSettings.CreateSerializer();
+            _streamName = eventStoreSettings.StreamName;
         }
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
@@ -41,7 +36,7 @@ namespace Memstate.EventStore
             var sub = _connection.SubscribeToStreamFrom(
                 stream: _streamName, 
                 lastCheckpoint: checkPoint, 
-                settings: _settings, 
+                settings: new CatchUpSubscriptionSettings(10000, 4096, false, false), 
                 eventAppeared: (s, re) =>
                 {
                     _logger.LogDebug("eventAppeared, recordNumber {0}", re.OriginalEventNumber);
@@ -52,7 +47,7 @@ namespace Memstate.EventStore
                     ready = true;
                     _logger.LogInformation("liveProcessingStarted");
                 });
-            return new EventStoreSubscriptionAdapter(_config, sub, () => ready);
+            return new EventStoreSubscriptionAdapter(_memstateSettings, sub, () => ready);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace Memstate
             return settings;
         }
 
-        public static MemstateSettings AppendRandomSuffixToStreamName(this MemstateSettings settings)
+        public static MemstateSettings WithRandomSuffixAppendedToStreamName(this MemstateSettings settings)
         {
-            var randomPart = Guid.NewGuid().ToString("N").Substring(10);
+            var randomPart = Guid.NewGuid().ToString("N").Substring(0, 10);
             settings.StreamName += randomPart;
             return settings;
 

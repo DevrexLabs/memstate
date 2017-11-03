@@ -5,11 +5,11 @@ namespace Memstate
 
     public abstract class Settings
     {
-        protected Settings(Settings parent, string configurationKey)
+        protected Settings(MemstateSettings parent, string configurationKey)
         {
             Ensure.NotNull(parent, nameof(parent));
             Ensure.NotNullOrEmpty(configurationKey, nameof(configurationKey));
-
+            Memstate = parent;
             Configuration = parent.Configuration.GetSection(configurationKey);
             Configuration.Bind(this);
         }
@@ -21,20 +21,9 @@ namespace Memstate
             Configuration.Bind(this);
         }
 
-        protected Settings(string configurationKey, params string[] commandLineArguments)
-        {
-            Ensure.NotNullOrEmpty(configurationKey, nameof(configurationKey));
-
-            Configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables()
-                .AddCommandLine(commandLineArguments ?? Array.Empty<string>())
-                .Build()
-                .GetSection(configurationKey);
-            Configuration.Bind(this);
-        }
-
         public IConfiguration Configuration { get; protected set; }
+
+        public MemstateSettings Memstate { get; protected set; }
 
         public virtual void Validate()
         {

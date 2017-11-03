@@ -8,7 +8,7 @@ namespace Memstate.EventStore
 
     public class EventStoreWriter : BatchingJournalWriter
     {
-        private readonly IEventStoreConnection _eventStore;
+        private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
         private readonly string _streamName;
         private readonly ILogger _logger;
@@ -16,17 +16,18 @@ namespace Memstate.EventStore
         public EventStoreWriter(MemstateSettings settings, IEventStoreConnection connection) 
             : base(settings)
         {
+            _connection = connection;
             _logger = settings.CreateLogger<EventStoreWriter>();
-            _serializer = settings.CreateSerializer();
-            _eventStore = connection;
-            _streamName = new EventStoreSettings(settings).StreamName;
+            var eventStoreSettings = new EventStoreSettings(settings);
+            _serializer = eventStoreSettings.CreateSerializer();
+            _streamName = eventStoreSettings.StreamName;
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData).ToArray();
             _logger.LogDebug("Writing {0} events", events.Count());
-            var writeResult = _eventStore.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Result;
+            var writeResult = _connection.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Result;
             _logger.LogDebug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
         }
 

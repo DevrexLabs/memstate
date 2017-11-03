@@ -24,10 +24,12 @@ namespace Memstate
             return settings;
         }
 
-        public static MemstateSettings WithRandomStreamName(this MemstateSettings settings)
+        public static MemstateSettings AppendRandomSuffixToStreamName(this MemstateSettings settings)
         {
-            settings.StreamName = "stream-" + Guid.NewGuid();
+            var randomPart = Guid.NewGuid().ToString("N").Substring(10);
+            settings.StreamName += randomPart;
             return settings;
+
         }
     }
 }

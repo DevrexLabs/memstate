@@ -36,6 +36,11 @@ namespace Memstate
             return LoggerFactory.CreateLogger<T>();
         }
 
+        public override string ToString()
+        {
+            return $"[MemstateSettings -> Name:{StreamName}, Provider:{StorageProvider}, Serializer: {Serializer}]";
+        }
+
         private T CreateInstanceFromTypeName<T>(string typeName)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);

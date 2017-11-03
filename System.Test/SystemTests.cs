@@ -31,16 +31,10 @@ namespace System.Test
             {
                 foreach (var providerType in ProviderTypes())
                 {
-                    var config = new MemstateSettings().WithRandomStreamName();
-                    config.Serializer = serializerName;
-                    config.StorageProvider = providerType.AssemblyQualifiedName;
-
-                    // NOTE: Not sure if this value should be set here.
-                    config.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; Database=postgres; Password=secret; User ID=postgres;";
-                    config.Configuration["StorageProviders:Postgresql:Table"] = $"memstate_commands_{Guid.NewGuid():N}";
-                    config.Configuration["StorageProviders:Postgresql:SubscriptionStream"] = $"memstate_notifications_{Guid.NewGuid():N}";
-
-                    yield return config;
+                    var settings = new MemstateSettings().AppendRandomSuffixToStreamName();
+                    settings.Serializer = serializerName;
+                    settings.StorageProvider = providerType.AssemblyQualifiedName;
+                    yield return settings;
                 }
             }
         }

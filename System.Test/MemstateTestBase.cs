@@ -13,8 +13,6 @@ namespace System.Test
             Log = testOutputHelper;
             Config = new MemstateSettings();
             Config.LoggerFactory.AddProvider(new TestOutputLoggingProvider(testOutputHelper));
-            string streamName = "test-stream-" + Guid.NewGuid();
-            Config.StreamName = streamName;
         }
     }
 }

@@ -8,6 +8,9 @@
         {
         }
 
-        public string FileName { get; set; } = "Memstate.journal";
+        public string FileNameSuffix { get; set; } = ".journal";
+
+        public string FileName => Memstate?.StreamName + FileNameSuffix;
+
     }
 }

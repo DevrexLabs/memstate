@@ -2,7 +2,11 @@ namespace Memstate
 {
     using System;
     using System.Collections.Concurrent;
+    using System.IO;
+    using System.Net;
+    using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
 
     public static class ExtensionMethods
     {
@@ -29,7 +33,16 @@ namespace Memstate
             var randomPart = Guid.NewGuid().ToString("N").Substring(0, 10);
             settings.StreamName += randomPart;
             return settings;
+        }
 
+        public static async Task<string> ReadToEnd(this Stream stream)
+        {
+            using (stream)
+            using (var reader = new StreamReader(stream))
+            {
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
+            }
         }
     }
 }
+

@@ -1,6 +1,9 @@
 namespace Memstate
 {
     using System;
+    using System.IO;
+    using System.Reflection;
+
     using Microsoft.Extensions.Configuration;
 
     public abstract class Settings
@@ -27,6 +30,22 @@ namespace Memstate
 
         public virtual void Validate()
         {
+        }
+
+        public string GetEmbeddedResource(string resourceName)
+        {
+            var assembly = GetType().GetTypeInfo().Assembly;
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        public string[] GetEmbeddedResourceNames()
+        {
+            var assembly = GetType().GetTypeInfo().Assembly;
+            return assembly.GetManifestResourceNames();
         }
     }
 }

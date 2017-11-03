@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace Memstate
 {
+    using System.Collections.Generic;
+    using System.IO;
+
     public class FileJournalReader : IJournalReader
 
     {
     private readonly FileStream _journalStream;
     private readonly ISerializer _serializer;
 
-    public FileJournalReader(String fileName, ISerializer serializer)
+    public FileJournalReader(string fileName, ISerializer serializer)
     {
         _journalStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         _serializer = serializer;

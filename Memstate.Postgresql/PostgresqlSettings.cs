@@ -1,9 +1,12 @@
 ﻿namespace Memstate.Postgresql
 {
+    using System;
+
     public class PostgresqlSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
         public const string DefaultConnectionString = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
+        public const string InitSqlResourceName = "Memstate.Postgresql.init_sql";
 
         private readonly MemstateSettings _memstateSettings;
 
@@ -23,6 +26,8 @@
         public string Table => _memstateSettings?.StreamName + TableSuffix;
 
         public string SubscriptionStream => _memstateSettings?.StreamName + SubscriptionStreamSuffix;
+
+        public Lazy<string> InitSql => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
 
         public override void Validate()
         {

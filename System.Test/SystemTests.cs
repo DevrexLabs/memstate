@@ -11,10 +11,12 @@ namespace System.Test
     public class SystemTests
     {
         private readonly ITestOutputHelper _log;
+        private readonly string _randomStreamName;
 
         public SystemTests(ITestOutputHelper log)
         {
             _log = log;
+            _randomStreamName = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
         }
 
         [Theory]
@@ -22,6 +24,8 @@ namespace System.Test
         public void CanWriteOne(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+            _log.WriteLine(settings.ToString());
 
             using (var provider = settings.CreateStorageProvider())
             {
@@ -43,6 +47,8 @@ namespace System.Test
         public void WriteAndReadCommands(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+
             using (var provider = settings.CreateStorageProvider())
             {
                 provider.Initialize();
@@ -67,6 +73,8 @@ namespace System.Test
         public async Task SubscriptionDeliversPreExistingCommands(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+
             using (var provider = settings.CreateStorageProvider())
             {
                 const int NumRecords = 50;
@@ -91,7 +99,9 @@ namespace System.Test
         public async Task SubscriptionDeliversFutureCommands(MemstateSettings settings)
         {
             const int NumRecords = 5;
+
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
 
             using (var provider = settings.CreateStorageProvider())
             {
@@ -118,6 +128,8 @@ namespace System.Test
         public async Task Can_execute_void_commands(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+
             var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();
             await engine.ExecuteAsync(new Reverse()).ConfigureAwait(false);
@@ -128,9 +140,10 @@ namespace System.Test
         [ClassData(typeof(TestConfigurations))]
         public async Task Smoke(MemstateSettings settings)
         {
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
-
             const int NumRecords = 100;
+
+            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
 
             var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();

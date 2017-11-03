@@ -1,6 +1,7 @@
 ﻿namespace Memstate
 {
     using System;
+    using System.IO;
 
     public class FileStorageProvider : StorageProvider
     {
@@ -17,6 +18,12 @@
         public override IJournalReader CreateJournalReader()
         {
             var fileName = _fileStorageSettings.FileName;
+
+            if (!File.Exists(fileName))
+            {
+                return new NullJournalReader();
+            }
+
             var serializer = _settings.CreateSerializer();
             return new FileJournalReader(fileName, serializer);
         }

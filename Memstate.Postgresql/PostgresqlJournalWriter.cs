@@ -32,15 +32,15 @@ namespace Memstate.Postgresql
 
                 var values = string.Join(",", Enumerable.Range(0, count).Select(i => $"(@{i})"));
 
-                using (var command = connection.CreateCommand())
+                using (var sqlCommand = connection.CreateCommand())
                 {
-                    command.CommandText = string.Format(InsertSql, _settings.Table, values);
+                    sqlCommand.CommandText = string.Format(InsertSql, _settings.Table, values);
                     
-                    commands.Select((c,i) => new { Index = i, Value = Convert.ToBase64String(_serializer.Serialize(command))})
+                    commands.Select((c,i) => new { Index = i, Value = Convert.ToBase64String(_serializer.Serialize(c))})
                         .ToList()
-                        .ForEach(item => command.Parameters.AddWithValue($"@{item.Index}", item.Value));
+                        .ForEach(item => sqlCommand.Parameters.AddWithValue($"@{item.Index}", item.Value));
 
-                    command.ExecuteNonQuery();
+                    sqlCommand.ExecuteNonQuery();
                 }
             }
         }

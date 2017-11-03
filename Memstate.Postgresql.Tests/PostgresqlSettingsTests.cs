@@ -1,16 +1,31 @@
 ﻿namespace Memstate.Postgresql.Tests
 {
     using Xunit;
+    using Xunit.Abstractions;
 
     public class PostgresqlSettingsTests
     {
         private readonly PostgresqlSettings _settings;
         private readonly MemstateSettings _memstateSettings;
+        private readonly ITestOutputHelper _log;
 
-        public PostgresqlSettingsTests()
+        public PostgresqlSettingsTests(ITestOutputHelper log)
         {
+            _log = log;
             _memstateSettings = new MemstateSettings();
             _settings = new PostgresqlSettings(_memstateSettings);
+        }
+
+        [Fact]
+        public void CanExtractInitSqlResource()
+        {
+            foreach (var resourceName in _settings.GetEmbeddedResourceNames())
+            {
+                _log.WriteLine(resourceName);
+            }
+
+            var initSql = _settings.InitSql.Value;
+            Assert.StartsWith("CREATE", initSql);
         }
 
         [Fact]

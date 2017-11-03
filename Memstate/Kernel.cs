@@ -13,7 +13,7 @@ namespace Memstate
         private readonly ReaderWriterLockSlim _lock;
         private readonly ILogger _logger;
 
-        public Kernel(Settings config, object model)
+        public Kernel(MemstateSettings config, object model)
         {
             _logger = config.CreateLogger<Kernel>();
             _model = model;

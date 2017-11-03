@@ -25,13 +25,13 @@ namespace System.Test
             return GetConfigurations().Select(c => new object[] {c});
         }
 
-        public static IEnumerable<Settings> GetConfigurations()
+        public static IEnumerable<MemstateSettings> GetConfigurations()
         {
             foreach (var serializerName in Serializers())
             {
                 foreach (var providerType in ProviderTypes())
                 {
-                    var config = new Settings().WithRandomStreamName();
+                    var config = new MemstateSettings().WithRandomStreamName();
                     config.Serializer = serializerName;
                     config.StorageProvider = providerType.AssemblyQualifiedName;
 
@@ -62,7 +62,7 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(Configurations))]
-        public void CanWriteOne(Settings settings)
+        public void CanWriteOne(MemstateSettings settings)
         {
             var provider = settings.CreateStorageProvider();
             provider.Initialize();
@@ -145,7 +145,7 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(Configurations))]
-        public void Can_execute_void_commands(Settings settings)
+        public void Can_execute_void_commands(MemstateSettings settings)
         {
             var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();
@@ -155,7 +155,7 @@ namespace System.Test
 
         [Theory]
         [MemberData(nameof(Configurations))]
-        public async Task Smoke(Settings settings)
+        public async Task Smoke(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
 

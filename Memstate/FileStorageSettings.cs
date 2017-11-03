@@ -2,11 +2,11 @@
 {
     using Microsoft.Extensions.Configuration;
 
-    public class FileStorageSettings : Settings
+    public class FileStorageSettings : MemstateSettings
     {
         public const string ConfigurationKey = "StorageProviders:FileStorage";
 
-        public FileStorageSettings(Settings parent)
+        public FileStorageSettings(MemstateSettings parent)
             : this(parent.Configuration)
         {
         }

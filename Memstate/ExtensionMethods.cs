@@ -18,13 +18,13 @@ namespace Memstate
             }
         }
 
-        public static Settings WithInmemoryStorage(this Settings settings)
+        public static MemstateSettings WithInmemoryStorage(this MemstateSettings settings)
         {
             settings.StorageProvider = typeof(InMemoryStorageProvider).FullName;
             return settings;
         }
 
-        public static Settings WithRandomStreamName(this Settings settings)
+        public static MemstateSettings WithRandomStreamName(this MemstateSettings settings)
         {
             settings.StreamName = "stream-" + Guid.NewGuid();
             return settings;

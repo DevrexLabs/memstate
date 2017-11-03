@@ -12,7 +12,7 @@
         private long _nextRecord;
 
 
-        public FileJournalWriter(Settings settings, string fileName, long nextRecord) 
+        public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord) 
             : base(settings)
         {
             _nextRecord = nextRecord;

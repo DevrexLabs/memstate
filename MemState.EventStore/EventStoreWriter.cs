@@ -16,7 +16,7 @@ namespace Memstate.EventStore
 
         private readonly ILogger _logger;
 
-        public EventStoreWriter(Settings config, IEventStoreConnection connection, ISerializer serializer, String streamName) 
+        public EventStoreWriter(MemstateSettings config, IEventStoreConnection connection, ISerializer serializer, String streamName) 
             : base(config)
         {
             _logger = config.CreateLogger<EventStoreWriter>();

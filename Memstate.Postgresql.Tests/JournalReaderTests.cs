@@ -19,7 +19,7 @@ namespace Memstate.Postgresql.Tests
 
         public JournalReaderTests()
         {
-            var settings = new PostgresqlSettings(new Settings())
+            var settings = new PostgresqlSettings(new MemstateSettings())
             {
                 ConnectionString = ConnectionString,
                 Table = $"memstate_{Guid.NewGuid():N}",

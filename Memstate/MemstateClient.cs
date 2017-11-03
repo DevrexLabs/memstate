@@ -10,7 +10,7 @@ namespace Memstate
 {
     public class MemstateClient<TModel> : Client<TModel> where TModel : class
     {
-        private readonly Settings _config;
+        private readonly MemstateSettings _config;
         private readonly ILogger _logger;
 
         private TcpClient _tcpClient;
@@ -25,7 +25,7 @@ namespace Memstate
         private readonly Counter _counter = new Counter();
         private readonly CancellationTokenSource _cancellationSource;
 
-        public MemstateClient(Settings config)
+        public MemstateClient(MemstateSettings config)
         {
             _config = config;
             _serializer = config.CreateSerializer();

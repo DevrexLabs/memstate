@@ -12,7 +12,7 @@
 
         public ProxyTest()
         {
-            var config = new Settings().WithInmemoryStorage();
+            var config = new MemstateSettings().WithInmemoryStorage();
             ITestModel model = new TestModel();
             _engine = new EngineBuilder(config).Build(model);
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();

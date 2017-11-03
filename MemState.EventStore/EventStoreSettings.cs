@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Memstate.EventStore
 {
-    public class EventStoreSettings : Settings
+    public class EventStoreSettings : MemstateSettings
     {
         public const string ConfigurationKey = "StorageProviders:EventStore";
 
@@ -12,7 +12,7 @@ namespace Memstate.EventStore
         {
         }
 
-        public EventStoreSettings(Settings settings)
+        public EventStoreSettings(MemstateSettings settings)
             : this(settings.Configuration)
         {
         }

@@ -8,7 +8,7 @@ namespace Memstate.Wire
     {
         private readonly Serializer _serializer;
 
-        public WireSerializerAdapter(Settings config)
+        public WireSerializerAdapter(MemstateSettings config)
         {
             var options = new SerializerOptions(versionTolerance: false, preserveObjectReferences: true);
             _serializer = new Serializer(options);

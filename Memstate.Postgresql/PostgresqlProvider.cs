@@ -12,7 +12,7 @@ namespace Memstate.Postgresql
             _settings = settings;
         }
 
-        public PostgresqlProvider(Settings memstateSettings)
+        public PostgresqlProvider(MemstateSettings memstateSettings)
             : this(new PostgresqlSettings(memstateSettings))
         {
         }

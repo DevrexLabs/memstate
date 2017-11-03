@@ -5,12 +5,12 @@ namespace Memstate
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
-    public class Settings
+    public class MemstateSettings
     {
         // https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
         private readonly IConfiguration _configuration;
 
-        public Settings(string[] args = null)
+        public MemstateSettings(string[] args = null)
         {
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
@@ -22,7 +22,7 @@ namespace Memstate
             _configuration.Bind(this);
         }
 
-        public Settings(IConfiguration config)
+        public MemstateSettings(IConfiguration config)
         {
             _configuration = config;
             _configuration.Bind(this);

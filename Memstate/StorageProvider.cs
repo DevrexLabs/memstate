@@ -4,9 +4,9 @@ namespace Memstate
 
     public abstract class StorageProvider : IDisposable
     {
-        protected readonly Settings Config;
+        protected readonly MemstateSettings Config;
 
-        protected StorageProvider(Settings config)
+        protected StorageProvider(MemstateSettings config)
         {
             Config = config;
         }

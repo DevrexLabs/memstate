@@ -5,10 +5,10 @@
     public class FileStorageProvider : StorageProvider
     {
         private readonly FileStorageSettings _fileStorageSettings;
-        private readonly Settings _settings;
+        private readonly MemstateSettings _settings;
         private FileJournalWriter _currentWriter;
 
-        public FileStorageProvider(Settings settings)
+        public FileStorageProvider(MemstateSettings settings)
             : base(settings)
         {
             _settings = settings;

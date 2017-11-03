@@ -3,7 +3,7 @@
     using System;
     using Microsoft.Extensions.Configuration;
 
-    public class PostgresqlSettings : Settings
+    public class PostgresqlSettings : MemstateSettings
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
 
@@ -12,7 +12,7 @@
         {
         }
 
-        public PostgresqlSettings(Settings settings)
+        public PostgresqlSettings(MemstateSettings settings)
             : this(settings.Configuration)
         {
         }

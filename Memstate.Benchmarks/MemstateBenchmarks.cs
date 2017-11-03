@@ -30,7 +30,7 @@
         [GlobalSetup]
         public void Setup()
         {
-            var settings = new Settings().WithRandomStreamName();
+            var settings = new MemstateSettings().WithRandomStreamName();
 
             /* 
             var logProvider = new ConsoleLoggerProvider(filter: (cat, level) => true, includeScopes: false);

@@ -52,7 +52,7 @@ namespace Memstate.Tests
         [Fact]
         public void Test1()
         {
-            var config = new Settings();
+            var config = new MemstateSettings();
             var model = new List<string>();
             Kernel k = new Kernel(config,model);
             var numStrings = (int) k.Execute(new AddStringCommand(string.Empty));
@@ -63,7 +63,7 @@ namespace Memstate.Tests
         [Fact]
         public void SmokeTest()
         {
-            var config = new Settings();
+            var config = new MemstateSettings();
             var initialModel = new List<string>();
             var commandStore = new InMemoryStorageProvider(config);
             var engine = new Engine<List<string>>(config, initialModel,commandStore, commandStore, 0);
@@ -82,7 +82,7 @@ namespace Memstate.Tests
         [Fact]
         public void FileJournalSmokeTest()
         {
-            var config = new Settings();
+            var config = new MemstateSettings();
             var fileName = Path.GetTempFileName();
             var journalWriter = new FileJournalWriter(config, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);

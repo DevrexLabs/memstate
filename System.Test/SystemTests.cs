@@ -32,7 +32,7 @@ namespace System.Test
                 provider.Initialize();
                 var writer = provider.CreateJournalWriter(0);
 
-                writer.Send(new AddStringCommand());
+                writer.Send(new AddStringCommand("hello"));
                 writer.Dispose();
 
                 var reader = provider.CreateJournalReader();
@@ -57,7 +57,7 @@ namespace System.Test
 
                 for (var i = 0; i < 10000; i++)
                 {
-                    journalWriter.Send(new AddStringCommand());
+                    journalWriter.Send(new AddStringCommand(i.ToString()));
                 }
 
                 journalWriter.Dispose();
@@ -81,7 +81,7 @@ namespace System.Test
                 var journalWriter = provider.CreateJournalWriter(0);
                 for (var i = 0; i < NumRecords; i++)
                 {
-                    journalWriter.Send(new AddStringCommand());
+                    journalWriter.Send(new AddStringCommand(i.ToString()));
                 }
 
                 journalWriter.Dispose();
@@ -112,7 +112,7 @@ namespace System.Test
 
                 for (var i = 0; i < NumRecords; i++)
                 {
-                    writer.Send(new AddStringCommand());
+                    writer.Send(new AddStringCommand(i.ToString()));
                 }
 
                 writer.Dispose();
@@ -150,7 +150,7 @@ namespace System.Test
 
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
-                var command = new AddStringCommand { StringToAdd = number.ToString() };
+                var command = new AddStringCommand(number.ToString());
                 var count = await engine.ExecuteAsync(command).ConfigureAwait(false);
                 Assert.Equal(number, count);
             }
@@ -163,7 +163,7 @@ namespace System.Test
             engine.Dispose();
         }
 
-        private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 10)
+        private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 25)
         {
             checkInterval = checkInterval ?? TimeSpan.FromMilliseconds(50);
             while (!condition.Invoke())

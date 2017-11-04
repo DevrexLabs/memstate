@@ -18,7 +18,7 @@ namespace Memstate
         private readonly Func<T, Task> _handler;
         private readonly ManualResetEvent _resetEvent = new ManualResetEvent(false);
 
-        public MessageProcessor(Func<T,Task> handler)
+        public MessageProcessor(Func<T, Task> handler)
         {
             _handler = handler;
             _messageQueue = new BlockingCollection<T>();
@@ -43,7 +43,7 @@ namespace Memstate
             {
                 var message = _messageQueue.TakeOrDefault(_cancellationToken);
                 if (message == null) break;
-                await _handler.Invoke(message);
+                await _handler.Invoke(message).ConfigureAwait(false);
             }
             _resetEvent.Set();
         }

@@ -1,16 +1,15 @@
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using Xunit;
-
 namespace Memstate.Tests
 {
+    using System.Collections.Concurrent;
+    using Xunit;
+
     public class BatcherTests
     {
         [Fact]
         public void Batcher_terminates_when_disposed()
         {
             var config = new MemstateSettings();
-            var batcher = new Batcher<int>(config, 200);
+            var batcher = new Batcher<int>(config);
             batcher.Dispose();
         }
 

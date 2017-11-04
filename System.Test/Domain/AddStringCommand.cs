@@ -6,7 +6,13 @@ namespace System.Test
 
     public class AddStringCommand : Command<List<string>, int>
     {
-        public String StringToAdd { get; set; }
+        public AddStringCommand(string stringToAdd)
+        {
+            Ensure.NotNull(stringToAdd, nameof(stringToAdd));
+            StringToAdd = stringToAdd;
+        }
+
+        public string StringToAdd { get; set; }
 
         public override int Execute(List<string> model)
         {

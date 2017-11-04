@@ -8,18 +8,17 @@
 
     public class Batcher<T> : IDisposable
     {    
-        public const int DefaultMaxBatchSize = 1000;
         private readonly int _maxBatchSize;
         private readonly BlockingCollection<T> _items;
         private readonly Task _batchTask;
 
         private readonly ILogger _logger;
 
-        public Batcher(MemstateSettings config, int maxBatchSize = DefaultMaxBatchSize, int? boundedCapacity = null)
+        public Batcher(MemstateSettings config)
         {
             _logger = config.CreateLogger<Batcher<T>>();
-            _maxBatchSize = maxBatchSize;
-            _items = new BlockingCollection<T>(boundedCapacity ?? int.MaxValue);
+            _maxBatchSize = config.MaxBatchSize;
+            _items = new BlockingCollection<T>(config.MaxBatchQueueLength);
             _batchTask = Task.Run((Action)ProcessItems);
         }
 
@@ -36,7 +35,7 @@
         {
             _logger.LogDebug("Begin Dispose");
             _items.CompleteAdding();
-            _batchTask.Wait(TimeSpan.FromSeconds(1));
+            _batchTask.Wait();
             _logger.LogDebug("End Dispose");
         }
 
@@ -45,21 +44,14 @@
             var buffer = new List<T>(_maxBatchSize);
             while (!_items.IsCompleted)
             {
-                try
+                if (_items.TryTake(out var firstItem, 1000))
                 {
-                    buffer.Add(_items.Take());
-                }
-                catch (InvalidOperationException)
-                {
-                }
+                    buffer.Add(firstItem);
+                    while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
+                    {
+                        buffer.Add(item);
+                    }
 
-                while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
-                {
-                    buffer.Add(item);
-                }
-
-                if (buffer.Count > 0)
-                {
                     OnBatch?.Invoke(buffer);
                     buffer.Clear();
                 }

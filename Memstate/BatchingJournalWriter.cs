@@ -12,7 +12,6 @@ namespace Memstate
 
             _batcher = new Batcher<Command>(config);
             _batcher.OnBatch += OnCommandBatch;
-
         }
 
         public void Send(Command command)
@@ -23,7 +22,6 @@ namespace Memstate
         public virtual void Dispose()
         {
             _batcher.Dispose();
-            _batcher.OnBatch -= OnCommandBatch;
         }
 
         protected abstract void OnCommandBatch(IEnumerable<Command> commands);

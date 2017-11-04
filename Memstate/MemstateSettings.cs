@@ -14,6 +14,8 @@ namespace Memstate
             Memstate = this;
         }
 
+        public int MaxBatchSize { get; set; } = 1024;
+
         public string StreamName { get; set; } = "memstate";
 
         public string StorageProvider { get; set; } = "file";
@@ -27,6 +29,8 @@ namespace Memstate
         public StorageProviders StorageProviders { get; set; } = new StorageProviders();
 
         public Serializers Serializers { get; set; } = new Serializers();
+
+        public int MaxBatchQueueLength { get; set; } = int.MaxValue;
 
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
 

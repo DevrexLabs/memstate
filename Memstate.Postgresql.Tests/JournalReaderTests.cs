@@ -8,7 +8,7 @@ namespace Memstate.Postgresql.Tests
     using Npgsql;
     using Xunit;
 
-    public class JournalReaderTests : IDisposable
+    public class JournalReaderTests
     {
         private readonly PostgresqlProvider _provider;
         private readonly IJournalReader _journalReader;
@@ -52,12 +52,6 @@ namespace Memstate.Postgresql.Tests
             var journalRecords = GetJournalRecords();
             
             Assert.Single(journalRecords);
-        }
-
-        public void Dispose()
-        {
-            _journalReader.Dispose();
-            _journalWriter.Dispose();
         }
 
         private void InsertCommand(byte[] data)

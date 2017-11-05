@@ -5,7 +5,7 @@
     using System.Linq;
     using Xunit;
 
-    public class ProxyTest : IDisposable
+    public class ProxyTest
     {
         private readonly ITestModel _proxy;
         private readonly Engine<ITestModel> _engine;
@@ -152,11 +152,6 @@
             {
                 _proxy.ThrowCommandAborted();
             });
-        }
-
-        public void Dispose()
-        {
-            _engine.Dispose();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Memstate
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public abstract class BatchingJournalWriter : IJournalWriter
     {
@@ -17,9 +18,9 @@
             _batcher.Add(command);
         }
 
-        public virtual void Dispose()
+        public virtual async Task DisposeAsync()
         {
-            _batcher.Dispose();
+            await _batcher.DisposeAsync().ConfigureAwait(false);
         }
 
         protected abstract void OnCommandBatch(IEnumerable<Command> commands);

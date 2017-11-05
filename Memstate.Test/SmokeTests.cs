@@ -8,6 +8,8 @@ using Xunit.Abstractions;
 
 namespace Memstate.Tests
 {
+    using System.Threading.Tasks;
+
     class AddStringCommand : Command<List<string>, int>
     {
         public readonly string StringToAdd;
@@ -80,7 +82,7 @@ namespace Memstate.Tests
         }
 
         [Fact]
-        public void FileJournalSmokeTest()
+        public async Task FileJournalSmokeTest()
         {
             var config = new MemstateSettings();
             var fileName = Path.GetTempFileName();
@@ -93,7 +95,8 @@ namespace Memstate.Tests
                 var command = new AddStringCommand(i.ToString());
                 journalWriter.Send(command);
             }
-            journalWriter.Dispose();
+
+            await journalWriter.DisposeAsync().ConfigureAwait(false);
             sub.Dispose();
             subSource.Dispose();
 
@@ -107,7 +110,7 @@ namespace Memstate.Tests
                 records.Add(record);
             }
             Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(0, 1000)));
-            reader.Dispose();
+            await reader.DisposeAsync().ConfigureAwait(false);
             File.Delete(fileName);
         }
     }

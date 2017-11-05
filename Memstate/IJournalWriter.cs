@@ -1,8 +1,7 @@
 ﻿namespace Memstate
 {
-    public interface IJournalWriter
+    public interface IJournalWriter : IAsyncDisposable
     {
         void Send(Command command);
-        void Dispose();
     }
 }

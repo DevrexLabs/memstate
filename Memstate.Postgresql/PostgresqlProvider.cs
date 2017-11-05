@@ -1,32 +1,29 @@
-﻿using Npgsql;
-
-namespace Memstate.Postgresql
+﻿namespace Memstate.Postgresql
 {
-    using System.IO;
-    using System.Reflection;
+    using System.Threading.Tasks;
+    using Npgsql;
 
     public class PostgresqlProvider : StorageProvider
     {
         private readonly MemstateSettings _settings;
-
-        private readonly PostgresqlSettings _pgSettings;
+        private readonly PostgresqlSettings _postgreSqlSettings;
 
         public PostgresqlProvider(MemstateSettings settings)
         {
             _settings = settings;
-            _pgSettings = new PostgresqlSettings(settings);
+            _postgreSqlSettings = new PostgresqlSettings(settings);
         }
 
-        public PostgresqlSettings Settings => _pgSettings;
+        public PostgresqlSettings Settings => _postgreSqlSettings;
 
         public override void Initialize()
         {
-            var sql = _pgSettings.InitSql.Value;
-            using (var connection = new NpgsqlConnection(_pgSettings.ConnectionString))
+            var sql = _postgreSqlSettings.InitSql.Value;
+            using (var connection = new NpgsqlConnection(_postgreSqlSettings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                command.CommandText = string.Format(sql, _pgSettings.SubscriptionStream, _pgSettings.Table);
+                command.CommandText = string.Format(sql, _postgreSqlSettings.SubscriptionStream, _postgreSqlSettings.Table);
                 command.ExecuteNonQuery();
             }
         }
@@ -48,8 +45,6 @@ namespace Memstate.Postgresql
             return new PostgresqlSubscriptionSource(_settings);
         }
 
-        public override void Dispose()
-        {
-        }
+        public Task DisposeAsync() => Task.CompletedTask;
     }
 }

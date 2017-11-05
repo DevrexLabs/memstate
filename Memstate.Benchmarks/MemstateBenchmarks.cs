@@ -48,9 +48,9 @@
         }
 
         [GlobalCleanup]
-        public void Cleanup()
+        public async Task Cleanup()
         {
-            _engine.Dispose();
+            await _engine.DisposeAsync().ConfigureAwait(false);
         }
 
         [Benchmark]

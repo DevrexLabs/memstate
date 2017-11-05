@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Memstate.Tests
 {
+    using System.Threading.Tasks;
+
     public class EngineTests
     {
         private readonly IJournalSubscriptionSource _fakeSubscriptionSource;
@@ -36,19 +38,19 @@ namespace Memstate.Tests
         }
 
         [Fact]
-        public void Subscription_is_disposed_when_engine_is_disposed()
+        public async Task Subscription_is_disposed_when_engine_is_disposed()
         {
-            _engine.Dispose();
+            await _engine.DisposeAsync().ConfigureAwait(false);
 
             A.CallTo(() => _fakeSubscription.Dispose())
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
-        public void Writer_is_disposed_when_engine_is_disposed()
-        {
-            _engine.Dispose();
-            A.CallTo(() => _fakeJournalWriter.Dispose())
+        public async Task Writer_is_disposed_when_engine_is_disposed()
+        { 
+            await _engine.DisposeAsync().ConfigureAwait(false);
+            A.CallTo(() => _fakeJournalWriter.DisposeAsync())
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 

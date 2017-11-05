@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Threading.Tasks;
 
     public class FileStorageProvider : StorageProvider
     {
@@ -45,8 +46,9 @@
             return new FileJournalSubscriptionSource(_currentWriter);
         }
 
-        public override void Dispose()
+        public Task DisposeAsync()
         {
+            return Task.CompletedTask;
         }
     }
 }

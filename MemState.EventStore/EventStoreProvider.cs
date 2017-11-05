@@ -1,8 +1,11 @@
 namespace Memstate.EventStore
 {
+    using System;
+    using System.Threading.Tasks;
+
     using global::EventStore.ClientAPI;
 
-    public class EventStoreProvider : StorageProvider
+    public class EventStoreProvider : StorageProvider, IAsyncDisposable
     {
         private readonly IEventStoreConnection _connection;
 
@@ -33,9 +36,9 @@ namespace Memstate.EventStore
             return new EventStoreSubscriptionSource(_memstateSettings, _connection);
         }
 
-        public override void Dispose()
+        public Task DisposeAsync()
         {
-            _connection.Close();
+            return Task.Run((Action)_connection.Close);
         }
     }
 }

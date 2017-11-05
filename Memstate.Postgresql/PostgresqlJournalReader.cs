@@ -5,6 +5,8 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
+    using System.Threading.Tasks;
+
     public class PostgresqlJournalReader : IJournalReader
     {
         private const string SelectSql = @"
@@ -50,8 +52,9 @@ ORDER BY
             }
         }
 
-        public void Dispose()
+        public Task DisposeAsync()
         {
+            return Task.CompletedTask;
         }
 
         private JournalRecord ReadRecord(IDataRecord reader)

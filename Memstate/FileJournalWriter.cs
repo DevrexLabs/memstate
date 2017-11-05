@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class FileJournalWriter : BatchingJournalWriter
     {
@@ -22,10 +23,10 @@
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
-            base.Dispose();
-            _journalStream.Flush();
+            await base.DisposeAsync().ConfigureAwait(false);
+            await _journalStream.FlushAsync().ConfigureAwait(false);
             _journalStream.Dispose();
         }
 

@@ -1,16 +1,18 @@
 namespace Memstate.Tests
 {
     using System.Collections.Concurrent;
+    using System.Threading.Tasks;
+
     using Xunit;
 
     public class BatcherTests
     {
         [Fact]
-        public void Batcher_terminates_when_disposed()
+        public async Task Batcher_terminates_when_disposed()
         {
             var config = new MemstateSettings();
             var batcher = new Batcher<int>(config, batch => { });
-            batcher.Dispose();
+            await batcher.DisposeAsync().ConfigureAwait(false);
         }
 
         [Fact]

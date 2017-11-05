@@ -21,51 +21,47 @@ namespace System.Test
 
         [Theory]
         [ClassData(typeof(TestConfigurations))]
-        public void CanWriteOne(MemstateSettings settings)
+        public async Task CanWriteOne(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
             _log.WriteLine(settings.ToString());
 
-            using (var provider = settings.CreateStorageProvider())
-            {
-                provider.Initialize();
-                var writer = provider.CreateJournalWriter(0);
+            var provider = settings.CreateStorageProvider();
+            provider.Initialize();
+            var writer = provider.CreateJournalWriter(0);
 
-                writer.Send(new AddStringCommand("hello"));
-                writer.Dispose();
+            writer.Send(new AddStringCommand("hello"));
+            await writer.DisposeAsync().ConfigureAwait(false);
 
-                var reader = provider.CreateJournalReader();
-                var records = reader.GetRecords().ToArray();
-                reader.Dispose();
-                Assert.Equal(1, records.Length);
-            }
+            var reader = provider.CreateJournalReader();
+            var records = reader.GetRecords().ToArray();
+            await reader.DisposeAsync().ConfigureAwait(false);
+            Assert.Equal(1, records.Length);
         }
 
         [Theory]
         [ClassData(typeof(TestConfigurations))]
-        public void WriteAndReadCommands(MemstateSettings settings)
+        public async Task WriteAndReadCommands(MemstateSettings settings)
         {
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
-            using (var provider = settings.CreateStorageProvider())
+            var provider = settings.CreateStorageProvider();
+            provider.Initialize();
+
+            var journalWriter = provider.CreateJournalWriter(0);
+
+            for (var i = 0; i < 10000; i++)
             {
-                provider.Initialize();
-
-                var journalWriter = provider.CreateJournalWriter(0);
-
-                for (var i = 0; i < 10000; i++)
-                {
-                    journalWriter.Send(new AddStringCommand(i.ToString()));
-                }
-
-                journalWriter.Dispose();
-                var journalReader = provider.CreateJournalReader();
-                var records = journalReader.GetRecords().ToArray();
-                journalReader.Dispose();
-                Assert.Equal(10000, records.Length);
+                journalWriter.Send(new AddStringCommand(i.ToString()));
             }
+
+            await journalWriter.DisposeAsync().ConfigureAwait(false);
+            var journalReader = provider.CreateJournalReader();
+            var records = journalReader.GetRecords().ToArray();
+            await journalReader.DisposeAsync().ConfigureAwait(false);
+            Assert.Equal(10000, records.Length);
         }
 
         [Theory]
@@ -75,23 +71,21 @@ namespace System.Test
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
-            using (var provider = settings.CreateStorageProvider())
+            var provider = settings.CreateStorageProvider();
+            const int NumRecords = 50;
+            var journalWriter = provider.CreateJournalWriter(0);
+            for (var i = 0; i < NumRecords; i++)
             {
-                const int NumRecords = 50;
-                var journalWriter = provider.CreateJournalWriter(0);
-                for (var i = 0; i < NumRecords; i++)
-                {
-                    journalWriter.Send(new AddStringCommand(i.ToString()));
-                }
-
-                journalWriter.Dispose();
-
-                var records = new List<JournalRecord>();
-                var subSource = provider.CreateJournalSubscriptionSource();
-                subSource.Subscribe(0, records.Add);
-                await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.Equal(Enumerable.Range(0, NumRecords).ToArray(), records.Select(r => (int)r.RecordNumber).ToArray());
+                journalWriter.Send(new AddStringCommand(i.ToString()));
             }
+
+            await journalWriter.DisposeAsync().ConfigureAwait(false);
+
+            var records = new List<JournalRecord>();
+            var subSource = provider.CreateJournalSubscriptionSource();
+            subSource.Subscribe(0, records.Add);
+            await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
+            Assert.Equal(Enumerable.Range(0, NumRecords).ToArray(), records.Select(r => (int)r.RecordNumber).ToArray());
         }
 
         [Theory]
@@ -103,24 +97,22 @@ namespace System.Test
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
-            using (var provider = settings.CreateStorageProvider())
+            var provider = settings.CreateStorageProvider();
+            var records = new List<JournalRecord>();
+            var subSource = provider.CreateJournalSubscriptionSource();
+            var sub = subSource.Subscribe(0, records.Add);
+            var writer = provider.CreateJournalWriter(0);
+
+            for (var i = 0; i < NumRecords; i++)
             {
-                var records = new List<JournalRecord>();
-                var subSource = provider.CreateJournalSubscriptionSource();
-                var sub = subSource.Subscribe(0, records.Add);
-                var writer = provider.CreateJournalWriter(0);
-
-                for (var i = 0; i < NumRecords; i++)
-                {
-                    writer.Send(new AddStringCommand(i.ToString()));
-                }
-
-                writer.Dispose();
-                await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
-                sub.Dispose();
-
-                Assert.Equal(5, records.Count);
+                writer.Send(new AddStringCommand(i.ToString()));
             }
+
+            await writer.DisposeAsync().ConfigureAwait(false);
+            await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
+            sub.Dispose();
+
+            Assert.Equal(5, records.Count);
         }
 
         [Theory]
@@ -133,7 +125,7 @@ namespace System.Test
             var builder = new EngineBuilder(settings);
             var engine = builder.Build<List<string>>();
             await engine.ExecuteAsync(new Reverse()).ConfigureAwait(false);
-            engine.Dispose();
+            await engine.DisposeAsync().ConfigureAwait(false);
         }
 
         [Theory]
@@ -155,12 +147,12 @@ namespace System.Test
                 Assert.Equal(number, count);
             }
 
-            engine.Dispose();
+            await engine.DisposeAsync().ConfigureAwait(false);
 
             engine = builder.Build<List<string>>();
             var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
             Assert.Equal(NumRecords, strings.Count);
-            engine.Dispose();
+            await engine.DisposeAsync().ConfigureAwait(false);
         }
 
         private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 25)

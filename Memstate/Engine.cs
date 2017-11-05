@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    public class Engine<TModel> : IDisposable where TModel : class
+    public class Engine<TModel> where TModel : class
     {
         private readonly ILogger _logger;
         private readonly Kernel _kernel;
@@ -69,10 +69,10 @@ namespace Memstate
             return (TResult)_kernel.Execute(query);
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
             _logger.LogDebug("Begin Dispose");
-            _journalWriter.Dispose();
+            await _journalWriter.DisposeAsync().ConfigureAwait(false);
             while (!_pendingLocalCommands.IsEmpty)
             {
                 _pendingCommandsChanged.WaitOne();

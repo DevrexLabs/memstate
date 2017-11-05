@@ -3,13 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class InMemoryStorageProvider : StorageProvider, IJournalWriter, IJournalReader, IJournalSubscriptionSource
     {
+        
         private readonly Dictionary<Guid, JournalSubscription> _subscriptions;
-        private readonly Batcher<Command> _batchingLogger;
         private readonly List<JournalRecord> _journal = new List<JournalRecord>();
 
+        private Batcher<Command> _batchingLogger;
         private long _nextRecord;
 
         public InMemoryStorageProvider(MemstateSettings settings) : this(settings, 0)
@@ -39,9 +41,13 @@
             return this;
         }
 
-        public override void Dispose()
+        public async Task DisposeAsync()
         {
-            _batchingLogger.Dispose();
+            if (_batchingLogger != null)
+            {
+                await _batchingLogger.DisposeAsync().ConfigureAwait(false);
+                _batchingLogger = null;
+            }
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

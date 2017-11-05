@@ -1,8 +1,10 @@
 
 namespace Memstate
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
 
     public class FileJournalReader : IJournalReader
 
@@ -16,9 +18,9 @@ namespace Memstate
         _serializer = serializer;
     }
 
-    public void Dispose()
+    public Task DisposeAsync()
     {
-        _journalStream.Dispose();
+        return Task.Run((Action)_journalStream.Dispose);
     }
 
     public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

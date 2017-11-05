@@ -6,7 +6,7 @@
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
 
-    public class Batcher<T> : IDisposable
+    public class Batcher<T> : IAsyncDisposable
     {    
         private readonly int _maxBatchSize;
         private readonly BlockingCollection<T> _items;
@@ -21,20 +21,20 @@
             _batchHandler = batchHandler;
             _maxBatchSize = config.MaxBatchSize;
             _items = new BlockingCollection<T>(config.MaxBatchQueueLength);
-            _batchTask = Task.Run((Action)ProcessItems);
+            _batchTask = new Task(ProcessItems, TaskCreationOptions.LongRunning);
+            _batchTask.Start();
         }
-
 
         public void Add(T item)
         {
             _items.Add(item);
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
             _logger.LogDebug("Begin Dispose");
             _items.CompleteAdding();
-            _batchTask.Wait();
+            await _batchTask.ConfigureAwait(false);
             _logger.LogDebug("End Dispose");
         }
 

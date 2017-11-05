@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
 namespace Memstate.EventStore
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using global::EventStore.ClientAPI;
+    using Microsoft.Extensions.Logging;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
+
     public class EventStoreReader : IJournalReader
     {
         private readonly IEventStoreConnection _connection;
@@ -15,7 +15,6 @@ namespace Memstate.EventStore
         private readonly int _eventsPerSlice;
 
         private readonly ILogger _logger;
-
 
         public EventStoreReader(MemstateSettings config, EventStoreSettings eventStoreSettings, IEventStoreConnection connection)
         {
@@ -26,8 +25,9 @@ namespace Memstate.EventStore
             _eventsPerSlice = eventStoreSettings.EventsPerSlice;
         }
 
-        public void Dispose()
+        public Task DisposeAsync()
         {
+            return Task.CompletedTask;
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

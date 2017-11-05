@@ -18,8 +18,7 @@
 
         public InMemoryStorageProvider(MemstateSettings settings, long nextRecord = 0) 
         {
-            _batchingLogger = new Batcher<Command>(settings);
-            _batchingLogger.OnBatch += OnCommandBatch;
+            _batchingLogger = new Batcher<Command>(settings, OnCommandBatch);
             _subscriptions = new Dictionary<Guid, JournalSubscription>();
             _nextRecord = nextRecord;
         }

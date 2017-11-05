@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>Integration.Test</AssemblyName>
+    <AssemblyName>System.Test</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

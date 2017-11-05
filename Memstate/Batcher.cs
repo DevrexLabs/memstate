@@ -12,19 +12,18 @@
         private readonly BlockingCollection<T> _items;
         private readonly Task _batchTask;
 
+        private readonly Action<IEnumerable<T>> _batchHandler;
         private readonly ILogger _logger;
 
-        public Batcher(MemstateSettings config)
+        public Batcher(MemstateSettings config, Action<IEnumerable<T>> batchHandler)
         {
             _logger = config.CreateLogger<Batcher<T>>();
+            _batchHandler = batchHandler;
             _maxBatchSize = config.MaxBatchSize;
             _items = new BlockingCollection<T>(config.MaxBatchQueueLength);
             _batchTask = Task.Run((Action)ProcessItems);
         }
 
-        public delegate void BatchHandler(IEnumerable<T> items);
-
-        public event BatchHandler OnBatch;
 
         public void Add(T item)
         {
@@ -52,7 +51,7 @@
                         buffer.Add(item);
                     }
 
-                    OnBatch?.Invoke(buffer);
+                    _batchHandler.Invoke(buffer);
                     buffer.Clear();
                 }
             }

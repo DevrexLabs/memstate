@@ -6,12 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host
 {
-    class Program
+    using System.Threading.Tasks;
+
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Memstate Console");
-            var command = "";
+            var command = string.Empty;
             while (true)
             {
                 Console.Write("'server' or 'client' : ");
@@ -23,7 +25,7 @@ namespace Memstate.Host
             else RunClient();
         }
 
-        static void RunClient()
+        private static void RunClient()
         {
             MemstateSettings config = new MemstateSettings();
             config.LoggerFactory.AddConsole((category, level) => true);
@@ -48,7 +50,7 @@ namespace Memstate.Host
 
         }
 
-        static void RunServer()
+        private static void RunServer()
         {
             Console.WriteLine("Starting server on port 3001, type exit to quit");
             MemstateSettings config = new MemstateSettings();

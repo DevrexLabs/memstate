@@ -1,4 +1,3 @@
-
 namespace Memstate
 {
     using System;
@@ -7,7 +6,6 @@ namespace Memstate
     using System.Threading.Tasks;
 
     public class FileJournalReader : IJournalReader
-
     {
     private readonly FileStream _journalStream;
     private readonly ISerializer _serializer;

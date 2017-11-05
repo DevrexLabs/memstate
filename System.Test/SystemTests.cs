@@ -122,8 +122,7 @@ namespace System.Test
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
-            var builder = new EngineBuilder(settings);
-            var engine = builder.Build<List<string>>();
+            var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             await engine.ExecuteAsync(new Reverse()).ConfigureAwait(false);
             await engine.DisposeAsync().ConfigureAwait(false);
         }
@@ -137,8 +136,7 @@ namespace System.Test
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
-            var builder = new EngineBuilder(settings);
-            var engine = builder.Build<List<string>>();
+            var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
@@ -149,7 +147,7 @@ namespace System.Test
 
             await engine.DisposeAsync().ConfigureAwait(false);
 
-            engine = builder.Build<List<string>>();
+            engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
             Assert.Equal(NumRecords, strings.Count);
             await engine.DisposeAsync().ConfigureAwait(false);

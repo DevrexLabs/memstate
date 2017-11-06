@@ -20,7 +20,7 @@ namespace System.Test
 
         // One writer, multiple readers
         [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [ClassData(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteOneAndReadFromMany(MemstateSettings settings)
         {
             const int records = 100;
@@ -57,7 +57,7 @@ namespace System.Test
 
         // Multiple writers, one reader
         [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [ClassData(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromOne(MemstateSettings settings)
         {
             const int records = 100;
@@ -75,10 +75,8 @@ namespace System.Test
 
             var totalCount = 0;
             
-            for (var i = 0; i < writers.Length; i++)
+            foreach (var writer in writers)
             {
-                var writer = writers[i];
-
                 foreach (var number in Enumerable.Range(1, records))
                 {
                     var command = new AddStringCommand($"{number}");
@@ -98,9 +96,48 @@ namespace System.Test
 
         // Multiple writers, multiple readers
         [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [ClassData(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromMany(MemstateSettings settings)
         {
+            const int records = 100;
+
+            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+
+            var readers = new Engine<List<string>>[3];
+
+            readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+
+            var writers = new Engine<List<string>>[3];
+
+            writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+
+            var totalCount = 0;
+            
+            foreach (var writer in writers)
+            {
+                foreach (var number in Enumerable.Range(1, records))
+                {
+                    var command = new AddStringCommand($"{number}");
+                    var count = await writer.ExecuteAsync(command).ConfigureAwait(false);
+                    Assert.Equal(++totalCount, count);
+                }
+
+                await writer.DisposeAsync().ConfigureAwait(false);
+            }
+
+            foreach (var reader in readers)
+            {
+                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+
+                Assert.Equal(records * writers.Length, strings.Count);
+
+                await reader.DisposeAsync().ConfigureAwait(false);
+            }
         }
     }
 }

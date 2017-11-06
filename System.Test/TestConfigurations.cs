@@ -3,7 +3,6 @@ namespace System.Test
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-
     using Memstate;
     using Memstate.EventStore;
     using Memstate.JsonNet;
@@ -12,7 +11,6 @@ namespace System.Test
 
     public class TestConfigurations : IEnumerable<object[]>
     {
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -46,7 +44,7 @@ namespace System.Test
             yield return typeof(WireSerializerAdapter).FullName;
         }
 
-        private IEnumerable<Type> ProviderTypes()
+        protected virtual IEnumerable<Type> ProviderTypes()
         {
             //yield return typeof(PostgresqlProvider);
             yield return typeof(InMemoryStorageProvider);
@@ -56,7 +54,16 @@ namespace System.Test
 
         private object[] ToObjectArray(object o)
         {
-            return new[] { o };
+            return new[] {o};
+        }
+
+        public class Cluster : TestConfigurations
+        {
+            protected override IEnumerable<Type> ProviderTypes()
+            {
+                yield return typeof(PostgresqlProvider);
+                yield return typeof(EventStoreProvider);
+            }
         }
     }
 }

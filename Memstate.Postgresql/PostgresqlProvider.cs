@@ -1,15 +1,20 @@
-﻿namespace Memstate.Postgresql
+﻿using Microsoft.Extensions.Logging;
+
+namespace Memstate.Postgresql
 {
     using System.Threading.Tasks;
     using Npgsql;
 
     public class PostgresqlProvider : StorageProvider
     {
+        private readonly ILogger<PostgresqlProvider> _log;
         private readonly MemstateSettings _settings;
         private readonly PostgresqlSettings _postgreSqlSettings;
+        private bool _initialized;
 
         public PostgresqlProvider(MemstateSettings settings)
         {
+            _log = settings.CreateLogger<PostgresqlProvider>();
             _settings = settings;
             _postgreSqlSettings = new PostgresqlSettings(settings);
         }
@@ -18,14 +23,22 @@
 
         public override void Initialize()
         {
+            if (_initialized)
+            {
+                return;
+            }
+            
             var sql = _postgreSqlSettings.InitSql.Value;
             using (var connection = new NpgsqlConnection(_postgreSqlSettings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
                 command.CommandText = string.Format(sql, _postgreSqlSettings.SubscriptionStream, _postgreSqlSettings.Table);
+                _log.LogInformation($"Executing SQL '{command.CommandText}'");
                 command.ExecuteNonQuery();
             }
+
+            _initialized = true;
         }
 
         public override IJournalReader CreateJournalReader()

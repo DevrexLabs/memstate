@@ -1,21 +1,22 @@
-#tool "nuget:?package=xunit.runner.console"
-
 var target = Argument("target", "Default");
 
 Task("Default")
-  .IsDependentOn("Build")
-  .IsDependentOn("Test");
-
+  .IsDependentOn("Build");
+  
 
 Task("Build")
   .Does(() =>{
     DotNetBuild("./memstate.sln");
   });
 
-Task("Test")
-  .IsDependentOn("Build")
+Task("SystemTest")
   .Does(() =>{
-    XUnit2("./**/*.Test.dll");
+    var settings = new DotNetCoreTestSettings
+    {
+        Configuration = "Release"
+    };
+
+    DotNetCoreTest("./System.Test/System.Test.csproj", settings);
   });
 
 Task("Clean")

@@ -34,7 +34,14 @@ namespace Memstate
 
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
 
-        public StorageProvider CreateStorageProvider() => StorageProviders.Create(StorageProvider, this);
+        public StorageProvider CreateStorageProvider()
+        {
+            var provider = StorageProviders.Create(StorageProvider, this);
+            
+            provider.Initialize();
+
+            return provider;
+        }
 
 
         public ILogger<T> CreateLogger<T>()

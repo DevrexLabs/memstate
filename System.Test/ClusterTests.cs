@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Memstate;
 using Xunit;
@@ -74,7 +75,7 @@ namespace System.Test
             writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
             var totalCount = 0;
-            
+
             foreach (var writer in writers)
             {
                 foreach (var number in Enumerable.Range(1, records))
@@ -117,7 +118,7 @@ namespace System.Test
             writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
             var totalCount = 0;
-            
+
             foreach (var writer in writers)
             {
                 foreach (var number in Enumerable.Range(1, records))
@@ -129,6 +130,57 @@ namespace System.Test
 
                 await writer.DisposeAsync().ConfigureAwait(false);
             }
+
+            foreach (var reader in readers)
+            {
+                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+
+                Assert.Equal(records * writers.Length, strings.Count);
+
+                await reader.DisposeAsync().ConfigureAwait(false);
+            }
+        }
+
+        // Multiple writers, multiple readers, in parallel
+        [Theory]
+        [ClassData(typeof(TestConfigurations.Cluster))]
+        public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
+        {
+            const int records = 100;
+
+            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            settings.StreamName = _randomStreamName;
+
+            var readers = new Engine<List<string>>[3];
+
+            readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+
+            var writers = new Engine<List<string>>[3];
+
+            writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+
+            var tasks = writers.Select(
+                    writer => Task.Run(
+                        async () =>
+                        {
+                            foreach (var number in Enumerable.Range(1, records))
+                            {
+                                var command = new AddStringCommand($"{number}");
+                                await writer.ExecuteAsync(command).ConfigureAwait(false);
+                            }
+
+                            await writer.DisposeAsync().ConfigureAwait(false);
+                        }))
+                .ToArray();
+
+            Task.WaitAny(tasks);
+
+            // TODO: Replace with Engine.Ensure(recordNumber) once implemented
+            Thread.Sleep(5000);
 
             foreach (var reader in readers)
             {

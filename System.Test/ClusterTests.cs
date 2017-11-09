@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Memstate;
 using Xunit;
@@ -179,8 +178,12 @@ namespace System.Test
 
             Task.WaitAny(tasks);
 
+            var lastRecordNumber = writers.Max(x => x.LastRecordNumber);
+
             // TODO: Replace with Engine.Ensure(recordNumber) once implemented
-            Thread.Sleep(5000);
+            readers[0].Ensure(lastRecordNumber);
+            readers[1].Ensure(lastRecordNumber);
+            readers[2].Ensure(lastRecordNumber);
 
             foreach (var reader in readers)
             {

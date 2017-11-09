@@ -31,12 +31,14 @@ namespace Memstate
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
         }
 
+        public long LastRecordNumber => _lastRecordNumber;
+
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
-            return (TResult)await completionSource.Task.ConfigureAwait(false);
+            return (TResult) await completionSource.Task.ConfigureAwait(false);
         }
 
         public Task ExecuteAsync(Command<TModel> command)
@@ -66,7 +68,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult)_kernel.Execute(query);
+            return (TResult) _kernel.Execute(query);
         }
 
         public async Task DisposeAsync()
@@ -80,6 +82,14 @@ namespace Memstate
 
             _commandSubscription.Dispose();
             _logger.LogDebug("End Dispose");
+        }
+
+        public void Ensure(long recordNumber)
+        {
+            while (_lastRecordNumber < recordNumber)
+            {
+                _pendingCommandsChanged.WaitOne();
+            }
         }
 
         internal object Execute(Query query)

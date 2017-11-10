@@ -150,22 +150,28 @@ namespace System.Test
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
+            _log.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
             readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            _log.WriteLine("Readers created");
 
+            _log.WriteLine("Creating writers");
             var writers = new Engine<List<string>>[3];
 
             writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            _log.WriteLine("Writers created");
 
+            _log.WriteLine("Creating write tasks");
             var tasks = writers.Select(
-                    writer => Task.Run(
+                    (writer, index) => Task.Run(
                         async () =>
                         {
+                            _log.WriteLine($"Writing commands on writer-{index+1}");
                             foreach (var number in Enumerable.Range(1, records))
                             {
                                 var command = new AddStringCommand($"{number}");
@@ -173,26 +179,38 @@ namespace System.Test
                             }
 
                             await writer.DisposeAsync().ConfigureAwait(false);
+                            _log.WriteLine($"Done writing commands on writer-{index+1}");
                         }))
                 .ToArray();
 
+            _log.WriteLine("Waiting on write tasks");
             Task.WaitAny(tasks);
+            _log.WriteLine("Done waiting on write tasks");
 
+            _log.WriteLine("Getting last record number");
             var lastRecordNumber = writers.Max(x => x.LastRecordNumber);
+            _log.WriteLine($"Last record number is {lastRecordNumber}");
 
-            // TODO: Replace with Engine.Ensure(recordNumber) once implemented
+            _log.WriteLine("Ensuring all readers has read the last record");
             readers[0].Ensure(lastRecordNumber);
             readers[1].Ensure(lastRecordNumber);
             readers[2].Ensure(lastRecordNumber);
+            _log.WriteLine("All readers has read the last record");
 
+            _log.WriteLine("Reading from all readers");
             foreach (var reader in readers)
             {
+                _log.WriteLine("Counting strings");
                 var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                _log.WriteLine($"Count: {strings.Count}");
 
                 Assert.Equal(records * writers.Length, strings.Count);
 
+                _log.WriteLine("Disposing reader");
                 await reader.DisposeAsync().ConfigureAwait(false);
+                _log.WriteLine("Disposed reader");
             }
+            _log.WriteLine("Done reading from all readers");
         }
     }
 }

@@ -145,7 +145,7 @@ namespace System.Test
         [ClassData(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
         {
-            const int records = 100;
+            const int Records = 100;
 
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
@@ -172,9 +172,9 @@ namespace System.Test
                         async () =>
                         {
                             _log.WriteLine($"Writing commands on writer-{index+1}");
-                            foreach (var number in Enumerable.Range(1, records))
+                            foreach (var number in Enumerable.Range(1, Records))
                             {
-                                var command = new AddStringCommand($"{number}");
+                                var command = new AddStringCommand($"{index}.{number}");
                                 await writer.ExecuteAsync(command).ConfigureAwait(false);
                             }
 
@@ -182,35 +182,30 @@ namespace System.Test
                             _log.WriteLine($"Done writing commands on writer-{index+1}");
                         }))
                 .ToArray();
-
+            
             _log.WriteLine("Waiting on write tasks");
-            Task.WaitAny(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            var recordsWritten = Records * writers.Length;
             _log.WriteLine("Done waiting on write tasks");
 
-            _log.WriteLine("Getting last record number");
-            var lastRecordNumber = writers.Max(x => x.LastRecordNumber);
-            _log.WriteLine($"Last record number is {lastRecordNumber}");
+            _log.WriteLine("Reading from all engines");
+            var engines = readers.Concat(writers);
 
-            _log.WriteLine("Ensuring all readers has read the last record");
-            readers[0].Ensure(lastRecordNumber);
-            readers[1].Ensure(lastRecordNumber);
-            readers[2].Ensure(lastRecordNumber);
-            _log.WriteLine("All readers has read the last record");
-
-            _log.WriteLine("Reading from all readers");
-            foreach (var reader in readers)
+            foreach (var engine in engines)
             {
                 _log.WriteLine("Counting strings");
-                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                await engine.EnsureAsync(recordsWritten - 1).ConfigureAwait(false);
+                var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                
                 _log.WriteLine($"Count: {strings.Count}");
 
-                Assert.Equal(records * writers.Length, strings.Count);
+                Assert.Equal(recordsWritten, strings.Count);
 
                 _log.WriteLine("Disposing reader");
-                await reader.DisposeAsync().ConfigureAwait(false);
+                await engine.DisposeAsync().ConfigureAwait(false);
                 _log.WriteLine("Disposed reader");
             }
-            _log.WriteLine("Done reading from all readers");
+            _log.WriteLine("Done reading from all engines");
         }
     }
 }

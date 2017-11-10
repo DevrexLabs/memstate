@@ -1,6 +1,7 @@
 ﻿namespace Memstate.Benchmarks
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BenchmarkDotNet.Attributes;
@@ -8,23 +9,22 @@
     using BenchmarkDotNet.Configs;
 
     using Memstate.EventStore;
+    using Memstate.JsonNet;
     using Memstate.Models;
     using Memstate.Models.KeyValue;
     using Memstate.Postgresql;
 
-    using Microsoft.Extensions.Logging.Console;
-
     [Config(typeof(MemstateConfig))]
     public class MemstateBenchmarks
     {
+        public const int Iterations = 10;
+
         private Engine<KeyValueStore<int>> _engine;
-        private Set<int> _setCommand;
 
         [Params(
-            typeof(InMemoryStorageProvider),
-            // todo: eventstore hangs, investigate. looks like recordnumber problem
-            // typeof(EventStoreProvider),
-            typeof(PostgresqlProvider))]
+            //typeof(InMemoryStorageProvider),
+            typeof(PostgresqlProvider),
+            typeof(EventStoreProvider))]
         public Type StorageProviderTypes { get; set; }
 
         [GlobalSetup]
@@ -37,26 +37,25 @@
             settings.LoggerFactory.AddProvider(logProvider);
             */
             settings.StorageProvider = StorageProviderTypes.AssemblyQualifiedName;
-
-            settings.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; Database=postgres; Password=secret; User ID=postgres;";
-            settings.Configuration["StorageProviders:Postgresql:Table"] = $"memstate_commands_{Guid.NewGuid():N}";
-            settings.Configuration["StorageProviders:Postgresql:SubscriptionStream"] = $"memstate_notifications_{Guid.NewGuid():N}";
-
+            settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
             var engineBuilder = new EngineBuilder(settings);
             _engine = engineBuilder.Build(new KeyValueStore<int>());
-            _setCommand = new Set<int>("Key", 42);
         }
 
         [GlobalCleanup]
-        public async Task Cleanup()
+        public void Cleanup()
         {
-            await _engine.DisposeAsync().ConfigureAwait(false);
+            //_engine.DisposeAsync().Wait();
         }
-
-        [Benchmark]
-        public async Task<int> CommandRoundtrip()
+        
+        [Benchmark(OperationsPerInvoke = Iterations)]
+        public async Task CommandRoundtrip()
         {
-            return await _engine.ExecuteAsync(_setCommand).ConfigureAwait(false);
+            var tasks = Enumerable
+                .Range(0, Iterations)
+                .Select(i => _engine.ExecuteAsync(new Set<int>(i.ToString(), i)));
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         private class MemstateConfig : ManualConfig

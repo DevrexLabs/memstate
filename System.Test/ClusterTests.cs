@@ -145,7 +145,7 @@ namespace System.Test
         [ClassData(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
         {
-            const int records = 100;
+            const int Records = 100;
 
             settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
@@ -162,36 +162,30 @@ namespace System.Test
             writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
-            var tasks = writers.Select(
-                    writer => Task.Run(
+            var writerTasks = writers.Select(
+                    (writer, idx) => Task.Run(
                         async () =>
                         {
-                            foreach (var number in Enumerable.Range(1, records))
+                            foreach (var number in Enumerable.Range(1, Records))
                             {
-                                var command = new AddStringCommand($"{number}");
+                                var command = new AddStringCommand($"{idx}.{number}");
                                 await writer.ExecuteAsync(command).ConfigureAwait(false);
                             }
-
-                            await writer.DisposeAsync().ConfigureAwait(false);
                         }))
                 .ToArray();
+            await Task.WhenAll(writerTasks).ConfigureAwait(false);
+            var recordsWritten = Records * writers.Length;
 
-            Task.WaitAny(tasks);
+            var engines = readers.Concat(writers);
 
-            var lastRecordNumber = writers.Max(x => x.LastRecordNumber);
-
-            // TODO: Replace with Engine.Ensure(recordNumber) once implemented
-            readers[0].Ensure(lastRecordNumber);
-            readers[1].Ensure(lastRecordNumber);
-            readers[2].Ensure(lastRecordNumber);
-
-            foreach (var reader in readers)
+            foreach (var engine in engines)
             {
-                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                await engine.EnsureAsync(recordsWritten - 1).ConfigureAwait(false);
+                var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
 
-                Assert.Equal(records * writers.Length, strings.Count);
+                Assert.Equal(recordsWritten, strings.Count);
 
-                await reader.DisposeAsync().ConfigureAwait(false);
+                await engine.DisposeAsync().ConfigureAwait(false);
             }
         }
     }

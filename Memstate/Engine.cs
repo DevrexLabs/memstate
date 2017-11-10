@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
+    // todo: refactor signature
+    public delegate void CommandExecutedDelegate(JournalRecord journalRecord, bool isLocal);
+
     public class Engine<TModel> where TModel : class
     {
         private readonly ILogger _logger;
@@ -31,14 +34,16 @@ namespace Memstate
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
         }
 
-        public long LastRecordNumber => _lastRecordNumber;
+        public event CommandExecutedDelegate CommandExecuted = delegate { };
+
+        public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
-            return (TResult) await completionSource.Task.ConfigureAwait(false);
+            return (TResult)await completionSource.Task.ConfigureAwait(false);
         }
 
         public Task ExecuteAsync(Command<TModel> command)
@@ -68,7 +73,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult) _kernel.Execute(query);
+            return (TResult)_kernel.Execute(query);
         }
 
         public async Task DisposeAsync()
@@ -84,12 +89,20 @@ namespace Memstate
             _logger.LogDebug("End Dispose");
         }
 
-        public void Ensure(long recordNumber)
+        public Task EnsureAsync(long recordNumber)
         {
-            while (_lastRecordNumber < recordNumber)
-            {
-                _pendingCommandsChanged.WaitOne();
-            }
+            var completionSource = new TaskCompletionSource<object>();
+            CommandExecuted += (journalRecord, isLocal) =>
+                {
+                    if (journalRecord.RecordNumber >= recordNumber)
+                    {
+                        completionSource.SetResult(null);
+                    }
+                };
+
+            return Interlocked.Read(ref _lastRecordNumber) >= recordNumber
+                ? Task.CompletedTask 
+                : completionSource.Task;
         }
 
         internal object Execute(Query query)
@@ -126,11 +139,29 @@ namespace Memstate
 
                 object result = _kernel.Execute(record.Command);
                 completion?.SetResult(result);
+                NotifyCommandExecuted(record, isLocalCommand);
             }
             catch (Exception ex)
             {
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="journalRecord"></param>
+        /// <param name="isLocal"></param>
+        private void NotifyCommandExecuted(JournalRecord journalRecord, bool isLocal)
+        {
+            try
+            {
+                CommandExecuted.Invoke(journalRecord, isLocal);
+            }
+            catch
+            {
+                // Don't let external code crash the engine
             }
         }
     }

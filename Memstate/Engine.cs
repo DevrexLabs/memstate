@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using App.Metrics;
+using App.Metrics.Counter;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate
@@ -11,6 +13,7 @@ namespace Memstate
 
     public class Engine<TModel> where TModel : class
     {
+        private readonly MemstateSettings _settings;
         private readonly ILogger _logger;
         private readonly Kernel _kernel;
         private readonly IJournalWriter _journalWriter;
@@ -26,6 +29,7 @@ namespace Memstate
             IJournalWriter journalWriter,
             long nextRecord)
         {
+            _settings = config;
             _lastRecordNumber = nextRecord - 1;
             _logger = config.CreateLogger<Engine<TModel>>();
             _kernel = new Kernel(config, model);
@@ -38,12 +42,14 @@ namespace Memstate
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
 
+        public Guid Id { get; } = Guid.NewGuid();
+
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
             _journalWriter.Send(command);
-            return (TResult)await completionSource.Task.ConfigureAwait(false);
+            return (TResult) await completionSource.Task.ConfigureAwait(false);
         }
 
         public Task ExecuteAsync(Command<TModel> command)
@@ -73,7 +79,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult)_kernel.Execute(query);
+            return (TResult) _kernel.Execute(query);
         }
 
         public async Task DisposeAsync()
@@ -93,15 +99,15 @@ namespace Memstate
         {
             var completionSource = new TaskCompletionSource<object>();
             CommandExecuted += (journalRecord, isLocal) =>
+            {
+                if (journalRecord.RecordNumber >= recordNumber)
                 {
-                    if (journalRecord.RecordNumber >= recordNumber)
-                    {
-                        completionSource.SetResult(null);
-                    }
-                };
+                    completionSource.SetResult(null);
+                }
+            };
 
             return Interlocked.Read(ref _lastRecordNumber) >= recordNumber
-                ? Task.CompletedTask 
+                ? Task.CompletedTask
                 : completionSource.Task;
         }
 
@@ -140,8 +146,17 @@ namespace Memstate
                 object result = _kernel.Execute(record.Command);
                 completion?.SetResult(result);
                 NotifyCommandExecuted(record, isLocalCommand);
+
+                var counterOptions = new CounterOptions
+                {
+                    Name = "CommandsExecuted",
+                    MeasurementUnit = Unit.Calls,
+                    Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+                };
+
+                _settings.Metrics.Measure.Counter.Increment(counterOptions);
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);

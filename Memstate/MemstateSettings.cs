@@ -1,3 +1,5 @@
+using App.Metrics;
+
 namespace Memstate
 {
     using System;
@@ -12,7 +14,14 @@ namespace Memstate
             : base(Build(args))
         {
             Memstate = this;
+
+            Metrics = new MetricsBuilder()
+                .Configuration.ReadFrom(Configuration)
+                .OutputMetrics.AsJson()
+                .Build();
         }
+
+        public IMetricsRoot Metrics { get; }
 
         public int MaxBatchSize { get; set; } = 1024;
 

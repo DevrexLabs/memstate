@@ -34,7 +34,7 @@ namespace Memstate
             _settings = config;
             _lastRecordNumber = nextRecord - 1;
             _logger = config.CreateLogger<Engine<TModel>>();
-            _kernel = new Kernel(config, model);
+            _kernel = new Kernel(config, model, Id);
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);

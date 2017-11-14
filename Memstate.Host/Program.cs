@@ -1,28 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
+using Memstate.Postgresql;
 using Memstate.Tcp;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host
 {
-    using System.Threading.Tasks;
-
-    public class Program
+    public static class Program
     {
+        private static readonly Dictionary<string, Action> Commands = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"client", RunClient},
+            {"server", RunServer},
+            {"metrics",Metrics},
+            {"help", Help},
+            {"quit", () => _running = false},
+            {"exit", () => _running = false}
+        };
+
+        private static bool _running = true;
+
         public static void Main(string[] args)
         {
             Console.WriteLine("Memstate Console");
-            var command = string.Empty;
-            while (true)
+
+            while (_running)
             {
-                Console.Write("'server' or 'client' : ");
-                command = Console.ReadLine();
-                if (command == "server" || command == "client") break;
-                Console.WriteLine("bad command, try again");
+                Console.Write("> ");
+
+                var input = Console.ReadLine();
+
+                if (Commands.TryGetValue(input, out var command))
+                {
+                    command();
+                }
+                else
+                {
+                    Console.WriteLine($"Invalid command '{input}, please try again.");
+                }
             }
-            if (command == "server") RunServer();
-            else RunClient();
+        }
+        
+        private static void Help()
+        {
+            Console.WriteLine("Available commands:");
+
+            foreach (var command in Commands)
+            {
+                Console.WriteLine($"\t{command.Key}");
+            }
+
+            Console.WriteLine();
         }
 
         private static void RunClient()
@@ -47,7 +80,6 @@ namespace Memstate.Host
 
             Console.WriteLine("Hit enter to exit");
             Console.ReadLine();
-
         }
 
         private static void RunServer()
@@ -55,7 +87,7 @@ namespace Memstate.Host
             Console.WriteLine("Starting server on port 3001, type exit to quit");
             MemstateSettings config = new MemstateSettings();
             config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
-            config.LoggerFactory.AddConsole((category,level) => true);
+            config.LoggerFactory.AddConsole((category, level) => true);
             var engine = new EngineBuilder(config).Build<KeyValueStore<int>>();
             var server = new MemstateServer<KeyValueStore<int>>(config, engine);
             server.Start();
@@ -66,6 +98,62 @@ namespace Memstate.Host
             server.Stop();
             Console.WriteLine("Server stopped, hit enter to terminate");
             Console.ReadLine();
+        }
+
+        private static void Metrics()
+        {
+            var random = new Random();
+            
+            Console.WriteLine("Starting an engine to generate traffic");
+
+            var settings = new MemstateSettings();
+
+            settings.WithRandomSuffixAppendedToStreamName();
+
+            settings.UsePostgresqlProvider();
+            settings.LoggerFactory.AddConsole((category, level) => true);
+
+            settings.Configuration["StorageProviders:Postgresql:ConnectionString"] = "Host=localhost; User ID=hagbard; Database=postgres;";
+
+            var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
+
+            var low = 0;
+            var high = random.Next(100, 200);
+
+            for (var i = low; i < high; i++)
+            {    
+                var command = new Set<int>($"key-{i}", i);
+
+                engine.Execute(command);
+            }
+
+            for (var i = low; i < random.Next(low, high); i++)
+            {
+                var query = new Get<int>($"key-{random.Next(low, high)}");
+
+                engine.Execute(query);
+            }
+
+            PrintMetrics(settings);
+
+            engine.DisposeAsync().Wait();
+        }
+
+        private static void PrintMetrics(MemstateSettings settings)
+        {
+            var snapshot = settings.Metrics.Snapshot.Get();
+
+            foreach (var formatter in settings.Metrics.OutputMetricsFormatters)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    formatter.WriteAsync(stream, snapshot).Wait();
+
+                    var result = Encoding.UTF8.GetString(stream.ToArray());
+
+                    Console.WriteLine(result);
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using App.Metrics;
 using App.Metrics.Counter;
+using App.Metrics.Gauge;
 using App.Metrics.Timer;
 using Microsoft.Extensions.Logging;
 
@@ -49,8 +50,30 @@ namespace Memstate
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
-            _journalWriter.Send(command);
-            return (TResult) await completionSource.Task.ConfigureAwait(false);
+
+            var gaugeOptions = new GaugeOptions
+            {
+                Name = "PendingCommands",
+                MeasurementUnit = Unit.Items,
+                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+            };
+
+            _settings.Metrics.Measure.Gauge.SetValue(gaugeOptions, _pendingLocalCommands.Count);
+
+            var timerOptions = new TimerOptions
+            {
+                Name = "CommandExecutionTime",
+                DurationUnit = TimeUnit.Milliseconds,
+                RateUnit = TimeUnit.Milliseconds,
+                MeasurementUnit = Unit.Requests,
+                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+            };
+
+            using (_settings.Metrics.Measure.Timer.Time(timerOptions))
+            {
+                _journalWriter.Send(command);
+                return (TResult) await completionSource.Task.ConfigureAwait(false);
+            }
         }
 
         public Task ExecuteAsync(Command<TModel> command)
@@ -112,9 +135,9 @@ namespace Memstate
                         MeasurementUnit = Unit.Calls,
                         Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
                     };
-                    
+
                     _settings.Metrics.Measure.Counter.Increment(failedCounterOptions);
-                    
+
                     throw;
                 }
             }
@@ -171,6 +194,15 @@ namespace Memstate
                 var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
                 if (isLocalCommand)
                 {
+                    var gaugeOptions = new GaugeOptions
+                    {
+                        Name = "PendingCommands",
+                        MeasurementUnit = Unit.Items,
+                        Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+                    };
+
+                    _settings.Metrics.Measure.Gauge.SetValue(gaugeOptions, _pendingLocalCommands.Count);
+
                     _pendingCommandsChanged.Set();
                 }
 
@@ -202,7 +234,7 @@ namespace Memstate
                     MeasurementUnit = Unit.Calls,
                     Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
                 };
-                
+
                 _settings.Metrics.Measure.Counter.Increment(counterOptions);
 
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);

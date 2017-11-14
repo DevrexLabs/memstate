@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using App.Metrics;
+using App.Metrics.Filtering;
+using App.Metrics.Formatters;
+using App.Metrics.Formatters.Json.Extensions;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Memstate.Postgresql;
@@ -17,7 +22,7 @@ namespace Memstate.Host
         {
             {"client", RunClient},
             {"server", RunServer},
-            {"metrics",Metrics},
+            {"metrics", Metrics},
             {"help", Help},
             {"quit", () => _running = false},
             {"exit", () => _running = false}
@@ -45,7 +50,7 @@ namespace Memstate.Host
                 }
             }
         }
-        
+
         private static void Help()
         {
             Console.WriteLine("Available commands:");
@@ -103,7 +108,7 @@ namespace Memstate.Host
         private static void Metrics()
         {
             var random = new Random();
-            
+
             Console.WriteLine("Starting an engine to generate traffic");
 
             var settings = new MemstateSettings();
@@ -121,7 +126,7 @@ namespace Memstate.Host
             var high = random.Next(100, 200);
 
             for (var i = low; i < high; i++)
-            {    
+            {
                 var command = new Set<int>($"key-{i}", i);
 
                 engine.Execute(command);
@@ -134,25 +139,20 @@ namespace Memstate.Host
                 engine.Execute(query);
             }
 
-            PrintMetrics(settings);
+            PrintMetrics(settings.Metrics.Snapshot.Get(), settings.Metrics.DefaultOutputMetricsFormatter);
 
             engine.DisposeAsync().Wait();
         }
 
-        private static void PrintMetrics(MemstateSettings settings)
+        private static void PrintMetrics(MetricsDataValueSource snapshot, IMetricsOutputFormatter formatter)
         {
-            var snapshot = settings.Metrics.Snapshot.Get();
-
-            foreach (var formatter in settings.Metrics.OutputMetricsFormatters)
+            using (var stream = new MemoryStream())
             {
-                using (var stream = new MemoryStream())
-                {
-                    formatter.WriteAsync(stream, snapshot).Wait();
+                formatter.WriteAsync(stream, snapshot).Wait();
 
-                    var result = Encoding.UTF8.GetString(stream.ToArray());
+                var result = Encoding.UTF8.GetString(stream.ToArray());
 
-                    Console.WriteLine(result);
-                }
+                Console.WriteLine(result);
             }
         }
     }

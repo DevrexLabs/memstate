@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using App.Metrics;
 using App.Metrics.Counter;
+using App.Metrics.Timer;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate
@@ -79,7 +80,44 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult) _kernel.Execute(query);
+            var counterOptions = new CounterOptions
+            {
+                Name = "QueriesExecuted",
+                MeasurementUnit = Unit.Calls,
+                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+            };
+
+            _settings.Metrics.Measure.Counter.Increment(counterOptions);
+
+            var requestTimer = new TimerOptions
+            {
+                Name = "QueryExecutionTime",
+                MeasurementUnit = Unit.Requests,
+                DurationUnit = TimeUnit.Milliseconds,
+                RateUnit = TimeUnit.Milliseconds,
+                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+            };
+
+            using (_settings.Metrics.Measure.Timer.Time(requestTimer))
+            {
+                try
+                {
+                    return (TResult) _kernel.Execute(query);
+                }
+                catch (Exception)
+                {
+                    var failedCounterOptions = new CounterOptions
+                    {
+                        Name = "QueriesFailed",
+                        MeasurementUnit = Unit.Calls,
+                        Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+                    };
+                    
+                    _settings.Metrics.Measure.Counter.Increment(failedCounterOptions);
+                    
+                    throw;
+                }
+            }
         }
 
         public async Task DisposeAsync()
@@ -156,8 +194,17 @@ namespace Memstate
 
                 _settings.Metrics.Measure.Counter.Increment(counterOptions);
             }
-            catch (Exception ex)    
+            catch (Exception ex)
             {
+                var counterOptions = new CounterOptions
+                {
+                    Name = "CommandsFailed",
+                    MeasurementUnit = Unit.Calls,
+                    Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
+                };
+                
+                _settings.Metrics.Measure.Counter.Increment(counterOptions);
+
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);
             }

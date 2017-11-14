@@ -31,6 +31,7 @@ namespace System.Test
                 {
                     var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
                     settings.Serializer = serializerName;
+                    settings.FileSystem = new InMemoryFileSystem();
                     settings.StorageProvider = providerType.AssemblyQualifiedName;
                     settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
                     yield return settings;
@@ -47,7 +48,6 @@ namespace System.Test
         protected virtual IEnumerable<Type> ProviderTypes()
         {
             //yield return typeof(PostgresqlProvider);
-            yield return typeof(InMemoryStorageProvider);
             yield return typeof(FileStorageProvider);
             yield return typeof(EventStoreProvider);
         }
@@ -61,7 +61,7 @@ namespace System.Test
         {
             protected override IEnumerable<Type> ProviderTypes()
             {
-                yield return typeof(PostgresqlProvider);
+                //yield return typeof(PostgresqlProvider);
                 yield return typeof(EventStoreProvider);
             }
         }

@@ -12,12 +12,11 @@
         private readonly ISerializer _serializer;
         private long _nextRecord;
 
-
         public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord) 
             : base(settings)
         {
             _nextRecord = nextRecord;
-            _journalStream = File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.None);
+            _journalStream = settings.FileSystem.OpenAppend(fileName);
             _serializer = settings.CreateSerializer();
         }
 

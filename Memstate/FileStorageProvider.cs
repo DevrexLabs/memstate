@@ -25,8 +25,7 @@
                 return new NullJournalReader();
             }
 
-            var serializer = _settings.CreateSerializer();
-            return new FileJournalReader(fileName, serializer);
+            return new FileJournalReader(fileName, _settings);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)

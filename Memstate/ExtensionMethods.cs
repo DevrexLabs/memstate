@@ -24,7 +24,7 @@ namespace Memstate
 
         public static MemstateSettings WithInmemoryStorage(this MemstateSettings settings)
         {
-            settings.StorageProvider = typeof(InMemoryStorageProvider).FullName;
+            settings.FileSystem = new InMemoryFileSystem();
             return settings;
         }
 

@@ -66,9 +66,12 @@ namespace Memstate.Tests
         public void SmokeTest()
         {
             var config = new MemstateSettings();
+            config.FileSystem = new InMemoryFileSystem();
             var initialModel = new List<string>();
-            var commandStore = new InMemoryStorageProvider(config);
-            var engine = new Engine<List<string>>(config, initialModel,commandStore, commandStore, 0);
+            var provider = config.CreateStorageProvider();
+            var commandStore = provider.CreateJournalWriter(0);
+            var subscriptionSource = provider.CreateJournalSubscriptionSource();
+            var engine = new Engine<List<string>>(config, initialModel, subscriptionSource, commandStore, 0);
             var tasks = Enumerable.Range(10, 10000)
                 .Select(n => engine.ExecuteAsync(new AddStringCommand(n.ToString())))
                 .ToArray();
@@ -84,9 +87,9 @@ namespace Memstate.Tests
         [Fact]
         public async Task FileJournalSmokeTest()
         {
-            var config = new MemstateSettings();
+            var settings = new MemstateSettings();
             var fileName = Path.GetTempFileName();
-            var journalWriter = new FileJournalWriter(config, fileName, 0);
+            var journalWriter = new FileJournalWriter(settings, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
             var sub = subSource.Subscribe(0, records.Add);
@@ -102,8 +105,8 @@ namespace Memstate.Tests
 
             Assert.Equal(1000, records.Count);
 
-            var serializer = new JsonSerializerAdapter();
-            var reader = new FileJournalReader(fileName, serializer);
+            
+            var reader = new FileJournalReader(fileName, settings);
             records.Clear();
             foreach (var record in reader.GetRecords())
             {

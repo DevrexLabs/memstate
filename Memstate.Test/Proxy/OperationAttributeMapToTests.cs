@@ -41,10 +41,10 @@ namespace Memstate.Tests.DispatchProxy
         [Fact]
         public void MapsToCommand()
         {
-            var config  = new MemstateSettings();
-            config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
-            var storageProvider = config.CreateStorageProvider();
-            var builder = new EngineBuilder(config, storageProvider);
+            var settings  = new MemstateSettings();
+            settings.FileSystem = new InMemoryFileSystem();
+            var storageProvider = settings.CreateStorageProvider();
+            var builder = new EngineBuilder(settings, storageProvider);
             var engine = builder.Build<ITestModel>(new TestModel());
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();

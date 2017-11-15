@@ -41,6 +41,8 @@ namespace Memstate
 
         public int MaxBatchQueueLength { get; set; } = int.MaxValue;
 
+        public IVirtualFileSystem FileSystem { get; set; } = new HostFileSystem();
+
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
 
         public StorageProvider CreateStorageProvider()
@@ -51,7 +53,6 @@ namespace Memstate
 
             return provider;
         }
-
 
         public ILogger<T> CreateLogger<T>()
         {

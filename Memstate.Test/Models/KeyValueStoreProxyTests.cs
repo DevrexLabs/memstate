@@ -11,7 +11,7 @@ namespace Memstate.Test.Models
         public KeyValueStoreProxyTests()
         {
             MemstateSettings config = new MemstateSettings();
-            config.StorageProvider = typeof(InMemoryStorageProvider).FullName;
+            config.FileSystem = new InMemoryFileSystem();
             IKeyValueStore<int> model = new KeyValueStore<int>();
             var engine = new EngineBuilder(config).Build(model);
             var client = new LocalClient<IKeyValueStore<int>>(engine);

@@ -1,7 +1,4 @@
-using System;
 using System.Threading;
-using App.Metrics;
-using App.Metrics.Timer;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate
@@ -15,32 +12,20 @@ namespace Memstate
         private readonly object _model;
         private readonly ReaderWriterLockSlim _lock;
         private readonly ILogger _logger;
-        private readonly MemstateSettings _config;
+        private readonly KernelMetrics _metrics;
 
-        public Kernel(MemstateSettings config, object model, Guid? id = null)
+        public Kernel(MemstateSettings config, object model)
         {
-            Id = id ?? Guid.NewGuid();
+            _metrics = new KernelMetrics(config);
             _logger = config.CreateLogger<Kernel>();
-            _config = config;
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
             _logger.LogInformation("Created Kernel");
         }
 
-        public Guid Id { get; }
-
         public object Execute(Command command)
         {
-            var timerOptions = new TimerOptions
-            {
-                Name = "KernelCommandExecutionTime",
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests,
-                Tags = new MetricTags(new[] {"Kernel"}, new[] {Id.ToString()})
-            };
-
-            using (_config.Metrics.Measure.Timer.Time(timerOptions))
+            using (_metrics.MeasureCommandExecution())
             {
                 try
                 {
@@ -56,16 +41,7 @@ namespace Memstate
 
         public object Execute(Query query)
         {
-            var timerOptions = new TimerOptions
-            {
-                Name = "KernelQueryExecutionTime",
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests,
-                Tags = new MetricTags(new[] {"Kernel"}, new[] {Id.ToString()})
-            };
-
-            using (_config.Metrics.Measure.Timer.Time(timerOptions))
+            using (_metrics.MeasureQueryExecution())
             {
                 try
                 {

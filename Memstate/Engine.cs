@@ -2,10 +2,6 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using App.Metrics;
-using App.Metrics.Counter;
-using App.Metrics.Gauge;
-using App.Metrics.Timer;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate
@@ -15,7 +11,6 @@ namespace Memstate
 
     public class Engine<TModel> where TModel : class
     {
-        private readonly MemstateSettings _settings;
         private readonly ILogger _logger;
         private readonly Kernel _kernel;
         private readonly IJournalWriter _journalWriter;
@@ -23,6 +18,7 @@ namespace Memstate
         private readonly IDisposable _commandSubscription;
         private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
         private long _lastRecordNumber;
+        private readonly EngineMetrics _metrics;
 
         public Engine(
             MemstateSettings config,
@@ -31,45 +27,26 @@ namespace Memstate
             IJournalWriter journalWriter,
             long nextRecord)
         {
-            _settings = config;
             _lastRecordNumber = nextRecord - 1;
             _logger = config.CreateLogger<Engine<TModel>>();
-            _kernel = new Kernel(config, model, Id);
+            _kernel = new Kernel(config, model);
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
+            _metrics = new EngineMetrics(config);
         }
 
         public event CommandExecutedDelegate CommandExecuted = delegate { };
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
 
-        public Guid Id { get; } = Guid.NewGuid();
-
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
+            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
-            var gaugeOptions = new GaugeOptions
-            {
-                Name = "PendingCommands",
-                MeasurementUnit = Unit.Items,
-                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-            };
-
-            _settings.Metrics.Measure.Gauge.SetValue(gaugeOptions, _pendingLocalCommands.Count);
-
-            var timerOptions = new TimerOptions
-            {
-                Name = "CommandExecutionTime",
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests,
-                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-            };
-
-            using (_settings.Metrics.Measure.Timer.Time(timerOptions))
+            using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
                 return (TResult) await completionSource.Task.ConfigureAwait(false);
@@ -103,40 +80,19 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            var counterOptions = new CounterOptions
-            {
-                Name = "QueriesExecuted",
-                MeasurementUnit = Unit.Calls,
-                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-            };
-
-            _settings.Metrics.Measure.Counter.Increment(counterOptions);
-
-            var requestTimer = new TimerOptions
-            {
-                Name = "QueryExecutionTime",
-                MeasurementUnit = Unit.Requests,
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-            };
-
-            using (_settings.Metrics.Measure.Timer.Time(requestTimer))
+            using (_metrics.MeasureQueryExecution())
             {
                 try
                 {
-                    return (TResult) _kernel.Execute(query);
+                    var result = (TResult) _kernel.Execute(query);
+                    
+                    _metrics.QueryExecuted();
+
+                    return result;
                 }
                 catch (Exception)
                 {
-                    var failedCounterOptions = new CounterOptions
-                    {
-                        Name = "QueriesFailed",
-                        MeasurementUnit = Unit.Calls,
-                        Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-                    };
-
-                    _settings.Metrics.Measure.Counter.Increment(failedCounterOptions);
+                    _metrics.QueryFailed();
 
                     throw;
                 }
@@ -194,14 +150,7 @@ namespace Memstate
                 var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
                 if (isLocalCommand)
                 {
-                    var gaugeOptions = new GaugeOptions
-                    {
-                        Name = "PendingCommands",
-                        MeasurementUnit = Unit.Items,
-                        Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-                    };
-
-                    _settings.Metrics.Measure.Gauge.SetValue(gaugeOptions, _pendingLocalCommands.Count);
+                    _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
                     _pendingCommandsChanged.Set();
                 }
@@ -217,25 +166,11 @@ namespace Memstate
                 completion?.SetResult(result);
                 NotifyCommandExecuted(record, isLocalCommand);
 
-                var counterOptions = new CounterOptions
-                {
-                    Name = "CommandsExecuted",
-                    MeasurementUnit = Unit.Calls,
-                    Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-                };
-
-                _settings.Metrics.Measure.Counter.Increment(counterOptions);
+                _metrics.CommandExecuted();
             }
             catch (Exception ex)
             {
-                var counterOptions = new CounterOptions
-                {
-                    Name = "CommandsFailed",
-                    MeasurementUnit = Unit.Calls,
-                    Tags = new MetricTags(new[] {"Engine"}, new[] {Id.ToString()})
-                };
-
-                _settings.Metrics.Measure.Counter.Increment(counterOptions);
+                _metrics.CommandFailed();
 
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);

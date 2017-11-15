@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using App.Metrics;
@@ -21,7 +23,9 @@ namespace Memstate.Host
             {"metrics", Metrics},
             {"help", Help},
             {"quit", Quit},
-            {"exit", Quit}
+            {"exit", Quit},
+            {"benchmark", Benchmark},
+            {"read-benchmark", QueriesPerSecondBenchmark}
         };
 
         private static bool _running = true;
@@ -129,10 +133,10 @@ namespace Memstate.Host
 
             var settings = new MemstateSettings();
 
-            Console.WriteLine($"Settings {settings}");
-
             settings.WithRandomSuffixAppendedToStreamName();
             settings.LoggerFactory.AddConsole((category, level) => level != LogLevel.Debug);
+
+            Console.WriteLine($"Settings: {settings}");
 
             var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
 
@@ -158,6 +162,11 @@ namespace Memstate.Host
             await engine.DisposeAsync();
         }
 
+        private static async Task PrintMetrics(MemstateSettings settings)
+        {
+            await PrintMetrics(settings.Metrics.Snapshot.Get(), settings.Metrics.DefaultOutputMetricsFormatter);
+        }
+
         private static async Task PrintMetrics(MetricsDataValueSource snapshot, IMetricsOutputFormatter formatter)
         {
             using (var stream = new MemoryStream())
@@ -168,6 +177,91 @@ namespace Memstate.Host
 
                 Console.WriteLine(result);
             }
+        }
+
+        private static async Task Benchmark()
+        {
+            Console.WriteLine("Running commands per second benchmark:");
+            await CommandsPerSecondBenchmark();
+            Console.WriteLine();
+            
+            Console.WriteLine("Running queries per second benchmark:");
+            await QueriesPerSecondBenchmark();
+            Console.WriteLine();
+        }
+
+        private static async Task CommandsPerSecondBenchmark()
+        {
+            var settings = new MemstateSettings();
+
+            settings.WithRandomSuffixAppendedToStreamName();
+            settings.LoggerFactory.AddConsole(LogLevel.Information);
+
+            Console.WriteLine($"Settings: {settings}");
+
+            const int writes = 1000;
+            
+            var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
+
+            var stopwatch = Stopwatch.StartNew();
+            
+            for (var i = 0; i < writes; i++)
+            {
+                engine.ExecuteAsync(new Set<int>($"key-{i}", i));
+            }
+
+            await engine.DisposeAsync();
+
+            stopwatch.Stop();
+            
+            Console.WriteLine($"Wrote {writes} commands in {stopwatch.Elapsed.TotalSeconds}s. {writes / stopwatch.Elapsed.TotalSeconds} commands/second");
+        }
+
+        private static async Task QueriesPerSecondBenchmark()
+        {
+            var settings = new MemstateSettings();
+
+            settings.WithRandomSuffixAppendedToStreamName();
+            settings.LoggerFactory.AddConsole(LogLevel.Information);
+
+            Console.WriteLine($"Settings: {settings}");
+
+            const int reads = 1000000;
+            
+            var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
+
+            await engine.ExecuteAsync(new Set<int>("key-0", 0));
+
+            var totals = new TimeSpan[10];
+
+            for (var run = 1; run <= 10; run++) {
+                Console.WriteLine($"Run {run}");
+                
+                var stopwatch = Stopwatch.StartNew();
+
+                for (var i = 0; i < reads; i++)
+                {
+                    engine.Execute(new Get<int>("key-0"));
+                }
+
+                stopwatch.Stop();
+
+                Console.WriteLine($"Read {reads} queries in {stopwatch.Elapsed.TotalSeconds}s. {reads / stopwatch.Elapsed.TotalSeconds:0.00} queries/second");
+
+                totals[run-1] = stopwatch.Elapsed;
+            }
+
+            await engine.DisposeAsync();
+
+            var min = totals.Select(x => reads / x.TotalSeconds).Min();
+            var max = totals.Select(x => reads / x.TotalSeconds).Max();
+            var average = totals.Select(x => reads / x.TotalSeconds).Average();
+            
+            Console.WriteLine($"Min: {min:0.00} qps");
+            Console.WriteLine($"Max: {max:0.00} qps");
+            Console.WriteLine($"Average: {average:0.00} qps");
+
+            await PrintMetrics(settings);
         }
     }
 }

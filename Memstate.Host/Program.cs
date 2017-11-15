@@ -26,7 +26,12 @@ namespace Memstate.Host
 
         private static bool _running = true;
 
-        public static async Task Main()
+        public static void Main()
+        {
+            MainAsync().GetAwaiter().GetResult();
+        }
+
+        private static async Task MainAsync()
         {
             Console.WriteLine("Memstate Console");
 
@@ -124,8 +129,10 @@ namespace Memstate.Host
 
             var settings = new MemstateSettings();
 
+            Console.WriteLine($"Settings {settings}");
+
             settings.WithRandomSuffixAppendedToStreamName();
-            settings.LoggerFactory.AddConsole((category, level) => true);
+            settings.LoggerFactory.AddConsole((category, level) => level != LogLevel.Debug);
 
             var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
 

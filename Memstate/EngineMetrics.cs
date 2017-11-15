@@ -76,8 +76,8 @@ namespace Memstate
             {
                 Name = "CommandExecutionTime",
                 DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests
+                MeasurementUnit = Unit.Requests,
+                RateUnit = TimeUnit.Seconds
             };
 
             return _settings.Metrics.Measure.Timer.Time(options);
@@ -89,8 +89,8 @@ namespace Memstate
             {
                 Name = "QueryExecutionTime",
                 MeasurementUnit = Unit.Requests,
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds
+                DurationUnit = TimeUnit.Microseconds,
+                RateUnit = TimeUnit.Seconds
             };
 
             return _settings.Metrics.Measure.Timer.Time(options);

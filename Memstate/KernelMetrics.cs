@@ -18,9 +18,9 @@ namespace Memstate
             var options = new TimerOptions
             {
                 Name = "KernelQueryExecutionTime",
-                DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests
+                DurationUnit = TimeUnit.Microseconds,
+                MeasurementUnit = Unit.Requests,
+                RateUnit = TimeUnit.Seconds
             };
 
             return _settings.Metrics.Measure.Timer.Time(options);
@@ -32,8 +32,8 @@ namespace Memstate
             {
                 Name = "KernelCommandExecutionTime",
                 DurationUnit = TimeUnit.Milliseconds,
-                RateUnit = TimeUnit.Milliseconds,
-                MeasurementUnit = Unit.Requests
+                MeasurementUnit = Unit.Requests,
+                RateUnit = TimeUnit.Seconds
             };
 
             return _settings.Metrics.Measure.Timer.Time(options);

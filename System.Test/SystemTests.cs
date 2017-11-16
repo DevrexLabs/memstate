@@ -83,9 +83,17 @@ namespace System.Test
 
             var records = new List<JournalRecord>();
             var subSource = provider.CreateJournalSubscriptionSource();
-            subSource.Subscribe(0, records.Add);
-            await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-            Assert.Equal(Enumerable.Range(0, NumRecords).ToArray(), records.Select(r => (int)r.RecordNumber).ToArray());
+
+            if (!provider.SupportsCatchupSubscriptions())
+            {
+                Assert.Throws<NotSupportedException>(() => subSource.Subscribe(0, records.Add));
+            }
+            else
+            {
+                subSource.Subscribe(0, records.Add);
+                await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
+                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
+            }
         }
 
         [Theory]
@@ -99,9 +107,10 @@ namespace System.Test
 
             var provider = settings.CreateStorageProvider();
             var records = new List<JournalRecord>();
+            var writer = provider.CreateJournalWriter(0);
+
             var subSource = provider.CreateJournalSubscriptionSource();
             var sub = subSource.Subscribe(0, records.Add);
-            var writer = provider.CreateJournalWriter(0);
 
             for (var i = 0; i < NumRecords; i++)
             {

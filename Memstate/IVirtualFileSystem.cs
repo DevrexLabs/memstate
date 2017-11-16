@@ -7,5 +7,7 @@ namespace Memstate
         Stream OpenAppend(string path);
 
         Stream OpenRead(string path);
+
+        bool Exists(string fileName);
     }
 }

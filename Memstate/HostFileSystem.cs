@@ -13,5 +13,10 @@ namespace Memstate
         {
             return File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
+
+        public bool Exists(string fileName)
+        {
+            return File.Exists(fileName);
+        }
     }
 }

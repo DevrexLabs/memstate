@@ -1,7 +1,6 @@
 ﻿namespace Memstate
 {
     using System;
-    using System.IO;
     using System.Threading.Tasks;
 
     public class FileStorageProvider : StorageProvider
@@ -9,6 +8,7 @@
         private readonly FileStorageSettings _fileStorageSettings;
         private readonly MemstateSettings _settings;
         private FileJournalWriter _currentWriter;
+
 
         public FileStorageProvider(MemstateSettings settings)
         {
@@ -20,7 +20,7 @@
         {
             var fileName = _fileStorageSettings.FileName;
 
-            if (!File.Exists(fileName))
+            if (!_settings.FileSystem.Exists(fileName))
             {
                 return new NullJournalReader();
             }
@@ -45,9 +45,8 @@
             return new FileJournalSubscriptionSource(_currentWriter);
         }
 
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        public Task DisposeAsync() => Task.CompletedTask;
+
+        public override bool SupportsCatchupSubscriptions() => false;
     }
 }

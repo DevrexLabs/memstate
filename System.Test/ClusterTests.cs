@@ -7,6 +7,8 @@ using Xunit.Abstractions;
 
 namespace System.Test
 {
+    using Microsoft.Extensions.Logging;
+
     public class ClusterTests
     {
         private readonly ITestOutputHelper _log;
@@ -25,8 +27,7 @@ namespace System.Test
         {
             const int records = 100;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
-            settings.StreamName = _randomStreamName;
+            Configure(settings);
 
             var writer = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
@@ -62,8 +63,8 @@ namespace System.Test
         {
             const int records = 100;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
-            settings.StreamName = _randomStreamName;
+            Configure(settings);
+
 
             var reader = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 
@@ -101,8 +102,8 @@ namespace System.Test
         {
             const int records = 100;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
-            settings.StreamName = _randomStreamName;
+            Configure(settings);
+
 
             var readers = new Engine<List<string>>[3];
 
@@ -147,8 +148,7 @@ namespace System.Test
         {
             const int Records = 100;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
-            settings.StreamName = _randomStreamName;
+            Configure(settings);
 
             _log.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
@@ -168,21 +168,20 @@ namespace System.Test
 
             _log.WriteLine("Creating write tasks");
             var tasks = writers.Select(
-                    (writer, index) => Task.Run(
-                        async () =>
+                (writer, index) => Task.Run(
+                    async () =>
                         {
-                            _log.WriteLine($"Writing commands on writer-{index+1}");
+                            _log.WriteLine($"Writing commands on writer-{index + 1}");
                             foreach (var number in Enumerable.Range(1, Records))
                             {
                                 var command = new AddStringCommand($"{index}.{number}");
                                 await writer.ExecuteAsync(command).ConfigureAwait(false);
                             }
 
-                            await writer.DisposeAsync().ConfigureAwait(false);
-                            _log.WriteLine($"Done writing commands on writer-{index+1}");
-                        }))
-                .ToArray();
-            
+                            //await writer.DisposeAsync().ConfigureAwait(false);
+                            _log.WriteLine($"Done writing commands on writer-{index + 1}");
+                        })).ToArray();
+
             _log.WriteLine("Waiting on write tasks");
             await Task.WhenAll(tasks).ConfigureAwait(false);
             var recordsWritten = Records * writers.Length;
@@ -196,7 +195,7 @@ namespace System.Test
                 _log.WriteLine("Counting strings");
                 await engine.EnsureAsync(recordsWritten - 1).ConfigureAwait(false);
                 var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
-                
+
                 _log.WriteLine($"Count: {strings.Count}");
 
                 Assert.Equal(recordsWritten, strings.Count);
@@ -206,6 +205,15 @@ namespace System.Test
                 _log.WriteLine("Disposed reader");
             }
             _log.WriteLine("Done reading from all engines");
+
+        }
+
+        private void Configure(MemstateSettings settings)
+        {
+            var logProvider = new TestOutputLoggingProvider(_log);
+            logProvider.MinimumLogLevel = LogLevel.Information;
+            settings.LoggerFactory.AddProvider(logProvider);
+            settings.StreamName = _randomStreamName;
         }
     }
 }

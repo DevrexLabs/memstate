@@ -4,12 +4,17 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net.Sockets;
     using System.Threading.Tasks;
 
     public class FileJournalWriter : BatchingJournalWriter
     {
         private readonly Stream _journalStream;
         private readonly ISerializer _serializer;
+
+        /// <summary>
+        /// Id of the next record to be written
+        /// </summary>
         private long _nextRecord;
 
         public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord) 
@@ -21,6 +26,8 @@
         }
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };
+
+        public long NextRecord => _nextRecord;
 
         public override async Task DisposeAsync()
         {

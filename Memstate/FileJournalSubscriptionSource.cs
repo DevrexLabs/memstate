@@ -15,6 +15,27 @@ namespace Memstate
             _journalWriter.RecordsWritten += OnRecordsWritten;
         }
 
+        public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
+        {
+            if (from != _journalWriter.NextRecord)
+            {
+                throw new NotSupportedException("CatchupSubscriptions are not supported by this FileStorageProvider");
+            }
+
+            var sub = new JournalSubscription(handler, from, OnDisposed);
+            lock (_subscriptions)
+            {
+                _subscriptions.Add(sub.Id, sub);
+            }
+
+            return sub;
+        }
+
+        public void Dispose()
+        {
+            _journalWriter.RecordsWritten -= OnRecordsWritten;
+        }
+
         private void OnRecordsWritten(JournalRecord[] records)
         {
             lock (_subscriptions)
@@ -29,28 +50,12 @@ namespace Memstate
             }
         }
 
-        public IJournalSubscription Subscribe(long @from, Action<JournalRecord> handler)
-        {
-            var sub = new JournalSubscription(handler, @from, OnDisposed);
-            lock (_subscriptions)
-            {
-                _subscriptions.Add(sub.Id, sub);
-            }
-
-            return sub;
-        }
-
         private void OnDisposed(JournalSubscription subscription)
         {
             lock (_subscriptions)
             {
                 _subscriptions.Remove(subscription.Id);
             }
-        }
-
-        public void Dispose()
-        {
-            _journalWriter.RecordsWritten -= OnRecordsWritten;
         }
     }
 }

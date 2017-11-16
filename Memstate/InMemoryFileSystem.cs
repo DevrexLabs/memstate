@@ -16,6 +16,8 @@ namespace Memstate
         private readonly HashSet<string> _lockedFiles
             = new HashSet<string>();
 
+        public bool Exists(string fileName) => _files.ContainsKey(fileName);
+
         public Stream OpenAppend(string path)
         {
             lock (_files)
@@ -55,6 +57,7 @@ namespace Memstate
                 _files[path] = new ReusableMemoryStream(() => ReleaseLock(path));
             }
 
+            _lockedFiles.Add(path);
             return _files[path];
         }
 

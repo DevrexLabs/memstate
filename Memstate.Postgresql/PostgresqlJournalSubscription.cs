@@ -79,7 +79,7 @@ namespace Memstate.Postgresql
                 connection.Notification += HandleNotification;
 
                 SendListenCommand(connection);
-
+                  
                 while (!_disposed)
                 {
                     connection.Wait(TimeSpan.FromSeconds(10));

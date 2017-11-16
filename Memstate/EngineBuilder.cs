@@ -42,6 +42,5 @@ namespace Memstate
         {
             return BuildAsync(new T()).Result;
         }
-
     }
 }

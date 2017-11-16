@@ -6,6 +6,11 @@ namespace Memstate
         {
         }
 
+        /// <summary>
+        /// True if a subscription can start from an arbitrary record in the past
+        /// </summary>
+        public virtual bool SupportsCatchupSubscriptions() => true;
+
         public abstract IJournalReader CreateJournalReader();
 
         public abstract IJournalWriter CreateJournalWriter(long nextRecordNumber);

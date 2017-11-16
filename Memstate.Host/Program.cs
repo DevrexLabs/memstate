@@ -196,7 +196,7 @@ namespace Memstate.Host
             var settings = new MemstateSettings();
 
             settings.WithRandomSuffixAppendedToStreamName();
-            settings.LoggerFactory.AddConsole(LogLevel.Debug);
+            settings.LoggerFactory.AddConsole(LogLevel.Information);
 
             Console.WriteLine($"Settings: {settings}");
 
@@ -234,9 +234,9 @@ namespace Memstate.Host
             var max = totals.Select(x => writes / x.TotalSeconds).Max();
             var average = totals.Select(x => writes / x.TotalSeconds).Average();
 
-            Console.WriteLine($"Min: {min:0.00} qps");
-            Console.WriteLine($"Max: {max:0.00} qps");
-            Console.WriteLine($"Average: {average:0.00} qps");
+            Console.WriteLine($"Min: {min:0.00} cps");
+            Console.WriteLine($"Max: {max:0.00} cps");
+            Console.WriteLine($"Average: {average:0.00} cps");
 
             await PrintMetrics(settings);
         }

@@ -25,7 +25,8 @@ namespace Memstate.Host
             {"quit", Quit},
             {"exit", Quit},
             {"benchmark", Benchmark},
-            {"read-benchmark", QueriesPerSecondBenchmark}
+            {"read-benchmark", QueriesPerSecondBenchmark},
+            {"write-benchmark", CommandsPerSecondBenchmark}
         };
 
         private static bool _running = true;
@@ -184,7 +185,7 @@ namespace Memstate.Host
             Console.WriteLine("Running commands per second benchmark:");
             await CommandsPerSecondBenchmark();
             Console.WriteLine();
-            
+
             Console.WriteLine("Running queries per second benchmark:");
             await QueriesPerSecondBenchmark();
             Console.WriteLine();
@@ -195,26 +196,49 @@ namespace Memstate.Host
             var settings = new MemstateSettings();
 
             settings.WithRandomSuffixAppendedToStreamName();
-            settings.LoggerFactory.AddConsole(LogLevel.Information);
+            settings.LoggerFactory.AddConsole(LogLevel.Debug);
 
             Console.WriteLine($"Settings: {settings}");
 
-            const int writes = 1000;
+            const int writes = 10000;
             
             var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
-
-            var stopwatch = Stopwatch.StartNew();
             
-            for (var i = 0; i < writes; i++)
-            {
-                engine.ExecuteAsync(new Set<int>($"key-{i}", i));
-            }
+            var totals = new TimeSpan[10];
 
+            for (var run = 1; run <= 10; run++)
+            {
+                Console.WriteLine($"Run {run}");
+                
+                var stopwatch = Stopwatch.StartNew();
+
+                var tasks = new Task[writes];
+
+                for (var i = 0; i < writes; i++)
+                {
+                    tasks[i] = engine.ExecuteAsync(new Set<int>($"key-{i}", i));
+                }
+
+                Task.WaitAll(tasks);
+
+                stopwatch.Stop();
+                
+                Console.WriteLine($"Executed {writes} commands in {stopwatch.Elapsed.TotalSeconds}s. {writes/ stopwatch.Elapsed.TotalSeconds:0.00} commands/second");
+
+                totals[run - 1] = stopwatch.Elapsed;
+            }
+            
             await engine.DisposeAsync();
 
-            stopwatch.Stop();
-            
-            Console.WriteLine($"Wrote {writes} commands in {stopwatch.Elapsed.TotalSeconds}s. {writes / stopwatch.Elapsed.TotalSeconds} commands/second");
+            var min = totals.Select(x => writes / x.TotalSeconds).Min();
+            var max = totals.Select(x => writes / x.TotalSeconds).Max();
+            var average = totals.Select(x => writes / x.TotalSeconds).Average();
+
+            Console.WriteLine($"Min: {min:0.00} qps");
+            Console.WriteLine($"Max: {max:0.00} qps");
+            Console.WriteLine($"Average: {average:0.00} qps");
+
+            await PrintMetrics(settings);
         }
 
         private static async Task QueriesPerSecondBenchmark()
@@ -227,16 +251,17 @@ namespace Memstate.Host
             Console.WriteLine($"Settings: {settings}");
 
             const int reads = 1000000;
-            
+
             var engine = new EngineBuilder(settings).Build<KeyValueStore<int>>();
 
             await engine.ExecuteAsync(new Set<int>("key-0", 0));
 
             var totals = new TimeSpan[10];
 
-            for (var run = 1; run <= 10; run++) {
+            for (var run = 1; run <= 10; run++)
+            {
                 Console.WriteLine($"Run {run}");
-                
+
                 var stopwatch = Stopwatch.StartNew();
 
                 for (var i = 0; i < reads; i++)
@@ -248,7 +273,7 @@ namespace Memstate.Host
 
                 Console.WriteLine($"Read {reads} queries in {stopwatch.Elapsed.TotalSeconds}s. {reads / stopwatch.Elapsed.TotalSeconds:0.00} queries/second");
 
-                totals[run-1] = stopwatch.Elapsed;
+                totals[run - 1] = stopwatch.Elapsed;
             }
 
             await engine.DisposeAsync();
@@ -256,7 +281,7 @@ namespace Memstate.Host
             var min = totals.Select(x => reads / x.TotalSeconds).Min();
             var max = totals.Select(x => reads / x.TotalSeconds).Max();
             var average = totals.Select(x => reads / x.TotalSeconds).Average();
-            
+
             Console.WriteLine($"Min: {min:0.00} qps");
             Console.WriteLine($"Max: {max:0.00} qps");
             Console.WriteLine($"Average: {average:0.00} qps");

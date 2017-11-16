@@ -1,115 +1,75 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Npgsql;
 
 namespace Memstate.Postgresql
 {
     public class PostgresqlJournalSubscription : IJournalSubscription
     {
-        private static readonly object Lock = new object();
+        private readonly AutoResetEvent _readWaiter = new AutoResetEvent(false);
         private readonly Thread _listenerThread;
+        private readonly Thread _readerThread;
         private readonly PostgresqlSettings _settings;
-        private readonly MemstateSettings _memstateSettings;
         private readonly Action<JournalRecord> _handler;
-        private readonly ILogger _log;
-        private readonly RingBuffer<JournalRecord> _buffer = new RingBuffer<JournalRecord>(4096);
-
-        private bool _shouldListen;
+        private readonly PostgresqlJournalReader _journalReader;
         private bool _ready;
+        private bool _disposed;
+        private long _lastRecordId;
 
-        public PostgresqlJournalSubscription(MemstateSettings memstateSettings, Action<JournalRecord> handler)
+        public PostgresqlJournalSubscription(PostgresqlSettings settings, Action<JournalRecord> handler, long lastRecordId)
         {
-            Ensure.NotNull(memstateSettings, nameof(memstateSettings));
-            _memstateSettings = memstateSettings;
-            _settings = new PostgresqlSettings(memstateSettings);
-            _handler = handler;
+            Ensure.NotNull(settings, nameof(settings));
 
-            _log = memstateSettings.LoggerFactory.CreateLogger("Memstate:Postgresql");
+            _settings = settings;
+            _handler = handler;
+            _lastRecordId = lastRecordId - 1;
+
+            _journalReader = new PostgresqlJournalReader(settings);
 
             _listenerThread = new Thread(Listen)
             {
                 Name = "Memstate:Postgresql:NotificationsListener"
             };
+
+            _readerThread = new Thread(Reader)
+            {
+                Name = "Memstate:Postgresql:Reader"
+            };
+        }
+
+        public PostgresqlJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long lastRecordId)
+            : this(new PostgresqlSettings(settings), handler, lastRecordId)
+        {
         }
 
         public void Start()
         {
-            _shouldListen = true;
-
+            _readerThread.Start();
             _listenerThread.Start();
-        }
 
-        public void CatchUp(long from)
-        {
-            var reader = new PostgresqlJournalReader(_memstateSettings);
-
-            while (true)
+            while (!Ready())
             {
-                var lastRecordId = from;
-
-                var records = reader.GetRecords(lastRecordId);
-
-                foreach (var record in records)
-                {
-                    lastRecordId = record.RecordNumber;
-
-                    try
-                    {
-                        _handler(record);
-                    }
-                    catch (Exception exception)
-                    {
-                        _log.LogError(exception, $"Exception occured in {GetType().Name}.CatchUp");
-                    }
-                }
-
-                lock (Lock)
-                {
-                    if (_buffer.TryPeek(out var queuedRecord))
-                    {
-                        if (queuedRecord.RecordNumber <= lastRecordId)
-                        {
-                            // Caught up
-                            while (_buffer.TryDequeue(out queuedRecord))
-                            {
-                                try
-                                {
-                                    _handler(queuedRecord);
-                                }
-                                catch (Exception exception)
-                                {
-                                    _log.LogError(exception, $"Exception occured in {GetType().Name}.CatchUp");
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _ready = true;
-
-                        return;
-                    }
-                }
+                Thread.Sleep(0);
             }
         }
 
         public void Dispose()
         {
-            if (_listenerThread.ThreadState == ThreadState.Unstarted)
+            if (_disposed)
             {
                 return;
             }
 
-            _shouldListen = false;
+            _disposed = true;
 
+            _readWaiter.Set();
+            _readerThread.Join(TimeSpan.FromSeconds(10).Milliseconds);
             _listenerThread.Join(TimeSpan.FromSeconds(10).Milliseconds);
         }
 
         public bool Ready()
         {
-            return true;
+            return _ready;
         }
 
         private void Listen()
@@ -120,48 +80,40 @@ namespace Memstate.Postgresql
 
                 SendListenCommand(connection);
 
-                while (_shouldListen)
+                while (!_disposed)
                 {
-                    connection.Wait(TimeSpan.FromSeconds(1));
+                    connection.Wait(TimeSpan.FromSeconds(10));
                 }
+            }
+        }
+
+        private void Reader()
+        {
+            var lastRecordId = _lastRecordId;
+            
+            while (!_disposed)
+            {
+                foreach (var record in _journalReader.GetRecords(lastRecordId))
+                {
+                    if (record.RecordNumber <= lastRecordId)
+                    {
+                        throw new Exception("You've traveled back in time...");
+                    }
+                    
+                    lastRecordId = record.RecordNumber;
+
+                    _handler(record);
+                }
+
+                _ready = true;
+
+                _readWaiter.WaitOne();
             }
         }
 
         private void HandleNotification(object sender, NpgsqlNotificationEventArgs arguments)
         {
-            var serializer = _memstateSettings.CreateSerializer();
-
-            try
-            {
-                var row = JsonConvert.DeserializeObject<Row>(arguments.AdditionalInformation);
-
-                var command = (Command) serializer.Deserialize(row.Command);
-
-                var record = new JournalRecord(row.Id, row.Written, command);
-
-                if (_ready)
-                {
-                    _handler(record);
-                }
-                else
-                {
-                    lock (Lock)
-                    {
-                        if (_ready)
-                        {
-                            _handler(record);
-                        }
-                        else
-                        {
-                            _buffer.Enqueue(record);
-                        }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                _log.LogError(exception, $"Exception occured in {GetType().Name}.HandleNotification");
-            }
+            _readWaiter.Set();
         }
 
         private void SendListenCommand(NpgsqlConnection connection)
@@ -181,18 +133,6 @@ namespace Memstate.Postgresql
             connection.Open();
 
             return connection;
-        }
-
-        public class Row
-        {
-            [JsonProperty("id")]
-            public long Id { get; set; }
-
-            [JsonProperty("written")]
-            public DateTime Written { get; set; }
-
-            [JsonProperty("command")]
-            public byte[] Command { get; set; }
         }
     }
 }

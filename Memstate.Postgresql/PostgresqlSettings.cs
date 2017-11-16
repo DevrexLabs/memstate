@@ -27,6 +27,8 @@
 
         public string SubscriptionStream => _memstateSettings?.StreamName + SubscriptionStreamSuffix;
 
+        public int ReadBatchSize { get; set; } = 1024;
+
         public Lazy<string> InitSql => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
 
         public override void Validate()

@@ -17,38 +17,60 @@ SELECT
 FROM
     {0}
 WHERE
-    id >= @id
+    id > @id
 ORDER BY
-    id ASC";
+    id ASC
+LIMIT {1};";
 
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
 
         public PostgresqlJournalReader(MemstateSettings memstateSettings)
+            : this(new PostgresqlSettings(memstateSettings))
         {
-            Ensure.NotNull(memstateSettings, nameof(memstateSettings));
-            _settings = new PostgresqlSettings(memstateSettings);
-            _serializer = memstateSettings.CreateSerializer();
+        }
+
+        public PostgresqlJournalReader(PostgresqlSettings settings)
+        {
+            Ensure.NotNull(settings, nameof(settings));
+            
+            _settings = settings;
+            _serializer = settings.Memstate.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            using (var connection = CreateConnection())
+            using (var connection = OpenConnection())
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = string.Format(SelectSql, _settings.Table);
-
-                command.Parameters.AddWithValue("@id", fromRecord);
-
-                connection.Open();
-
-                using (var reader = command.ExecuteReader())
+                do
                 {
-                    while (reader.Read())
+                    var recordsRead = 0;
+
+                    command.CommandText = string.Format(SelectSql, _settings.Table, _settings.ReadBatchSize);
+
+                    command.Parameters.AddWithValue("@id", fromRecord);
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        yield return ReadRecord(reader);
+                        while (reader.Read())
+                        {
+                            recordsRead++;
+
+                            var record = ReadRecord(reader);
+
+                            fromRecord = record.RecordNumber;
+
+                            yield return record;
+                        }
+                    }
+
+                    if (recordsRead < _settings.ReadBatchSize)
+                    {
+                        break;
                     }
                 }
+                while (true);
             }
         }
 
@@ -67,9 +89,13 @@ ORDER BY
             return new JournalRecord(recordNumber, written, command);
         }
 
-        private NpgsqlConnection CreateConnection()
+        private NpgsqlConnection OpenConnection()
         {
-            return new NpgsqlConnection(_settings.ConnectionString);
+            var connection = new NpgsqlConnection(_settings.ConnectionString);
+
+            connection.Open();
+
+            return connection;
         }
     }
 }

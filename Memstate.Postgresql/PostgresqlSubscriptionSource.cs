@@ -13,11 +13,9 @@ namespace Memstate.Postgresql
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
-            var subscription = new PostgresqlJournalSubscription(_settings, handler);
+            var subscription = new PostgresqlJournalSubscription(_settings, handler, from);
             
             subscription.Start();
-
-            subscription.CatchUp(from);
 
             return subscription;
         }

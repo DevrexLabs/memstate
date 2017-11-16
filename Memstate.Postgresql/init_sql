@@ -1,11 +1,6 @@
 ﻿CREATE OR REPLACE FUNCTION {1}_notify_command() RETURNS TRIGGER AS $$
-    DECLARE
-        data json;
-
     BEGIN
-        data = row_to_json(NEW);
-
-        PERFORM pg_notify('{0}', data::text);
+        PERFORM pg_notify('{0}', 'Data available');
 
         RETURN NULL;
     END;
@@ -25,4 +20,4 @@ DROP TRIGGER IF EXISTS "{1}_notify_command" ON "{1}";
 
 CREATE TRIGGER "{1}_notify_command"
     AFTER INSERT ON "{1}"
-    FOR EACH ROW EXECUTE PROCEDURE {1}_notify_command();
+    FOR EACH STATEMENT EXECUTE PROCEDURE {1}_notify_command();

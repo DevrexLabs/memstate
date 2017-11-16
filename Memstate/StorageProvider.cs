@@ -1,8 +1,5 @@
 namespace Memstate
 {
-    using System;
-    using System.Threading.Tasks;
-
     public abstract class StorageProvider
     {
         public virtual void Initialize()

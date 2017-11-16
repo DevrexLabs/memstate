@@ -17,7 +17,7 @@ SELECT
 FROM
     {0}
 WHERE
-    id > @id
+    id >= @id
 ORDER BY
     id ASC
 LIMIT {1};";
@@ -40,8 +40,6 @@ LIMIT {1};";
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            var batchCount = 0;
-
             using (var connection = OpenConnection())
             {
                 do
@@ -62,7 +60,7 @@ LIMIT {1};";
 
                                 var record = ReadRecord(reader);
 
-                                fromRecord = record.RecordNumber;
+                                fromRecord++;
 
                                 yield return record;
                             }
@@ -72,8 +70,6 @@ LIMIT {1};";
                         {
                             break;
                         }
-
-                        batchCount++;
                     }
                 }
                 while (true);

@@ -13,16 +13,20 @@ namespace Memstate.Postgresql
         private readonly Action<JournalRecord> _handler;
         private readonly PostgresqlJournalReader _journalReader;
         private bool _ready;
-        private bool _disposed;
-        private long _lastRecordId;
+        private volatile bool _disposed;
 
-        public PostgresqlJournalSubscription(PostgresqlSettings settings, Action<JournalRecord> handler, long lastRecordId)
+        /// <summary>
+        /// Id of the next record to read
+        /// </summary>
+        private long _nextRecordId;
+
+        public PostgresqlJournalSubscription(PostgresqlSettings settings, Action<JournalRecord> handler, long nextRecordId)
         {
             Ensure.NotNull(settings, nameof(settings));
 
             _settings = settings;
             _handler = handler;
-            _lastRecordId = lastRecordId - 1;
+            _nextRecordId = nextRecordId;
 
             _journalReader = new PostgresqlJournalReader(settings);
 
@@ -37,8 +41,8 @@ namespace Memstate.Postgresql
             };
         }
 
-        public PostgresqlJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long lastRecordId)
-            : this(new PostgresqlSettings(settings), handler, lastRecordId)
+        public PostgresqlJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long nextRecordId)
+            : this(new PostgresqlSettings(settings), handler, nextRecordId)
         {
         }
 
@@ -89,28 +93,15 @@ namespace Memstate.Postgresql
 
         private void Reader()
         {
-            var lastRecordId = _lastRecordId;
-            
             while (!_disposed)
             {
-                var batchCount = 0;
-                
-                foreach (var record in _journalReader.GetRecords(lastRecordId))
+                foreach (var record in _journalReader.GetRecords(_nextRecordId))
                 {
-                    if (record.RecordNumber < lastRecordId)
-                    {
-                        throw new Exception($"You've traveled back in time... {record.RecordNumber} should be greater than {lastRecordId}, {batchCount}");
-                    }
-                    
-                    lastRecordId = record.RecordNumber;
-
-                    _handler(record);
-
-                    batchCount++;
+                    _nextRecordId++;
+                    _handler.Invoke(record);
                 }
 
                 _ready = true;
-
                 _readWaiter.WaitOne();
             }
         }

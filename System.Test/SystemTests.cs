@@ -5,6 +5,8 @@ namespace System.Test
     using System.Threading.Tasks;
     using Memstate;
 
+    using Microsoft.Extensions.Logging;
+
     using Xunit;
     using Xunit.Abstractions;
 
@@ -23,7 +25,9 @@ namespace System.Test
         [ClassData(typeof(TestConfigurations))]
         public async Task CanWriteOne(MemstateSettings settings)
         {
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
+            var logProvider = new TestOutputLoggingProvider(_log);
+            logProvider.MinimumLogLevel = LogLevel.Trace;
+            settings.LoggerFactory.AddProvider(logProvider);
             settings.StreamName = _randomStreamName;
             _log.WriteLine(settings.ToString());
 
@@ -121,7 +125,7 @@ namespace System.Test
             await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
             sub.Dispose();
 
-            Assert.Equal(5, records.Count);
+            Assert.Equal(NumRecords, records.Count);
         }
 
         [Theory]

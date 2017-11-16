@@ -93,16 +93,20 @@ namespace Memstate.Postgresql
             
             while (!_disposed)
             {
+                var batchCount = 0;
+                
                 foreach (var record in _journalReader.GetRecords(lastRecordId))
                 {
-                    if (record.RecordNumber <= lastRecordId)
+                    if (record.RecordNumber < lastRecordId)
                     {
-                        throw new Exception("You've traveled back in time...");
+                        throw new Exception($"You've traveled back in time... {record.RecordNumber} should be greater than {lastRecordId}, {batchCount}");
                     }
                     
                     lastRecordId = record.RecordNumber;
 
                     _handler(record);
+
+                    batchCount++;
                 }
 
                 _ready = true;

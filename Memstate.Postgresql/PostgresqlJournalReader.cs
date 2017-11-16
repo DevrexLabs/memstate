@@ -33,41 +33,47 @@ LIMIT {1};";
         public PostgresqlJournalReader(PostgresqlSettings settings)
         {
             Ensure.NotNull(settings, nameof(settings));
-            
+
             _settings = settings;
             _serializer = settings.Memstate.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
+            var batchCount = 0;
+
             using (var connection = OpenConnection())
-            using (var command = connection.CreateCommand())
             {
                 do
                 {
-                    var recordsRead = 0;
-
-                    command.CommandText = string.Format(SelectSql, _settings.Table, _settings.ReadBatchSize);
-
-                    command.Parameters.AddWithValue("@id", fromRecord);
-
-                    using (var reader = command.ExecuteReader())
+                    using (var command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        var recordsRead = 0;
+
+                        command.CommandText = string.Format(SelectSql, _settings.Table, _settings.ReadBatchSize);
+
+                        command.Parameters.AddWithValue("id", fromRecord);
+
+                        using (var reader = command.ExecuteReader())
                         {
-                            recordsRead++;
+                            while (reader.Read())
+                            {
+                                recordsRead++;
 
-                            var record = ReadRecord(reader);
+                                var record = ReadRecord(reader);
 
-                            fromRecord = record.RecordNumber;
+                                fromRecord = record.RecordNumber;
 
-                            yield return record;
+                                yield return record;
+                            }
                         }
-                    }
 
-                    if (recordsRead < _settings.ReadBatchSize)
-                    {
-                        break;
+                        if (recordsRead < _settings.ReadBatchSize)
+                        {
+                            break;
+                        }
+
+                        batchCount++;
                     }
                 }
                 while (true);

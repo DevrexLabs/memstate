@@ -43,6 +43,8 @@ namespace Memstate
 
         public IVirtualFileSystem FileSystem { get; set; } = new HostFileSystem();
 
+        public bool AllowBrokenSequence { get; set; } = false;
+
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
 
         public StorageProvider CreateStorageProvider()

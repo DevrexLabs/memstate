@@ -13,27 +13,36 @@ namespace Memstate
     {
         private readonly ILogger _logger;
         private readonly Kernel _kernel;
+        private readonly MemstateSettings _settings;
         private readonly IJournalWriter _journalWriter;
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
         private readonly IDisposable _commandSubscription;
         private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
-        private long _lastRecordNumber;
         private readonly EngineMetrics _metrics;
 
+        private volatile bool _stopped;
+
+        /// <summary>
+        /// Last record number applied to the model, -1 if initial model
+        /// Numbering starts from 0!
+        /// </summary>
+        private long _lastRecordNumber;
+
         public Engine(
-            MemstateSettings config,
+            MemstateSettings settings,
             TModel model,
             IJournalSubscriptionSource subscriptionSource,
             IJournalWriter journalWriter,
             long nextRecord)
         {
             _lastRecordNumber = nextRecord - 1;
-            _logger = config.CreateLogger<Engine<TModel>>();
-            _kernel = new Kernel(config, model);
+            _logger = settings.CreateLogger<Engine<TModel>>();
+            _kernel = new Kernel(settings, model);
+            _settings = settings;
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
-            _metrics = new EngineMetrics(config);
+            _metrics = new EngineMetrics(settings);
         }
 
         public event CommandExecutedDelegate CommandExecuted = delegate { };
@@ -42,6 +51,7 @@ namespace Memstate
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
+            EnsureOperational();
             var completionSource = new TaskCompletionSource<object>();
             _pendingLocalCommands[command.Id] = completionSource;
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
@@ -55,6 +65,7 @@ namespace Memstate
 
         public Task ExecuteAsync(Command<TModel> command)
         {
+            EnsureOperational();
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
@@ -65,21 +76,25 @@ namespace Memstate
 
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
+            EnsureOperational();
             return await Task.Run(() => Execute(query)).ConfigureAwait(false);
         }
 
         public TResult Execute<TResult>(Command<TModel, TResult> command)
         {
+            EnsureOperational();
             return ExecuteAsync(command).Result;
         }
 
         public void Execute(Command<TModel> command)
         {
+            EnsureOperational();
             ExecuteAsync(command).Wait();
         }
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
+            EnsureOperational();
             using (_metrics.MeasureQueryExecution())
             {
                 try
@@ -114,6 +129,7 @@ namespace Memstate
 
         public Task EnsureAsync(long recordNumber)
         {
+            EnsureOperational();
             var completionSource = new TaskCompletionSource<object>();
             CommandExecuted += (journalRecord, isLocal) =>
             {
@@ -130,11 +146,13 @@ namespace Memstate
 
         internal object Execute(Query query)
         {
+            EnsureOperational();
             return _kernel.Execute(query);
         }
 
         internal object Execute(Command command)
         {
+            EnsureOperational();
             return _kernel.Execute(command);
         }
 
@@ -159,7 +177,16 @@ namespace Memstate
                 long expected = Interlocked.Increment(ref _lastRecordNumber);
                 if (expected != record.RecordNumber)
                 {
-                    _logger.LogError("ApplyRecord: RecordNumber out of order. Expected {0}, got {1}", expected, record.RecordNumber);
+                    if (!_settings.AllowBrokenSequence)
+                    {
+                        _stopped = true;
+                        throw new Exception($"Broken sequence, expected {expected}, got {record.RecordNumber}");
+                    }
+
+                    _logger.LogWarning(
+                            "ApplyRecord: RecordNumber out of order. Expected {0}, got {1}",
+                            expected,
+                            record.RecordNumber);
                 }
 
                 object result = _kernel.Execute(record.Command);
@@ -174,6 +201,14 @@ namespace Memstate
 
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);
+            }
+        }
+
+        private void EnsureOperational()
+        {
+            if (_stopped)
+            {
+                throw new Exception("Engine has stopped due to a failure condition");
             }
         }
 

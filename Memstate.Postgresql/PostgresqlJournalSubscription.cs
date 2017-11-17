@@ -102,7 +102,7 @@ namespace Memstate.Postgresql
                 }
 
                 _ready = true;
-                _readWaiter.WaitOne();
+                _readWaiter.WaitOne(TimeSpan.FromSeconds(1));
             }
         }
 

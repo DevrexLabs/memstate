@@ -48,6 +48,8 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
+                await reader.EnsureAsync(writer.LastRecordNumber);
+                
                 var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
 
                 Assert.Equal(records, strings.Count);

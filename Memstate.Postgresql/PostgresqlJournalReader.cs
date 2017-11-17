@@ -19,8 +19,7 @@ FROM
 WHERE
     id >= @id
 ORDER BY
-    id ASC
-LIMIT {1};";
+    id ASC";
 
         private readonly ISerializer _serializer;
         private readonly PostgresqlSettings _settings;
@@ -48,7 +47,7 @@ LIMIT {1};";
                     {
                         var recordsRead = 0;
 
-                        command.CommandText = string.Format(SelectSql, _settings.Table, _settings.ReadBatchSize);
+                        command.CommandText = string.Format(SelectSql, _settings.Table);
 
                         command.Parameters.AddWithValue("id", fromRecord);
 
@@ -66,7 +65,7 @@ LIMIT {1};";
                             }
                         }
 
-                        if (recordsRead < _settings.ReadBatchSize)
+                        if (recordsRead == 0)
                         {
                             break;
                         }

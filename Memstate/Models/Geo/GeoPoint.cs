@@ -33,6 +33,11 @@ namespace Memstate.Models.Geo
             
             return new ArcDistance(radians);
         }
+        
+        public ArcDistance DistanceTo(GeoPoint other)
+        {
+            return Distance(this, other);
+        }
 
         private GeoPoint ToRadians()
         {

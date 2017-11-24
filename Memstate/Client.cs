@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Memstate
@@ -27,6 +28,11 @@ namespace Memstate
         public LocalClient(Engine<TModel> engine)
         {
             _engine = engine;
+        }
+
+        public LocalClient(Func<TModel> creator, MemstateSettings settings)
+        {
+            _engine = new EngineBuilder(settings).Build(creator());
         }
 
         internal override object Execute(Query query)

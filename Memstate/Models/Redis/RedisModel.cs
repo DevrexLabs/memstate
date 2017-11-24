@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Memstate.Models.Redis
 {
-    public partial class RedisModel : IDisposable
+    public partial class RedisModel : IRedisModel
     {
         private readonly Random _random = new Random();
         private TimeSpan _purgeInterval = TimeSpan.FromSeconds(1);
@@ -378,6 +378,8 @@ namespace Memstate.Models.Redis
             }
         }
 
+        // ReSharper disable once InconsistentNaming
+        // NOTE: Disabled because the name follows the Redis naming scheme.
         public void HMSet(string keys, params string[] keyValuePairs)
         {
             foreach (var pair in ToPairs(keyValuePairs))
@@ -386,6 +388,8 @@ namespace Memstate.Models.Redis
             }
         }
 
+        // ReSharper disable once InconsistentNaming
+        // NOTE: Disabled because the name follows the Redis naming scheme.
         public string[] HMGet(string key, params string[] fields)
         {
             var hash = GetHash(key);

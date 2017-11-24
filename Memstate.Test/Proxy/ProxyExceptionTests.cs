@@ -5,14 +5,15 @@ namespace Memstate.Tests.DispatchProxy
 {
     public class ProxyExceptionTests
     {
-        readonly ProxyExceptionTestModel _proxy;
-        readonly Client<ProxyExceptionTestModel> _client;
+        readonly IProxyExceptionTestModel _proxy;
+        readonly Client<IProxyExceptionTestModel> _client;
 
         int _callsToExecuting, _callsToExecuted;
 
         public ProxyExceptionTests()
         {
-            _client = null;
+            var settings = new MemstateSettings();
+            _client = new LocalClient<IProxyExceptionTestModel>(() => new ProxyExceptionTestModel(), settings);
             _proxy = _client.GetDispatchProxy();
             _callsToExecuting = 0;
             _callsToExecuted = 0;
@@ -60,9 +61,16 @@ namespace Memstate.Tests.DispatchProxy
         }
     }
 
+    public interface IProxyExceptionTestModel
+    {
+        void ModifyAndThrow(Exception exception);
+
+        int GetState();
+    }
+    
 
     [Serializable]
-    public class ProxyExceptionTestModel
+    public class ProxyExceptionTestModel : IProxyExceptionTestModel
     {
         private int _state;
         public void ModifyAndThrow(Exception ex)

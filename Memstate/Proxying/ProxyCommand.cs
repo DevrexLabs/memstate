@@ -20,7 +20,7 @@ namespace Memstate
             GenericTypeArguments = genericTypeArguments;
         }
 
-        public override object Execute(TModel model)
+        public override object Execute(TModel model, Action<Event> eventHandler)
         {
             try
             {

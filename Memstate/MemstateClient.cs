@@ -20,7 +20,6 @@ namespace Memstate
         private readonly Dictionary<Guid, TaskCompletionSource<Message>> _pendingRequests;
         private MessageProcessor<Message> _messageWriter;
         private Task _messageReader;
-        
 
         private readonly Counter _counter = new Counter();
         private readonly CancellationTokenSource _cancellationSource;
@@ -33,6 +32,8 @@ namespace Memstate
             _logger = _config.LoggerFactory.CreateLogger<MemstateClient<TModel>>();
             _cancellationSource = new CancellationTokenSource();
         }
+
+        public override IClientEvents Events => throw new NotImplementedException();
 
         public async Task ConnectAsync(string host = "localhost", int port = 3001)
         {
@@ -74,7 +75,6 @@ namespace Memstate
             {
                 _logger.LogError($"No completion source for {response}, id {response.ResponseTo}");
             }
-
         }
 
         private async Task ReceiveMessages()
@@ -86,7 +86,7 @@ namespace Memstate
             {
                 _logger.LogTrace("awaiting NetworkMessage");
                 var message = await Message.ReadAsync(_stream, serializer, cancellationToken);
-                _logger.LogDebug("message received " +  message);
+                _logger.LogDebug("message received " + message);
                 if (message == null) break;
                 Handle(message);
             }
@@ -121,7 +121,7 @@ namespace Memstate
         internal override object Execute(Query query)
         {
             //not sure if we need this method
-           throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Execute(Command<TModel> command)

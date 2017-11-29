@@ -4,6 +4,8 @@ namespace Memstate
 
     public class ModelLoader
     {
+        private static readonly Action<Event> NoopEventHandler = e => { };
+
         public ModelLoader()
         {
             LastRecordNumber = -1;
@@ -25,7 +27,7 @@ namespace Memstate
             {
                 try
                 {
-                    journalRecord.Command.ExecuteImpl(model);
+                    journalRecord.Command.ExecuteImpl(model, NoopEventHandler);
                     LastRecordNumber = journalRecord.RecordNumber;
                 }
                 catch

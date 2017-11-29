@@ -1,4 +1,6 @@
-﻿namespace Memstate.Models.KeyValue
+﻿using System;
+
+namespace Memstate.Models.KeyValue
 {
     /// <summary>
     /// Assign a value to the given Key, returns the resulting version
@@ -19,7 +21,7 @@
         
         public int? ExpectedVersion { get; }
         
-        public override int Execute(KeyValueStore<T> model)
+        public override int Execute(KeyValueStore<T> model, Action<Event> eventHandler)
         {
             return model.Set(Key, Value, ExpectedVersion);
         }

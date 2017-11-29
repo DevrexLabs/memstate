@@ -70,7 +70,7 @@ namespace Memstate.Tests
             {
                 foreach (var randomTransferCommand in RandomTransferCommands(100000))
                 {
-                    _kernel.Execute(randomTransferCommand);
+                    _kernel.Execute(randomTransferCommand, e => { });
                 }
             });
 

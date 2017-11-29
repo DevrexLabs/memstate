@@ -9,6 +9,9 @@ namespace Memstate.Tcp
     /// </summary>
     internal class Session<T> : IHandle<Message> where T : class
     {
+        // TODO: Implement the event handler.
+        private readonly Action<Event> _remoteEventHandler = e => { };
+        
         private readonly Engine<T> _engine;
         private readonly ILogger _logger;
 
@@ -29,7 +32,7 @@ namespace Memstate.Tcp
 
         private void HandleImpl(CommandRequest request)
         {
-            var result = _engine.Execute(request.Command);
+            var result = _engine.Execute(request.Command, _remoteEventHandler);
             var response = new CommandResponse(result, request.Id);
             OnMessage.Invoke(response);
         }

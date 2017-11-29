@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
@@ -23,14 +24,14 @@ namespace Memstate
             _logger.LogInformation("Created Kernel");
         }
 
-        public object Execute(Command command)
+        public object Execute(Command command, Action<Event> eventHandler)
         {
             using (_metrics.MeasureCommandExecution())
             {
                 try
                 {
                     _lock.EnterWriteLock();
-                    return command.ExecuteImpl(_model);
+                    return command.ExecuteImpl(_model, eventHandler);
                 }
                 finally
                 {

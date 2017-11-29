@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Memstate
 {
     // todo: refactor signature
-    public delegate void CommandExecutedDelegate(JournalRecord journalRecord, bool isLocal);
+    public delegate void CommandExecutedDelegate(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events);
 
     public class Engine<TModel> where TModel : class
     {
@@ -53,6 +54,7 @@ namespace Memstate
         {
             EnsureOperational();
             var completionSource = new TaskCompletionSource<object>();
+
             _pendingLocalCommands[command.Id] = completionSource;
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
@@ -69,9 +71,13 @@ namespace Memstate
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
-            _journalWriter.Send(command);
+            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
-            return completionSource.Task;
+            using (_metrics.MeasureCommandExecution())
+            {
+                _journalWriter.Send(command);
+                return completionSource.Task;
+            }
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
@@ -100,7 +106,7 @@ namespace Memstate
                 try
                 {
                     var result = (TResult) _kernel.Execute(query);
-                    
+
                     _metrics.QueryExecuted();
 
                     return result;
@@ -131,7 +137,7 @@ namespace Memstate
         {
             EnsureOperational();
             var completionSource = new TaskCompletionSource<object>();
-            CommandExecuted += (journalRecord, isLocal) =>
+            CommandExecuted += (journalRecord, isLocal, events) =>
             {
                 if (journalRecord.RecordNumber >= recordNumber)
                 {
@@ -150,10 +156,10 @@ namespace Memstate
             return _kernel.Execute(query);
         }
 
-        internal object Execute(Command command)
+        internal object Execute(Command command, Action<Event> eventHandler)
         {
             EnsureOperational();
-            return _kernel.Execute(command);
+            return _kernel.Execute(command, eventHandler);
         }
 
         /// <summary>
@@ -184,14 +190,18 @@ namespace Memstate
                     }
 
                     _logger.LogWarning(
-                            "ApplyRecord: RecordNumber out of order. Expected {0}, got {1}",
-                            expected,
-                            record.RecordNumber);
+                        "ApplyRecord: RecordNumber out of order. Expected {0}, got {1}",
+                        expected,
+                        record.RecordNumber);
                 }
 
-                object result = _kernel.Execute(record.Command);
+                var events = new List<Event>();
+
+                var result = _kernel.Execute(record.Command, events.Add);
+                
+                NotifyCommandExecuted(record, isLocalCommand, events);
+                
                 completion?.SetResult(result);
-                NotifyCommandExecuted(record, isLocalCommand);
 
                 _metrics.CommandExecuted();
             }
@@ -217,11 +227,12 @@ namespace Memstate
         /// </summary>
         /// <param name="journalRecord"></param>
         /// <param name="isLocal"></param>
-        private void NotifyCommandExecuted(JournalRecord journalRecord, bool isLocal)
+        /// <param name="events"></param>
+        private void NotifyCommandExecuted(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
         {
             try
             {
-                CommandExecuted.Invoke(journalRecord, isLocal);
+                CommandExecuted.Invoke(journalRecord, isLocal, events);
             }
             catch
             {

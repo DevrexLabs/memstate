@@ -82,7 +82,7 @@ namespace Memstate.Test.Models.Redis
 
             var mre = new ManualResetEvent(false);
 
-            engine.CommandExecuted += (record, isLocal) =>
+            engine.CommandExecuted += (record, isLocal, events) =>
             {
                 if (record.Command is PurgeExpiredKeysCommand)
                 {

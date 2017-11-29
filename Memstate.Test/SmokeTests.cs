@@ -25,13 +25,13 @@ namespace Memstate.Tests
             return model.Count;
         }
     }
+
     public class CommandTests
     {
-
         public static IEnumerable<object[]> Serializers()
         {
             yield return new object[] {new JsonSerializerAdapter()};
-        } 
+        }
 
         [MemberData(nameof(Serializers))]
         [Theory]
@@ -42,6 +42,7 @@ namespace Memstate.Tests
             Assert.Equal(original.Id, clone.Id);
         }
     }
+
     public class SmokeTests
     {
         private readonly ITestOutputHelper _log;
@@ -56,9 +57,9 @@ namespace Memstate.Tests
         {
             var config = new MemstateSettings();
             var model = new List<string>();
-            Kernel k = new Kernel(config,model);
-            var numStrings = (int) k.Execute(new AddStringCommand(string.Empty));
-            Assert.Equal(1,numStrings);
+            Kernel k = new Kernel(config, model);
+            var numStrings = (int) k.Execute(new AddStringCommand(string.Empty), e => { });
+            Assert.Equal(1, numStrings);
             _log.WriteLine("hello test");
         }
 
@@ -105,14 +106,14 @@ namespace Memstate.Tests
 
             Assert.Equal(1000, records.Count);
 
-            
+
             var reader = new FileJournalReader(fileName, settings);
             records.Clear();
             foreach (var record in reader.GetRecords())
             {
                 records.Add(record);
             }
-            Assert.True(records.Select(r => (int)r.RecordNumber).SequenceEqual(Enumerable.Range(0, 1000)));
+            Assert.True(records.Select(r => (int) r.RecordNumber).SequenceEqual(Enumerable.Range(0, 1000)));
             await reader.DisposeAsync().ConfigureAwait(false);
             File.Delete(fileName);
         }

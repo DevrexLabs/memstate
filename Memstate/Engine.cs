@@ -100,24 +100,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            EnsureOperational();
-            using (_metrics.MeasureQueryExecution())
-            {
-                try
-                {
-                    var result = (TResult) _kernel.Execute(query);
-
-                    _metrics.QueryExecuted();
-
-                    return result;
-                }
-                catch (Exception)
-                {
-                    _metrics.QueryFailed();
-
-                    throw;
-                }
-            }
+            return (TResult) Execute((Query) query);
         }
 
         public async Task DisposeAsync()
@@ -153,13 +136,38 @@ namespace Memstate
         internal object Execute(Query query)
         {
             EnsureOperational();
-            return _kernel.Execute(query);
+            using (_metrics.MeasureQueryExecution())
+            {
+                try
+                {
+                    var result = _kernel.Execute(query);
+
+                    _metrics.QueryExecuted();
+
+                    return result;
+                }
+                catch (Exception)
+                {
+                    _metrics.QueryFailed();
+
+                    throw;
+                }
+            }
         }
 
-        internal object Execute(Command command, Action<Event> eventHandler)
+        internal object Execute(Command command)
         {
             EnsureOperational();
-            return _kernel.Execute(command, eventHandler);
+            var completionSource = new TaskCompletionSource<object>();
+
+            _pendingLocalCommands[command.Id] = completionSource;
+            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
+
+            using (_metrics.MeasureCommandExecution())
+            {
+                _journalWriter.Send(command);
+                return completionSource.Task.ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>
@@ -198,9 +206,9 @@ namespace Memstate
                 var events = new List<Event>();
 
                 var result = _kernel.Execute(record.Command, events.Add);
-                
+
                 NotifyCommandExecuted(record, isLocalCommand, events);
-                
+
                 completion?.SetResult(result);
 
                 _metrics.CommandExecuted();

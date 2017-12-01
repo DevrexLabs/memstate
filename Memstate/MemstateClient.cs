@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Memstate
 
         private readonly Counter _counter = new Counter();
         private readonly CancellationTokenSource _cancellationSource;
+        private readonly ClientEvents _events;
 
         public MemstateClient(MemstateSettings config)
         {
@@ -31,9 +33,32 @@ namespace Memstate
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
             _logger = _config.LoggerFactory.CreateLogger<MemstateClient<TModel>>();
             _cancellationSource = new CancellationTokenSource();
+            
+            _events = new ClientEvents();
+            
+            _events.SubscriptionAdded += async (type, filters) =>
+            {
+                var request = new SubscribeRequest(type, filters.ToArray());
+
+                await SendAndReceive(request);
+            };
+            
+            _events.SubscriptionRemoved += async type =>
+            {
+                var request = new UnsubscribeRequest(type);
+
+                await SendAndReceive(request);
+            };
+
+            _events.GlobalFilterAdded += async filter =>
+            {
+                var request = new FilterRequest(filter);
+
+                await SendAndReceive(request);
+            };
         }
 
-        public override IClientEvents Events => throw new NotImplementedException();
+        public override IClientEvents Events => _events;
 
         public async Task ConnectAsync(string host = "localhost", int port = 3001)
         {
@@ -47,21 +72,44 @@ namespace Memstate
 
         private void Handle(Message message)
         {
-            if (message is CommandResponse commandResponse) Handle(commandResponse);
-            else if (message is QueryResponse queryResponse) Handle(queryResponse);
-            else _logger.LogError("No handler for message " + message);
+            switch (message)
+            {
+                case CommandResponse respose:
+                    Handle(respose);
+                    break;
+
+                case QueryResponse response:
+                    Handle(response);
+                    break;
+
+                case EventsResponse response:
+                    Handle(response);
+                    break;
+
+                case SubscribeResponse response:
+                    Handle(response);
+                    break;
+
+                case UnsubscribeResponse response:
+                    Handle(response);
+                    break;
+
+                default:
+                    _logger.LogError("No handler for message " + message);
+                    break;
+            }
         }
 
-        private void Handle(CommandResponse response)
+        private void Handle(Response response)
         {
             var requestId = response.ResponseTo;
+
             CompleteRequest(requestId, response);
         }
 
-        private void Handle(QueryResponse response)
+        private void Handle(EventsResponse response)
         {
-            var requestId = response.ResponseTo;
-            CompleteRequest(requestId, response);
+            _events.Handle(response.Events);
         }
 
         private void CompleteRequest(Guid requestId, Response response)

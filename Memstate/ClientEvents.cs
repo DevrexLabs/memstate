@@ -4,18 +4,21 @@ using System.Linq;
 
 namespace Memstate
 {
-    public class ClientEvents<TModel> : IClientEvents where TModel : class
+    public class ClientEvents : IClientEvents
     {
         private readonly IDictionary<Type, HashSet<Handler>> _subscriptions = new Dictionary<Type, HashSet<Handler>>();
 
         private readonly HashSet<IEventFilter> _globalFilters = new HashSet<IEventFilter>();
 
-        public ClientEvents(Engine<TModel> engine)
-        {
-            engine.CommandExecuted += OnEngineOnCommandExecuted;
-        }
+        public event Action<Type, IEnumerable<IEventFilter>> SubscriptionAdded = (type, filters) => { };
 
-        private void OnEngineOnCommandExecuted(JournalRecord record, bool local, IEnumerable<Event> events)
+        public event Action<Type> SubscriptionRemoved = type => { };
+
+        public event Action<IEventFilter> GlobalFilterAdded = filter => { };
+
+        public event Action<Event> Raised = item => { };
+
+        public void Handle(IEnumerable<Event> events)
         {
             foreach (var item in events)
             {
@@ -63,6 +66,8 @@ namespace Memstate
             }
 
             handlers.Add(new Handler(Raise));
+            
+            SubscriptionAdded?.Invoke(typeof(TEvent), Array.Empty<IEventFilter>());
         }
 
         public void Subscribe<TEvent>(IEnumerable<IEventFilter> filters) where TEvent : Event
@@ -72,7 +77,11 @@ namespace Memstate
                 _subscriptions[typeof(TEvent)] = handlers = new HashSet<Handler>();
             }
 
+            filters = filters.ToArray();
+
             handlers.Add(new Handler(Raise, filters));
+            
+            SubscriptionAdded?.Invoke(typeof(TEvent), filters);
         }
 
         public void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : Event
@@ -83,6 +92,8 @@ namespace Memstate
             }
 
             handlers.Add(new Handler(item => handler.Invoke((TEvent) item)));
+            
+            SubscriptionAdded?.Invoke(typeof(TEvent), Array.Empty<IEventFilter>());
         }
 
         public void Subscribe<TEvent>(Action<TEvent> handler, IEnumerable<IEventFilter> filters) where TEvent : Event
@@ -91,27 +102,34 @@ namespace Memstate
             {
                 _subscriptions[typeof(TEvent)] = handlers = new HashSet<Handler>();
             }
+            
+            filters = filters.ToArray();
 
             handlers.Add(new Handler(item => handler.Invoke((TEvent) item), filters));
+            
+            SubscriptionAdded?.Invoke(typeof(TEvent), filters);
         }
 
         public void Unsubscribe<TEvent>() where TEvent : Event
         {
             _subscriptions.Remove(typeof(TEvent));
+            
+            SubscriptionRemoved?.Invoke(typeof(TEvent));
         }
 
         public void Filter(IEnumerable<IEventFilter> filters)
         {
-            filters.ToList().ForEach(filter => _globalFilters.Add(filter));
+            filters.Select(filter => new {Added = _globalFilters.Add(filter), Filter = filter})
+                .Where(item => item.Added)
+                .ToList()
+                .ForEach(item => GlobalFilterAdded?.Invoke(item.Filter));
         }
-
-        public event Action<Event> Raised = e => { };
-
+        
         private void Raise(Event item)
         {
             Raised?.Invoke(item);
         }
-        
+
         private class Handler
         {
             private readonly Action<Event> _action;

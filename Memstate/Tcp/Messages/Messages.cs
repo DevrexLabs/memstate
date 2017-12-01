@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Memstate.Tcp
 {
@@ -10,7 +11,6 @@ namespace Memstate.Tcp
         }
 
         public Guid ResponseTo { get; }
-
     }
 
     internal class QueryResponse : Response
@@ -43,7 +43,6 @@ namespace Memstate.Tcp
         }
 
         public Command Command { get; set; }
-
     }
 
     internal abstract class Request : Message
@@ -58,7 +57,6 @@ namespace Memstate.Tcp
         }
 
         public Query Query { get; }
-
     }
 
     internal class Ping : Request
@@ -70,9 +68,7 @@ namespace Memstate.Tcp
 
         public Ping() : this(Guid.NewGuid())
         {
-            
         }
-
     }
 
     internal class Pong : Response
@@ -86,11 +82,82 @@ namespace Memstate.Tcp
     {
         public Exception Exception { get; }
 
-        public ExceptionResponse(Message cause, Exception exception) 
+        public ExceptionResponse(Message cause, Exception exception)
             : base(cause.Id)
         {
             Exception = exception;
         }
     }
 
+    internal class EventsResponse : Message
+    {
+        public EventsResponse(Event[] events)
+        {
+            Events = events;
+        }
+
+        [JsonProperty]
+        public Event[] Events { get; private set; }
+    }
+
+    internal class SubscribeRequest : Request
+    {
+        public SubscribeRequest(Type type, IEventFilter[] filters)
+        {
+            Type = type;
+            Filters = filters;
+        }
+
+        [JsonProperty]
+        public Type Type { get; private set; }
+
+        [JsonProperty]
+        public IEventFilter[] Filters { get; private set; }
+    }
+
+    internal class SubscribeResponse : Response
+    {
+        public SubscribeResponse(Guid responseTo)
+            : base(responseTo)
+        {
+        }
+    }
+
+    internal class UnsubscribeRequest : Request
+    {
+        public UnsubscribeRequest(Type type)
+        {
+            Type = type;
+        }
+
+        [JsonProperty]
+        public Type Type { get; private set; }
+    }
+
+    internal class UnsubscribeResponse : Response
+    {
+        public UnsubscribeResponse(Guid responseTo)
+            : base(responseTo)
+        {
+        }
+    }
+
+    internal class FilterRequest : Request
+    {
+        public FilterRequest(IEventFilter filter)
+        {
+            Filter = filter;
+        }
+
+        [JsonProperty]
+        public IEventFilter Filter { get; private set; }
+    }
+
+    internal class FilterResponse : Response
+    {
+        public FilterResponse(Guid responseTo)
+            : base(responseTo)
+        {
+        }
+    }
 }

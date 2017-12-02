@@ -2,6 +2,8 @@
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Globalization;
+using System;
 
 namespace Memstate.JsonNet
 {
@@ -40,19 +42,12 @@ namespace Memstate.JsonNet
             var line = streamReader.ReadLine();
             var reader = new JsonTextReader(new StringReader(line));
             var result = _serializer.Deserialize(reader);
+            var output = result as Newtonsoft.Json.Linq.JObject;
             //SurrogateConverter Changes.
-            if (result != null && result.ToString().Contains("$"))
+            if (output != null && output["$"] != null)
             {
-                var output = result as Newtonsoft.Json.Linq.JObject;
-                if (output["$"] != null)
-                {
-                    var convertedoutput = SurrogateConverter.GetValue(output["$"].ToString());
-                    return convertedoutput;
-                }
-                else
-                {
-                    return null;
-                }
+                 var convertedoutput = GetValue(output["$"].ToString());
+                 return convertedoutput;                
             }
             else
             {
@@ -78,6 +73,20 @@ namespace Memstate.JsonNet
             _serializer.Serialize(writer, @object);
             writer.Flush();
             streamWriter.Flush();
+        }
+
+        public object GetValue(string V)
+        {
+            var t = V.Substring(0, 1);
+            var v = V.Substring(1);
+            if (t == "I")
+                return int.Parse(v, NumberFormatInfo.InvariantInfo);
+            if (t == "F")
+                return float.Parse(v, NumberFormatInfo.InvariantInfo);
+            if (t == "M")
+                return decimal.Parse(v, NumberFormatInfo.InvariantInfo);
+
+            throw new NotSupportedException();
         }
     }
 }

@@ -30,5 +30,28 @@ namespace Memstate.Tests
             Assert.IsType<long>(o);
         }
 
+        [Fact]
+        public void Float_can_be_cloned()
+        {
+            float i = 42.1F;
+            var serializer = new JsonSerializerAdapter();
+            var stream = new MemoryStream();
+            serializer.WriteObject(stream, i);
+            stream.Position = 0;
+            object o = serializer.ReadObject(stream);
+            Assert.IsType<float>(o);
+        }
+
+        [Fact]
+        public void Double_can_be_cloned()
+        {
+            double i = 42.10;
+            var serializer = new JsonSerializerAdapter();
+            var stream = new MemoryStream();
+            serializer.WriteObject(stream, i);
+            stream.Position = 0;
+            object o = serializer.ReadObject(stream);
+            Assert.IsType<double>(o);
+        }
     }
 }

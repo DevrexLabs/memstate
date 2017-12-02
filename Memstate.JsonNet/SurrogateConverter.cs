@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using System.Globalization;
 
@@ -79,42 +80,7 @@ namespace Memstate.JsonNet
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
-            return DeserializeFromReader(reader, serializer, objectType);
-        }
-        //Below two methods are not hit in our deserialization.
-        private object DeserializeFromReader(JsonReader reader, JsonSerializer serializer, Type objectType)
-        {
-            var surrogate = serializer.Deserialize(reader);
-            return TranslateSurrogate(surrogate, _parent, objectType);
-        }
-
-        private static object TranslateSurrogate(object deserializedValue, JsonSerializer parent, Type type)
-        {
-            var j = deserializedValue as object;
-            if (j != null)
-            {
-                if (j.ToString().Contains("$"))
-                {
-                    return GetValue(j.ToString());
-                }
-            }
-
-            return deserializedValue;
-        }
-        //This method is required
-        public static object GetValue(string V)
-        {
-            var t = V.Substring(0, 1);
-            var v = V.Substring(1);
-            if (t == "I")
-                return int.Parse(v, NumberFormatInfo.InvariantInfo);
-            if (t == "F")
-                return float.Parse(v, NumberFormatInfo.InvariantInfo);
-            if (t == "M")
-                return decimal.Parse(v, NumberFormatInfo.InvariantInfo);
-
             throw new NotSupportedException();
-        }
-
+        }       
     }
 }

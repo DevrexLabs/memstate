@@ -7,8 +7,9 @@
     <Compile Remove="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="4.1.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
+    <PackageReference Include="FakeItEasy" Version="4.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.0.3" />
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit.Runners" Version="3.7.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />

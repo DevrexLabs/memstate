@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1.0-alpha</Version>
     <Authors>Devrex Labs</Authors>
@@ -13,17 +12,14 @@
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="JsonObjectToIntegerConverter.cs" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1-beta1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Memstate\Memstate.csproj" />
   </ItemGroup>
-
 </Project>

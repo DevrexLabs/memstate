@@ -51,7 +51,7 @@ namespace Memstate.Tests.DispatchProxy
             proxy.SetCustomer(new Customer());
             var journalEntry = storageProvider.CreateJournalReader().GetRecords().FirstOrDefault();
             Assert.NotNull(journalEntry);
-            Assert.IsType(typeof(SetCustomerCommand), journalEntry.Command);
+            Assert.IsType<SetCustomerCommand>(journalEntry.Command);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Memstate.Tests.DispatchProxy
         public void CanCallNoArgMethod()
         {
             _db.Meth();
-           Assert.Equal(_db.GetCalls(), 1);
+           Assert.Equal(1, _db.GetCalls());
         }
 
         [Fact]

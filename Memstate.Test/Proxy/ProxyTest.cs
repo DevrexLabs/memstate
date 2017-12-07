@@ -36,7 +36,7 @@
         [Fact]
         public void CanExecuteCommandWithResultMethod()
         {
-            Assert.Equal(_proxy.Uppercase("livedb"), "LIVEDB");
+            Assert.Equal("MEMSTATE", _proxy.Uppercase("memstate"));
             Assert.Equal(1, _proxy.CommandsExecuted);
         }
 
@@ -100,7 +100,7 @@
         public void ComplexGeneric()
         {
             double result = _proxy.ComplexGeneric(new KeyValuePair<string, double>("dog", 42.0));
-            Assert.Equal(result, 42.0);
+            Assert.Equal(42.0, result, precision: 4);
             Assert.Equal(1, _proxy.CommandsExecuted);
         }
 

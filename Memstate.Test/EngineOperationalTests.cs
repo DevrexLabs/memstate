@@ -34,6 +34,7 @@ namespace Memstate.Tests
             Assert.ThrowsAny<Exception>(() => _engine.Execute(_dummyCommand));
         }
 
+        [Fact]
         public void Broken_sequence_is_allowed()
         {
             // Arrange

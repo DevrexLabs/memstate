@@ -41,7 +41,7 @@ namespace System.Test
             var reader = provider.CreateJournalReader();
             var records = reader.GetRecords().ToArray();
             await reader.DisposeAsync().ConfigureAwait(false);
-            Assert.Equal(1, records.Length);
+            Assert.Single(records);
         }
 
         [Theory]

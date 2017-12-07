@@ -69,7 +69,7 @@ namespace Memstate.Tests
 
             _session.Handle(queryRequest);
 
-            Assert.Equal(1, _messagesEmitted.Count);
+            Assert.Single(_messagesEmitted);
             var response = (QueryResponse)_messagesEmitted.Single();
             Assert.Equal(queryRequest.Id, response.ResponseTo);
             var node = (KeyValueStore<int>.Node)response.Result;
@@ -123,23 +123,22 @@ namespace Memstate.Tests
 
         private T AssertAndGetSingle<T>() where T : Message
         {
-            Assert.Equal(1, _messagesEmitted.Count);
+            Assert.Single(_messagesEmitted);
             var message = _messagesEmitted.Single();
             Assert.IsType<T>(message);
             return (T)message;
         }
-    }
 
-    internal class UnknownMessage : Message
-    {
-
-    }
-
-    internal class FailingQuery : Query<KeyValueStore<int>, int>
-    {
-        public override int Execute(KeyValueStore<int> model)
+        internal class UnknownMessage : Message
         {
-            throw new Exception("the innermost exception");
+        }
+
+        internal class FailingQuery : Query<KeyValueStore<int>, int>
+        {
+            public override int Execute(KeyValueStore<int> model)
+            {
+                throw new Exception("the innermost exception");
+            }
         }
     }
 }

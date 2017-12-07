@@ -23,7 +23,7 @@ namespace Memstate.Test.Models
         {
             _keyValueStore.Set("KEY", 1);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(node.Value, 1);
+            Assert.Equal(1, node.Value);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Memstate.Test.Models
         {
             _keyValueStore.Set("KEY", 1);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(node.Version, 1);
+            Assert.Equal(1, node.Version);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Memstate.Test.Models
             _keyValueStore.Set("KEY", 1);
             _keyValueStore.Set("KEY", 2);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(node.Version, 2);
+            Assert.Equal(2, node.Version);
         }
 
         [Fact]

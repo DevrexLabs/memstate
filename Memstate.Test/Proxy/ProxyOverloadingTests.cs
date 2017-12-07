@@ -6,14 +6,16 @@ namespace Memstate.Tests.DispatchProxy
 {
     public class ProxyOverloadingTests
     {
-        private readonly ModelWithOverloads _db = new ModelWithOverloads();
+        private readonly IModelWithOverloads _db;
 
         public ProxyOverloadingTests()
         {
             var settings = new MemstateSettings().WithInmemoryStorage();
             var storageProvider = settings.CreateStorageProvider();
-            var engine = new EngineBuilder(settings, storageProvider).Build<ModelWithOverloads>();
-            var client = new LocalClient<ModelWithOverloads>(engine);
+            var model = new ModelWithOverloads();
+            var engine = new EngineBuilder(settings, storageProvider)
+                .Build<IModelWithOverloads>(model);
+            var client = new LocalClient<IModelWithOverloads>(engine);
             _db = client.GetDispatchProxy();
         }
 
@@ -76,19 +78,27 @@ namespace Memstate.Tests.DispatchProxy
         {
             Assert.Throws<Exception>(() =>
             {
-                Client<ModelWithRefArg> client = null;
-                var proxy = client.GetDispatchProxy();
+                Client<IModelWithRefArg> client = null;
+                client.GetDispatchProxy();
             });
         }
 
         [Fact]
         public void OutArgsNotAllowed()
         {
-            Assert.Throws<Exception>(() => new DispatchProxy<ModelWithOutArg>());
+            Assert.Throws<Exception>(() =>
+                {
+                    Client<IModelWithOutArg> client = null;
+                    client.GetDispatchProxy();
+                });
         }
 
+        internal interface IModelWithOutArg
+        {
+            void Method(out int a);
+        }
 
-        private class ModelWithOutArg 
+        private class ModelWithOutArg  : IModelWithOutArg
         {
             public void Method(out int a)
             {
@@ -96,7 +106,7 @@ namespace Memstate.Tests.DispatchProxy
             }
         }
         
-        private class ModelWithRefArg 
+        private class ModelWithRefArg : IModelWithRefArg
         {
             public void Method(ref int a)
             {

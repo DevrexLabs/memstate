@@ -3,10 +3,9 @@ using System.Linq;
 
 namespace Memstate.Tests.DispatchProxy
 {
-    [Serializable]
-    public class ModelWithOverloads
-    {
 
+    public class ModelWithOverloads : IModelWithOverloads
+    {
         private int _calls;
 
         public int GetCalls()

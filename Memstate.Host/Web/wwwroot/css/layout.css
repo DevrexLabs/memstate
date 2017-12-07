@@ -1,0 +1,19 @@
+body {
+    padding-top: 3.5rem;
+}
+
+h1 {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+div#metrics div.col-md-3 p.value span.value {
+    font-size: 400%;
+    font-weight: bold;
+}
+
+div#metrics div.col-md-4 p.value span.value {
+    font-size: 600%;
+    font-weight: bold;
+}

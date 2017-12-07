@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" href="/favicon.ico">
+        <title>Memstate</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/css/layout.css" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a class="navbar-brand" href="/">Memstate</a>
+                <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/">Dashboard</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="container-fluid">
+            <div id="metrics">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <p class="commands-executed value"><span class="value">0</span><br>Commands executed</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <p class="queries-executed value"><span class="value">0</span><br>Queries executed</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <p class="pending-commands value"><span class="value">0</span><br>Pending commands</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <p class="value command-execution-time"><span class="value">0</span><br> Command execution</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <p class="value query-execution-time"><span class="value">0</span><br> Query execution</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <p class="value kernel-command-execution-time"><span class="value">0</span><br> Kernel command execution</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <p class="value kernel-query-execution-time"><span class="value">0</span><br> Kernel query execution</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+        <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="/js/application.js" type="text/javascript"></script>
+    </body>
+</html>

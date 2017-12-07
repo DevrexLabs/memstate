@@ -4,8 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="benchmarkdotnet" Version="0.10.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
+    <PackageReference Include="benchmarkdotnet" Version="0.10.11" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>

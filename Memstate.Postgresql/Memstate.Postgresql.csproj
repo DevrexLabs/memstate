@@ -26,7 +26,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="2.0.1" />
     <PackageReference Include="Npgsql" Version="3.2.6" />
   </ItemGroup>
 </Project>

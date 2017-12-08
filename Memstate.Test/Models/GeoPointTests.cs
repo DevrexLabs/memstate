@@ -22,20 +22,27 @@ namespace Memstate.Test.Models
                 Name = name;
             }
         }
-        private readonly double[][] _distances =
+        private static IEnumerable<object[]> Distances()
         {
-            //palermo, catania
-            new[] {13.361389, 38.115556, 15.087269, 37.502669, 166.27415156960038},
-        };
+            yield return new object[]
+                             {
+                                 //Palermo
+                                 new GeoPoint(38.115556, 13.361389), 
+                                 //Catania
+                                 new GeoPoint(37.502669, 15.087269),
+                                 //expected distance
+                                 166.27415156960038
+                             };
+        }
 
 
-        private IEnumerable<GeoLocation> RandomSample()
+        private static IEnumerable<GeoLocation> RandomSample()
         {
             var rnd = new Random(43);
             return TestData().Where(_ => rnd.NextDouble() < 0.001).Take(20);
         }
 
-        private IEnumerable<GeoLocation>TestData()
+        private static IEnumerable<GeoLocation> TestData()
         {
             var rnd = new Random(42);
             var seen = new HashSet<string>();
@@ -54,16 +61,14 @@ namespace Memstate.Test.Models
 
         private static GeoSpatialIndex<String> _places;
 
-        [Test, TestCaseSource("_distances")]
-        public void Distance(double[] data)
+        [Test, TestCaseSource(nameof(Distances))]
+        public void Distance(GeoPoint a, GeoPoint b, double expectedDistance)
         {
-            var a = new GeoPoint(data[1], data[0]);
-            var b = new GeoPoint(data[3], data[2]);
             var actual = GeoPoint.Distance(a, b);
             var actualInverse = GeoPoint.Distance(b, a);
             Assert.AreEqual(actual, actualInverse, "dist(b,a) should equal dist(a,b)");
-            double faultTolerance = data[4]*0.005;
-            Assert.AreEqual(data[4], actual.ToKilometers(), faultTolerance);
+            double faultTolerance = expectedDistance * 0.005;
+            Assert.AreEqual(expectedDistance, actual.ToKilometers(), faultTolerance);
         }
 
 
@@ -113,7 +118,7 @@ namespace Memstate.Test.Models
 
 
         //swedish cities/locations taken from http://www.geonames.org/
-        private string raw = @"Gåshällan	63.65	20.25
+        private static string raw = @"Gåshällan	63.65	20.25
 Viggen	63.63333	20.23333
 Kallen	63.64167	20.21667
 Sörbölekobbarna	63.65	20.18333

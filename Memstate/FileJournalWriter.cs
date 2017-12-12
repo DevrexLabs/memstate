@@ -1,15 +1,15 @@
-﻿namespace Memstate
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net.Sockets;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
+namespace Memstate
+{
     public class FileJournalWriter : BatchingJournalWriter
     {
         private readonly Stream _journalStream;
+
         private readonly ISerializer _serializer;
 
         /// <summary>
@@ -17,7 +17,7 @@
         /// </summary>
         private long _nextRecord;
 
-        public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord) 
+        public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord)
             : base(settings)
         {
             _nextRecord = nextRecord;
@@ -32,14 +32,18 @@
         public override async Task DisposeAsync()
         {
             await base.DisposeAsync().ConfigureAwait(false);
+
             await _journalStream.FlushAsync().ConfigureAwait(false);
+
             _journalStream.Dispose();
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
             var records = commands.Select(ToJournalRecord).ToArray();
+
             _serializer.WriteObject(_journalStream, records);
+
             RecordsWritten.Invoke(records);
         }
 

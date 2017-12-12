@@ -6,6 +6,7 @@ namespace Memstate
     public class FileJournalSubscriptionSource : IJournalSubscriptionSource
     {
         private readonly Dictionary<Guid, JournalSubscription> _subscriptions;
+
         private readonly FileJournalWriter _journalWriter;
 
         public FileJournalSubscriptionSource(FileJournalWriter journalWriter)
@@ -23,6 +24,7 @@ namespace Memstate
             }
 
             var sub = new JournalSubscription(handler, from, OnDisposed);
+
             lock (_subscriptions)
             {
                 _subscriptions.Add(sub.Id, sub);

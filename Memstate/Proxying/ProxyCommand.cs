@@ -26,10 +26,12 @@ namespace Memstate
             {
                 var proxyMethod = MethodMap.MapFor<TModel>().GetOperationInfo(MethodName);
                 var methodInfo = proxyMethod.MethodInfo;
+
                 if (methodInfo.IsGenericMethod)
                 {
                     methodInfo = methodInfo.MakeGenericMethod(GenericTypeArguments);
                 }
+
                 return methodInfo.Invoke(model, Arguments);
             }
             catch (TargetInvocationException ex)

@@ -18,19 +18,27 @@ namespace Memstate.Tcp
         public Guid Id { get; set; }
 
         public static async Task<Message> ReadAsync(
-            Stream stream, 
-            ISerializer serializer, 
+            Stream stream,
+            ISerializer serializer,
             CancellationToken cancellationToken)
         {
-            MemoryStream buffer = new MemoryStream();
+            var buffer = new MemoryStream();
+
             while (true)
             {
                 var packet = await Packet.ReadAsync(stream, cancellationToken);
+
                 buffer.Write(packet.Payload, 0, packet.Payload.Length);
-                if (packet.IsTerminal) break;
+
+                if (packet.IsTerminal)
+                {
+                    break;
+                }
             }
+
             buffer.Position = 0;
-            return (Message)serializer.ReadObject(buffer);
+
+            return (Message) serializer.ReadObject(buffer);
         }
     }
 }

@@ -1,17 +1,17 @@
+using System;
+using System.Threading.Tasks;
+
+using EventStore.ClientAPI;
+
 namespace Memstate.EventStore
 {
-    using System;
-    using System.Threading.Tasks;
-
-    using global::EventStore.ClientAPI;
-
     public class EventStoreProvider : StorageProvider, IAsyncDisposable
     {
         private readonly IEventStoreConnection _connection;
 
         private readonly MemstateSettings _memstateSettings;
+        
         private readonly EventStoreSettings _eventStoreSettings;
-
 
         public EventStoreProvider(MemstateSettings memstateSettings)
         {

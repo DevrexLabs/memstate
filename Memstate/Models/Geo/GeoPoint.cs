@@ -21,11 +21,12 @@ namespace Memstate.Models.Geo
             a = a.ToRadians();
             b = b.ToRadians();
 
-            double u = Math.Sin((b.Latitude - a.Latitude) / 2);
-            double v = Math.Sin((b.Longitude - a.Longitude) / 2);
+            var u = Math.Sin((b.Latitude - a.Latitude) / 2);
+            var v = Math.Sin((b.Longitude - a.Longitude) / 2);
 
             var cosCosv2 = Math.Cos(b.Latitude) * Math.Cos(a.Latitude) * v * v;
-            var radians = 2.0 * Math.Asin(Math.Sqrt((u * u) + cosCosv2));
+            var radians = 2.0 * Math.Asin(Math.Sqrt(u * u + cosCosv2));
+
             return new ArcDistance(radians);
         }
 
@@ -42,6 +43,7 @@ namespace Memstate.Models.Geo
         private GeoPoint ToRadians()
         {
             const double R = Math.PI / 180;
+
             return new GeoPoint(Latitude * R, Longitude * R);
         }
     }

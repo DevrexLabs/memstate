@@ -4,8 +4,6 @@ namespace Memstate
 {
     public abstract class Client<TModel>
     {
-        internal abstract object Execute(Query query);
-
         public abstract void Execute(Command<TModel> command);
 
         public abstract TResult Execute<TResult>(Command<TModel, TResult> command);
@@ -19,5 +17,7 @@ namespace Memstate
         public abstract Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query);
 
         public abstract IClientEvents Events { get; }
+
+        internal abstract object Execute(Query query);
     }
 }

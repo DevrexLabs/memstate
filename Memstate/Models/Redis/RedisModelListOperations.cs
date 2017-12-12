@@ -71,7 +71,7 @@ namespace Memstate.Models.Redis
         public int LLength(string key)
         {
             var list = GetList(key);
-            
+
             return list?.Count ?? 0;
         }
 
@@ -128,6 +128,7 @@ namespace Memstate.Models.Redis
 
             list[index] = value;
         }
+
         private List<string> GetList(string key, bool create = false)
         {
             return As(key, create, () => new List<string>());

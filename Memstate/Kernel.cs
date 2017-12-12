@@ -11,17 +11,18 @@ namespace Memstate
     public class Kernel
     {
         private readonly object _model;
+
         private readonly ReaderWriterLockSlim _lock;
-        private readonly ILogger _logger;
+
         private readonly KernelMetrics _metrics;
 
         public Kernel(MemstateSettings config, object model)
         {
             _metrics = new KernelMetrics(config);
-            _logger = config.CreateLogger<Kernel>();
+            var logger = config.CreateLogger<Kernel>();
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-            _logger.LogInformation("Created Kernel");
+            logger.LogInformation("Created Kernel");
         }
 
         public object Execute(Command command, Action<Event> eventHandler)
@@ -31,6 +32,7 @@ namespace Memstate
                 try
                 {
                     _lock.EnterWriteLock();
+
                     return command.ExecuteImpl(_model, eventHandler);
                 }
                 finally
@@ -47,6 +49,7 @@ namespace Memstate
                 try
                 {
                     _lock.EnterReadLock();
+
                     return query.ExecuteImpl(_model);
                 }
                 finally

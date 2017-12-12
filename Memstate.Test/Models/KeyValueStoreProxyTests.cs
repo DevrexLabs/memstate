@@ -1,3 +1,5 @@
+using Memstate.Models.KeyValue;
+
 namespace Memstate.Test.Models
 {
     using System;

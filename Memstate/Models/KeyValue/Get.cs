@@ -6,9 +6,9 @@
         {
             Key = key;
         }
-        
+
         public string Key { get; }
-        
+
         public override KeyValueStore<T>.Node Execute(KeyValueStore<T> model)
         {
             return model.Get(Key);

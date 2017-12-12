@@ -66,7 +66,7 @@ namespace Memstate
             }
 
             handlers.Add(new Handler(Raise));
-            
+
             SubscriptionAdded?.Invoke(typeof(TEvent), Array.Empty<IEventFilter>());
         }
 
@@ -80,7 +80,7 @@ namespace Memstate
             filters = filters.ToArray();
 
             handlers.Add(new Handler(Raise, filters));
-            
+
             SubscriptionAdded?.Invoke(typeof(TEvent), filters);
         }
 
@@ -92,7 +92,7 @@ namespace Memstate
             }
 
             handlers.Add(new Handler(item => handler.Invoke((TEvent) item)));
-            
+
             SubscriptionAdded?.Invoke(typeof(TEvent), Array.Empty<IEventFilter>());
         }
 
@@ -102,18 +102,18 @@ namespace Memstate
             {
                 _subscriptions[typeof(TEvent)] = handlers = new HashSet<Handler>();
             }
-            
+
             filters = filters.ToArray();
 
             handlers.Add(new Handler(item => handler.Invoke((TEvent) item), filters));
-            
+
             SubscriptionAdded?.Invoke(typeof(TEvent), filters);
         }
 
         public void Unsubscribe<TEvent>() where TEvent : Event
         {
             _subscriptions.Remove(typeof(TEvent));
-            
+
             SubscriptionRemoved?.Invoke(typeof(TEvent));
         }
 
@@ -124,7 +124,7 @@ namespace Memstate
                 .ToList()
                 .ForEach(item => GlobalFilterAdded?.Invoke(item.Filter));
         }
-        
+
         private void Raise(Event item)
         {
             Raised?.Invoke(item);
@@ -133,6 +133,7 @@ namespace Memstate
         private class Handler
         {
             private readonly Action<Event> _action;
+
             private readonly HashSet<IEventFilter> _filters;
 
             public Handler(Action<Event> action, IEnumerable<IEventFilter> filters)

@@ -7,6 +7,7 @@ namespace Memstate.EventStore
         public static JournalRecord ToJournalRecord(this RecordedEvent @event, ISerializer serializer)
         {
             var command = (Command) serializer.Deserialize(@event.Data);
+            
             return new JournalRecord(@event.EventNumber, @event.Created, command);
         }
     }

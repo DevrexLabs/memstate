@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Memstate.Models.KeyValue;
 
 namespace Memstate.Models
 {

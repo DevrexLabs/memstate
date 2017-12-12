@@ -1,21 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
 namespace Memstate
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-
     /// <summary>
     /// A virtual file system where each file is kept in memory as a MemoryStream.
     /// The intended use case is for internal testing 
     /// </summary>
     public class InMemoryFileSystem : IVirtualFileSystem
     {
-        private readonly Dictionary<string, MemoryStream> _files 
-            = new Dictionary<string, MemoryStream>();
+        private readonly Dictionary<string, MemoryStream> _files = new Dictionary<string, MemoryStream>();
 
-        private readonly HashSet<string> _lockedFiles
-            = new HashSet<string>();
+        private readonly HashSet<string> _lockedFiles = new HashSet<string>();
 
+        // NOTE: Should this property use a lock?
         public bool Exists(string fileName) => _files.ContainsKey(fileName);
 
         public Stream OpenAppend(string path)
@@ -23,7 +22,9 @@ namespace Memstate
             lock (_files)
             {
                 var stream = OpenOrCreateStream(path);
+
                 stream.Position = stream.Length;
+
                 return stream;
             }
         }
@@ -34,11 +35,13 @@ namespace Memstate
             {
                 if (!_files.ContainsKey(path))
                 {
-                    throw new FileNotFoundException(path);    
+                    throw new FileNotFoundException(path);
                 }
 
                 var result = OpenOrCreateStream(path);
+
                 result.Position = 0;
+
                 return result;
             }
         }
@@ -51,13 +54,14 @@ namespace Memstate
         private MemoryStream OpenOrCreateStream(string path)
         {
             Ensure.That(() => !_lockedFiles.Contains(path), "Can't open locked file: " + path);
-                
+
             if (!_files.ContainsKey(path))
             {
                 _files[path] = new ReusableMemoryStream(() => ReleaseLock(path));
             }
 
             _lockedFiles.Add(path);
+
             return _files[path];
         }
 

@@ -11,11 +11,17 @@ namespace Memstate.Models.Redis
     public partial class RedisModel : IRedisModel
     {
         private readonly Random _random = new Random();
-        private TimeSpan _purgeInterval = TimeSpan.FromSeconds(1);
+
+        private readonly TimeSpan _purgeInterval = TimeSpan.FromSeconds(1);
+
         private readonly SortedDictionary<string, object> _structures = new SortedDictionary<string, object>();
+
         private readonly SortedSet<Expiration> _expirations = new SortedSet<Expiration>();
+
         private readonly SortedDictionary<string, Expiration> _expirationKeys = new SortedDictionary<string, Expiration>();
+
         private readonly Timer _purgeTimer;
+
         private volatile bool _disposed;
 
         public RedisModel()
@@ -152,7 +158,7 @@ namespace Memstate.Models.Redis
         {
             var builder = GetStringBuilder(key);
 
-            return builder != null ? builder.ToString() : null;
+            return builder?.ToString();
         }
 
         public string GetRange(string key, int start, int end)

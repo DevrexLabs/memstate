@@ -13,10 +13,10 @@ namespace Memstate.JsonNet
 
         public JsonSerializerAdapter(MemstateSettings config = null)
         {
-
-            IList<JsonConverter> converters = new List<JsonConverter>();
-            converters.Add(new SurrogateConverter(_serializer));
-
+            var converters = new List<JsonConverter>
+            {
+                new SurrogateConverter(_serializer)
+            };
 
             var settings = new JsonSerializerSettings
             {
@@ -32,7 +32,7 @@ namespace Memstate.JsonNet
                 CheckAdditionalContent = false,
                 Converters = converters
             };
-            
+
             _serializer = JsonSerializer.Create(settings);
         }
 
@@ -43,48 +43,57 @@ namespace Memstate.JsonNet
             var reader = new JsonTextReader(new StringReader(line));
             var result = _serializer.Deserialize(reader);
             var output = result as Newtonsoft.Json.Linq.JObject;
-            //SurrogateConverter Changes.
-            if (output != null && output["$"] != null)
-            {
-                 var convertedoutput = GetValue(output["$"].ToString());
-                 return convertedoutput;                
-            }
-            else
+
+            if (output?["$"] == null)
             {
                 return result;
             }
+
+            var convertedoutput = GetValue(output["$"].ToString());
+
+            return convertedoutput;
         }
 
         public IEnumerable<T> ReadObjects<T>(Stream stream)
         {
-            var streamReader = new StreamReader(stream);
-            var jsonReader = new JsonTextReader(streamReader);
-            jsonReader.SupportMultipleContent = true;
-            while (jsonReader.Read())
+            using (var reader = new JsonTextReader(new StreamReader(stream))
             {
-                yield return _serializer.Deserialize<T>(jsonReader);
+                SupportMultipleContent = true
+            })
+            {
+                while (reader.Read())
+                {
+                    yield return _serializer.Deserialize<T>(reader);
+                }
             }
         }
 
         public void WriteObject(Stream serializationStream, object @object)
         {
             var streamWriter = new StreamWriter(serializationStream);
+            
             var writer = new JsonTextWriter(streamWriter);
+            
             _serializer.Serialize(writer, @object);
+            
             writer.Flush();
             streamWriter.Flush();
         }
 
-        public object GetValue(string V)
+        public object GetValue(string input)
         {
-            var t = V.Substring(0, 1);
-            var v = V.Substring(1);
-            if (t == "I")
-                return int.Parse(v, NumberFormatInfo.InvariantInfo);
-            if (t == "F")
-                return float.Parse(v, NumberFormatInfo.InvariantInfo);
-            if (t == "M")
-                return decimal.Parse(v, NumberFormatInfo.InvariantInfo);
+            var type = input.Substring(0, 1);
+            var value = input.Substring(1);
+            
+            switch (type)
+            {
+                case "I":
+                    return int.Parse(value, NumberFormatInfo.InvariantInfo);
+                case "F":
+                    return float.Parse(value, NumberFormatInfo.InvariantInfo);
+                case "M":
+                    return decimal.Parse(value, NumberFormatInfo.InvariantInfo);
+            }
 
             throw new NotSupportedException();
         }

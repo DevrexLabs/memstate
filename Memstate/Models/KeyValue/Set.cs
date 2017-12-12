@@ -14,13 +14,13 @@ namespace Memstate.Models.KeyValue
             Value = value;
             ExpectedVersion = expectedVersion;
         }
-        
+
         public string Key { get; }
-        
+
         public T Value { get; }
-        
+
         public int? ExpectedVersion { get; }
-        
+
         public override int Execute(KeyValueStore<T> model, Action<Event> eventHandler)
         {
             return model.Set(Key, Value, ExpectedVersion);

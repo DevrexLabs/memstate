@@ -7,7 +7,9 @@ namespace Memstate.Models.Relational
     public class Batch
     {
         internal readonly List<IEntity> Inserts = new List<IEntity>();
+
         internal readonly List<IEntity> Updates = new List<IEntity>();
+
         internal readonly List<IEntity> Deletes = new List<IEntity>();
 
         private readonly ISet<Guid> _uniqueIds = new HashSet<Guid>();

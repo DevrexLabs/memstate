@@ -1,17 +1,16 @@
+using System.IO;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
+
 namespace Memstate
 {
-    using System;
-    using System.IO;
-    using System.Reflection;
-
-    using Microsoft.Extensions.Configuration;
-
     public abstract class Settings
     {
         protected Settings(MemstateSettings parent, string configurationKey)
         {
             Ensure.NotNull(parent, nameof(parent));
             Ensure.NotNullOrEmpty(configurationKey, nameof(configurationKey));
+
             Memstate = parent;
             Configuration = parent.Configuration.GetSection(configurationKey);
             Configuration.Bind(this);
@@ -20,6 +19,7 @@ namespace Memstate
         protected Settings(IConfiguration configuration)
         {
             Ensure.NotNull(configuration, nameof(configuration));
+
             Configuration = configuration;
             Configuration.Bind(this);
         }
@@ -35,6 +35,7 @@ namespace Memstate
         public string GetEmbeddedResource(string resourceName)
         {
             var assembly = GetType().GetTypeInfo().Assembly;
+
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream))
             {
@@ -45,6 +46,7 @@ namespace Memstate
         public string[] GetEmbeddedResourceNames()
         {
             var assembly = GetType().GetTypeInfo().Assembly;
+
             return assembly.GetManifestResourceNames();
         }
     }

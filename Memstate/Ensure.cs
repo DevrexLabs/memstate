@@ -23,11 +23,13 @@ namespace Memstate
         public static void ResolvableTypeName(string typeName, string name)
         {
             var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
-            if (type == null)
+
+            if (type != null)
             {
-                var message = string.Format("{0} is not a valid type", typeName);
-                throw new ArgumentException(message, name);
+                return;
             }
+
+            throw new ArgumentException($"{typeName} is not a valid type", name);
         }
 
         public static void That(Func<bool> predicate, string errorMessage)

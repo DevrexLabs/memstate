@@ -8,8 +8,11 @@ namespace Memstate.Models.Geo
     public class GeoSpatialIndex<T> : IDictionary<T, GeoPoint>
     {
         private const double EarthCircumference = GeoPoint.EarthRadiusKm * 2 * Math.PI;
+
         private readonly SortedDictionary<T, Entry> _entries;
+
         private readonly SortedSet<Entry> _byLatitude;
+
         private readonly SortedSet<Entry> _byLongitude;
 
         public GeoSpatialIndex()
@@ -185,16 +188,18 @@ namespace Memstate.Models.Geo
                 return result;
             }
 
-            if (to > 180)
+            if (!(to > 180))
+            {
+                return _byLongitude.GetViewBetween(new Entry(0, from), new Entry(0, to));
+            }
+
             {
                 var result = _byLongitude.GetViewBetween(new Entry(0, from - 360), new Entry(0, -180));
 
-                result.UnionWith(LongitudeRange(from, 180));
+                result.UnionWith(other: LongitudeRange(from, 180));
 
                 return result;
             }
-
-            return _byLongitude.GetViewBetween(new Entry(0, from), new Entry(0, to));
         }
 
         private class DelegateComparer : IComparer<Entry>
@@ -227,6 +232,7 @@ namespace Memstate.Models.Geo
         private class Entry
         {
             public readonly GeoPoint Point;
+
             public readonly T Item;
 
             public Entry(T item, GeoPoint point)

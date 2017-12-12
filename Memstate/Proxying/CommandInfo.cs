@@ -20,12 +20,12 @@ namespace Memstate
 
         internal abstract OperationInfo<T> ToOperationInfo<T>(MethodInfo methodInfo);
     }
+
     internal sealed class CommandInfo<T> : OperationInfo<T>
     {
         public CommandInfo(MethodInfo methodInfo, OperationAttribute attribute)
             : base(methodInfo, attribute)
         {
-
         }
 
         protected override object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature)

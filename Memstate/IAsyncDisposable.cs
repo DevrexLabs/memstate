@@ -1,7 +1,7 @@
+using System.Threading.Tasks;
+
 namespace Memstate
 {
-    using System.Threading.Tasks;
-
     public interface IAsyncDisposable
     {
         Task DisposeAsync();

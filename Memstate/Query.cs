@@ -4,7 +4,7 @@
     {
         public abstract object ExecuteImpl(object model);
     }
-    
+
     public abstract class Query<TModel, TResult> : Query
     {
         public abstract TResult Execute(TModel model);

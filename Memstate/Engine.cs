@@ -7,18 +7,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    // todo: refactor signature
-    public delegate void CommandExecutedDelegate(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events);
-
     public class Engine<TModel> where TModel : class
     {
         private readonly ILogger _logger;
+
         private readonly Kernel _kernel;
+
         private readonly MemstateSettings _settings;
+
         private readonly IJournalWriter _journalWriter;
+
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
+
         private readonly IDisposable _commandSubscription;
+
         private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
+
         private readonly EngineMetrics _metrics;
 
         private volatile bool _stopped;
@@ -28,6 +32,8 @@ namespace Memstate
         /// Numbering starts from 0!
         /// </summary>
         private long _lastRecordNumber;
+
+        public event CommandExecutedDelegate CommandExecuted = delegate { };
 
         public Engine(
             MemstateSettings settings,
@@ -46,21 +52,22 @@ namespace Memstate
             _metrics = new EngineMetrics(settings);
         }
 
-        public event CommandExecutedDelegate CommandExecuted = delegate { };
-
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
 
         public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
         {
             EnsureOperational();
+
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
+
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
             using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
+
                 return (TResult) await completionSource.Task.ConfigureAwait(false);
             }
         }
@@ -68,9 +75,11 @@ namespace Memstate
         public Task ExecuteAsync(Command<TModel> command)
         {
             EnsureOperational();
+
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
+
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
             using (_metrics.MeasureCommandExecution())
@@ -83,18 +92,21 @@ namespace Memstate
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
             EnsureOperational();
+
             return await Task.Run(() => Execute(query)).ConfigureAwait(false);
         }
 
         public TResult Execute<TResult>(Command<TModel, TResult> command)
         {
             EnsureOperational();
+
             return ExecuteAsync(command).Result;
         }
 
         public void Execute(Command<TModel> command)
         {
             EnsureOperational();
+
             ExecuteAsync(command).Wait();
         }
 
@@ -106,20 +118,25 @@ namespace Memstate
         public async Task DisposeAsync()
         {
             _logger.LogDebug("Begin Dispose");
+
             await _journalWriter.DisposeAsync().ConfigureAwait(false);
+
             while (!_pendingLocalCommands.IsEmpty)
             {
                 _pendingCommandsChanged.WaitOne();
             }
 
             _commandSubscription.Dispose();
+
             _logger.LogDebug("End Dispose");
         }
 
         public Task EnsureAsync(long recordNumber)
         {
             EnsureOperational();
+
             var completionSource = new TaskCompletionSource<object>();
+
             CommandExecuted += (journalRecord, isLocal, events) =>
             {
                 if (journalRecord.RecordNumber >= recordNumber)
@@ -136,6 +153,7 @@ namespace Memstate
         internal object Execute(Query query)
         {
             EnsureOperational();
+
             using (_metrics.MeasureQueryExecution())
             {
                 try
@@ -158,14 +176,17 @@ namespace Memstate
         internal object Execute(Command command)
         {
             EnsureOperational();
+
             var completionSource = new TaskCompletionSource<object>();
 
             _pendingLocalCommands[command.Id] = completionSource;
+
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
             using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
+
                 return completionSource.Task.ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
@@ -176,10 +197,13 @@ namespace Memstate
         private void ApplyRecord(JournalRecord record)
         {
             TaskCompletionSource<object> completion = null;
+
             try
             {
                 var command = record.Command;
+
                 var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
+
                 if (isLocalCommand)
                 {
                     _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
@@ -188,12 +212,15 @@ namespace Memstate
                 }
 
                 _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
-                long expected = Interlocked.Increment(ref _lastRecordNumber);
+
+                var expected = Interlocked.Increment(ref _lastRecordNumber);
+
                 if (expected != record.RecordNumber)
                 {
                     if (!_settings.AllowBrokenSequence)
                     {
                         _stopped = true;
+
                         throw new Exception($"Broken sequence, expected {expected}, got {record.RecordNumber}");
                     }
 
@@ -218,6 +245,7 @@ namespace Memstate
                 _metrics.CommandFailed();
 
                 _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+
                 completion?.SetException(ex);
             }
         }
@@ -230,21 +258,15 @@ namespace Memstate
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="journalRecord"></param>
-        /// <param name="isLocal"></param>
-        /// <param name="events"></param>
         private void NotifyCommandExecuted(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
         {
             try
             {
                 CommandExecuted.Invoke(journalRecord, isLocal, events);
             }
-            catch
+            catch (Exception exception)
             {
-                // Don't let external code crash the engine
+                _logger.LogError(exception, "Exception thrown in CommandExecuted handler.");
             }
         }
     }

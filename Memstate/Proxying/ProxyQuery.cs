@@ -5,17 +5,18 @@ namespace Memstate
 {
     public class ProxyQuery<T> : Query<T, object>
     {
-        public string MethodName { get; set; }
-        public object[] Arguments { get; set; }
-        public Type[] GenericTypeArguments { get; set; }
-
-
         public ProxyQuery(string methodName, object[] inArgs, Type[] genericTypeArguments)
         {
             MethodName = methodName;
             Arguments = inArgs;
             GenericTypeArguments = genericTypeArguments;
         }
+
+        public string MethodName { get; set; }
+
+        public object[] Arguments { get; set; }
+
+        public Type[] GenericTypeArguments { get; set; }
 
         public override object Execute(T model)
         {
@@ -28,6 +29,7 @@ namespace Memstate
                 {
                     method = method.MakeGenericMethod(GenericTypeArguments);
                 }
+
                 return method.Invoke(model, Arguments);
             }
             catch (TargetInvocationException ex)

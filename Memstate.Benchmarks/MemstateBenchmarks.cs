@@ -1,19 +1,19 @@
-﻿namespace Memstate.Benchmarks
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+
+using Memstate.EventStore;
+using Memstate.JsonNet;
+using Memstate.Models;
+using Memstate.Models.KeyValue;
+using Memstate.Postgresql;
+
+namespace Memstate.Benchmarks
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using BenchmarkDotNet.Attributes;
-    using BenchmarkDotNet.Columns;
-    using BenchmarkDotNet.Configs;
-
-    using Memstate.EventStore;
-    using Memstate.JsonNet;
-    using Memstate.Models;
-    using Memstate.Models.KeyValue;
-    using Memstate.Postgresql;
-
     [Config(typeof(MemstateConfig))]
     public class MemstateBenchmarks
     {

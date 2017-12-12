@@ -22,6 +22,7 @@ ORDER BY
     id ASC";
 
         private readonly ISerializer _serializer;
+        
         private readonly PostgresqlSettings _settings;
 
         public PostgresqlJournalReader(MemstateSettings memstateSettings)

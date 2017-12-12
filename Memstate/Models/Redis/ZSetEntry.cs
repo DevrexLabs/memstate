@@ -5,6 +5,7 @@ namespace Memstate.Models.Redis
     public class ZSetEntry : IComparable<ZSetEntry>
     {
         public readonly string Member;
+
         public readonly double Score;
 
         public ZSetEntry(string member, double score)

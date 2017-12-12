@@ -1,14 +1,17 @@
-﻿namespace Memstate
-{
-    using System;
+﻿using System;
 
+namespace Memstate
+{
     public class JournalSubscription : IJournalSubscription
     {
         public readonly Guid Id = Guid.NewGuid();
+
         private readonly Action<JournalRecord> _callback;
+
         private readonly Action<JournalSubscription> _onDisposed;
+
         private long _nextRecord;
-        
+
         public JournalSubscription(Action<JournalRecord> callback, long nextRecord, Action<JournalSubscription> onDisposed)
         {
             _nextRecord = nextRecord;
@@ -34,6 +37,7 @@
             }
 
             _nextRecord++;
+
             _callback.Invoke(record);
         }
     }

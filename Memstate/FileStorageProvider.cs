@@ -1,8 +1,8 @@
-﻿namespace Memstate
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Memstate
+{
     public class FileStorageProvider : StorageProvider
     {
         private readonly FileStorageSettings _fileStorageSettings;
@@ -31,7 +31,9 @@
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             var fileName = _fileStorageSettings.FileName;
+
             _currentWriter = new FileJournalWriter(_settings, fileName, nextRecordNumber);
+
             return _currentWriter;
         }
 

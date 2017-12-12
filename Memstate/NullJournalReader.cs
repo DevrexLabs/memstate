@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace Memstate
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     public class NullJournalReader : IJournalReader
     {
         public Task DisposeAsync()

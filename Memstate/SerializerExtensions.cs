@@ -11,22 +11,22 @@ namespace Memstate
 
         public static byte[] Serialize(this ISerializer serializer, object graph)
         {
-            var ms = new MemoryStream();
-            
-            serializer.WriteObject(ms, graph);
-            ms.Position = 0;
-            
-            return ms.ToArray();
+            using (var stream = new MemoryStream())
+            {
+                serializer.WriteObject(stream, graph);
+
+                stream.Position = 0;
+
+                return stream.ToArray();
+            }
         }
 
         public static object Deserialize(this ISerializer serializer, byte[] bytes)
         {
-            var ms = new MemoryStream(bytes)
+            using (var stream = new MemoryStream(bytes) {Position = 0})
             {
-                Position = 0
-            };
-            
-            return serializer.ReadObject(ms);
+                return serializer.ReadObject(stream);
+            }
         }
     }
 }

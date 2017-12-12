@@ -1,12 +1,14 @@
-﻿namespace Memstate.Postgresql.Tests
-{
-    using Xunit;
-    using Xunit.Abstractions;
+﻿using Xunit;
+using Xunit.Abstractions;
 
+namespace Memstate.Postgresql.Tests
+{
     public class PostgresqlSettingsTests
     {
         private readonly PostgresqlSettings _settings;
+
         private readonly MemstateSettings _memstateSettings;
+
         private readonly ITestOutputHelper _log;
 
         public PostgresqlSettingsTests(ITestOutputHelper log)
@@ -25,6 +27,7 @@
             }
 
             var initSql = _settings.InitSql.Value;
+
             Assert.StartsWith("CREATE", initSql);
         }
 
@@ -45,6 +48,5 @@
         {
             Assert.StartsWith(_memstateSettings.StreamName, _settings.Table);
         }
-
     }
 }

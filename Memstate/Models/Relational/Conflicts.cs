@@ -8,12 +8,12 @@ namespace Memstate.Models.Relational
         /// Existing keys.
         /// </summary>
         public readonly List<EntityKey> Inserts = new List<EntityKey>();
-        
+
         /// <summary>
         /// Missing key or version mismatch.
         /// </summary>
         public readonly List<EntityKey> Updates = new List<EntityKey>();
-        
+
         /// <summary>
         /// Missing key or version mismatch.
         /// </summary>

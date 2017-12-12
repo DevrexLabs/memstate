@@ -1,16 +1,15 @@
+using System;
+using System.Reflection;
 using App.Metrics;
+using App.Metrics.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    using System;
-    using System.Reflection;
-
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     public class MemstateSettings : Settings
     {
-        public MemstateSettings(params string[] args) 
+        public MemstateSettings(params string[] args)
             : base(Build(args))
         {
             Memstate = this;
@@ -50,7 +49,7 @@ namespace Memstate
         public StorageProvider CreateStorageProvider()
         {
             var provider = StorageProviders.Create(StorageProvider, this);
-            
+
             provider.Initialize();
 
             return provider;

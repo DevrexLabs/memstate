@@ -12,7 +12,7 @@ namespace Memstate
         /// The event type.
         /// </typeparam>
         void Subscribe<TEvent>() where TEvent : Event;
-        
+
         /// <summary>
         /// Subscribe to events of a specific type that matches the filters.
         /// </summary>
@@ -23,7 +23,7 @@ namespace Memstate
         /// The event type.
         /// </typeparam>
         void Subscribe<TEvent>(IEnumerable<IEventFilter> filters) where TEvent : Event;
-        
+
         /// <summary>
         /// Subscribe to events of a specific type and handle them with the supplied handler.
         /// </summary>
@@ -34,7 +34,7 @@ namespace Memstate
         /// The event type.
         /// </typeparam>
         void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : Event;
-        
+
         /// <summary>
         /// Subscribe to events of a specific type that matches the filters and handle them with the supplied handler.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Memstate
         /// The event type.
         /// </typeparam>
         void Subscribe<TEvent>(Action<TEvent> handler, IEnumerable<IEventFilter> filters) where TEvent : Event;
-        
+
         /// <summary>
         /// Unsubscribe to all events of a specific.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Memstate
         /// The event type.
         /// </typeparam>
         void Unsubscribe<TEvent>() where TEvent : Event;
-        
+
         /// <summary>
         /// Filter all incoming events via the supplied filters.
         /// </summary>
@@ -64,7 +64,7 @@ namespace Memstate
         /// The filters.
         /// </param>
         void Filter(IEnumerable<IEventFilter> filters);
-        
+
         /// <summary>
         /// Raised is invoked when an event is raised.
         /// </summary>

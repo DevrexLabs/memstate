@@ -8,7 +8,7 @@ namespace Memstate
         {
             return new NullJournalSubscription();
         }
-        
+
         public class NullJournalSubscription : IJournalSubscription
         {
             public void Dispose()

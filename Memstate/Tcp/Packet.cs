@@ -1,16 +1,9 @@
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Memstate.Tcp
 {
-    [Flags]
-    internal enum PacketInfo : Int16
-    {
-        IsPartial = 1,
-    }
-
     /// <summary>
     /// A packet is the atomic unit of data transferred server and client over tcp 
     /// </summary>
@@ -33,12 +26,11 @@ namespace Memstate.Tcp
         /// sequence (not interleaved with packets of a different message)
         /// </summary>
         public long MessageId { get; set; }
-        
+
         /// <summary>
         /// The actual data, number of bytes is Size - HeaderSize
         /// </summary>
         public byte[] Payload;
-
 
         public bool IsPartial => Info.HasFlag(PacketInfo.IsPartial);
 
@@ -61,11 +53,12 @@ namespace Memstate.Tcp
         public static async Task<Packet> ReadAsync(Stream stream, CancellationToken cancellation)
         {
             var buf = new byte[HeaderSize];
+
             await FillBufferAsync(stream, buf, cancellation);
 
-            var reader = new BinaryReader(new MemoryStream(buf, writable:false));
+            var reader = new BinaryReader(new MemoryStream(buf, writable: false));
 
-            var packet = new Packet()
+            var packet = new Packet
             {
                 Size = reader.ReadInt32(),
                 Info = (PacketInfo) reader.ReadInt16(),
@@ -73,8 +66,11 @@ namespace Memstate.Tcp
             };
 
             var payloadSize = packet.Size - HeaderSize;
+
             packet.Payload = new byte[payloadSize];
+
             await FillBufferAsync(stream, packet.Payload, cancellation);
+
             return packet;
         }
 
@@ -87,11 +83,14 @@ namespace Memstate.Tcp
         /// <returns></returns>
         internal static async Task FillBufferAsync(Stream stream, byte[] buffer, CancellationToken cancellation)
         {
-            int totalBytesRead = 0;
+            var totalBytesRead = 0;
+
             while (totalBytesRead < buffer.Length)
             {
                 var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, buffer.Length - totalBytesRead, cancellation);
+
                 totalBytesRead += bytesRead;
+
                 cancellation.ThrowIfCancellationRequested();
             }
         }
@@ -104,13 +103,17 @@ namespace Memstate.Tcp
         public async Task WriteToAsync(Stream stream)
         {
             var ms = new MemoryStream();
+
             var writer = new BinaryWriter(ms);
+
             writer.Write(Size);
-            writer.Write((short)Info);
+            writer.Write((short) Info);
             writer.Write(MessageId);
             writer.Write(Payload);
             writer.Flush();
+
             ms.Position = 0;
+
             await ms.CopyToAsync(stream);
         }
 

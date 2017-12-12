@@ -1,25 +1,28 @@
 ﻿using System.Threading;
+using System;
+using System.Collections.Generic;
+using Memstate.Postgresql.Tests.Domain;
+using Npgsql;
+using Xunit;
 
 namespace Memstate.Postgresql.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using Domain;
-    using Npgsql;
-    using Xunit;
-
     public class JournalReaderTests
     {
         private readonly PostgresqlProvider _provider;
+
         private readonly IJournalReader _journalReader;
+
         private readonly IJournalWriter _journalWriter;
+
         private readonly ISerializer _serializer;
 
         public JournalReaderTests()
         {
             var settings = new MemstateSettings();
+
             _provider = new PostgresqlProvider(settings);
-            
+
             _provider.Initialize();
 
             _journalReader = _provider.CreateJournalReader();
@@ -32,11 +35,11 @@ namespace Memstate.Postgresql.Tests
         public void CanRead()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
-            
+
             InsertCommand(_serializer.Serialize(create));
-            
+
             var journalRecords = _journalReader.GetRecords();
-            
+
             Assert.Single(journalRecords);
         }
 
@@ -44,13 +47,13 @@ namespace Memstate.Postgresql.Tests
         public void CanWrite()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
-            
+
             _journalWriter.Send(create);
-            
+
             Thread.Sleep(500);
-            
+
             var journalRecords = GetJournalRecords();
-            
+
             Assert.Single(journalRecords);
         }
 
@@ -60,8 +63,9 @@ namespace Memstate.Postgresql.Tests
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                
-                command.CommandText = string.Format(@"
+
+                command.CommandText = string.Format(
+                    @"
 INSERT INTO {0}
 (
     command
@@ -73,7 +77,7 @@ VALUES
                     _provider.Settings.Table);
 
                 command.Parameters.AddWithValue("@command", data);
-                
+
                 Assert.Equal(1, command.ExecuteNonQuery());
             }
         }
@@ -81,13 +85,14 @@ VALUES
         private IEnumerable<JournalRecord> GetJournalRecords()
         {
             var journalRecords = new List<JournalRecord>();
-            
+
             using (var connection = new NpgsqlConnection(_provider.Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                
-                command.CommandText = string.Format(@"
+
+                command.CommandText = string.Format(
+                    @"
 SELECT
     id,
     written
@@ -101,8 +106,8 @@ ORDER BY
                 {
                     while (reader.Read())
                     {
-                        var journalRecord = new JournalRecord((long)reader[0], (DateTime)reader[1], null);
-                        
+                        var journalRecord = new JournalRecord((long) reader[0], (DateTime) reader[1], null);
+
                         journalRecords.Add(journalRecord);
                     }
                 }

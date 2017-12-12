@@ -1,11 +1,13 @@
-﻿namespace Memstate.Postgresql
-{
-    using System;
+﻿using System;
 
+namespace Memstate.Postgresql
+{
     public class PostgresqlSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
+
         public const string DefaultConnectionString = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
+
         public const string InitSqlResourceName = "Memstate.Postgresql.init_sql";
 
         private readonly MemstateSettings _memstateSettings;
@@ -14,6 +16,7 @@
             : base(settings, ConfigurationKey)
         {
             Ensure.NotNull(settings, nameof(settings));
+
             _memstateSettings = settings;
         }
 

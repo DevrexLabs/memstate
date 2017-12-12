@@ -1,13 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
 namespace Memstate
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Threading.Tasks;
-
     public class FileJournalReader : IJournalReader
     {
         private readonly Stream _journalStream;
+
         private readonly ISerializer _serializer;
 
         public FileJournalReader(string fileName, MemstateSettings settings)
@@ -18,7 +19,7 @@ namespace Memstate
 
         public Task DisposeAsync()
         {
-            return Task.Run((Action)_journalStream.Dispose);
+            return Task.Run((Action) _journalStream.Dispose);
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

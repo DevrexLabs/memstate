@@ -8,11 +8,11 @@ namespace Memstate.EventStore
     public class EventStoreSubscriptionAdapter : IJournalSubscription
     {
         private readonly EventStoreCatchUpSubscription _subscription;
+
         private readonly Func<bool> _ready;
+
         private readonly ILogger _logger;
 
-        public bool Ready() => _ready.Invoke();
-            
         public EventStoreSubscriptionAdapter(MemstateSettings config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
         {
             _logger = config.CreateLogger<EventStoreSubscriptionAdapter>();
@@ -20,9 +20,12 @@ namespace Memstate.EventStore
             _ready = ready;
         }
 
+        public bool Ready() => _ready.Invoke();
+
         public void Dispose()
         {
             _logger.LogInformation("Disposing");
+
             _subscription.Stop();
         }
     }

@@ -1,9 +1,8 @@
+using System;
+using Microsoft.Extensions.Logging;
+
 namespace Memstate
 {
-    using System;
-
-    using Microsoft.Extensions.Logging;
-
     public static class LoggerExtensions
     {
         private static readonly EventId DefaultEventId = new EventId();

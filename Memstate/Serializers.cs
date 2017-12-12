@@ -1,7 +1,7 @@
+using Memstate.Wire;
+
 namespace Memstate
 {
-    using Memstate.Wire;
-
     public class Serializers : Providers<ISerializer>
     {
         public Serializers()

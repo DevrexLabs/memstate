@@ -6,6 +6,7 @@ namespace Memstate
     public class LocalClient<TModel> : Client<TModel> where TModel : class
     {
         private readonly Engine<TModel> _engine;
+
         private readonly ClientEvents _events;
 
         public override IClientEvents Events => _events;
@@ -13,7 +14,9 @@ namespace Memstate
         public LocalClient(Engine<TModel> engine)
         {
             _engine = engine;
+
             _events = new ClientEvents();
+
             engine.CommandExecuted += (record, local, events) => _events.Handle(events);
         }
 

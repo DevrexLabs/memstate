@@ -12,6 +12,7 @@
             : base(settings, ConfigurationKey)
         {
             Ensure.NotNull(settings, nameof(settings));
+            
             _memstateSettings = settings;
         }
 

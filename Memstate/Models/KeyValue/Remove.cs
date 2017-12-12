@@ -9,9 +9,9 @@ namespace Memstate.Models.KeyValue
             Key = key;
             ExpectedVersion = expectedVersion;
         }
-        
+
         public string Key { get; }
-        
+
         public int? ExpectedVersion { get; }
 
         public override void Execute(KeyValueStore<T> model, Action<Event> eventHandler)

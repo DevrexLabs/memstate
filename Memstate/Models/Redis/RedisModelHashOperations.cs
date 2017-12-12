@@ -56,7 +56,7 @@ namespace Memstate.Models.Redis
 
             var result = new List<string>(hash.Count * 2);
 
-            foreach (KeyValuePair<string, string> pair in hash)
+            foreach (var pair in hash)
             {
                 result.Add(pair.Key);
                 result.Add(pair.Value);
@@ -103,7 +103,7 @@ namespace Memstate.Models.Redis
 
             return hash?.Values.ToArray() ?? Array.Empty<string>();
         }
-        
+
         private Dictionary<string, string> GetHash(string key, bool create = false)
         {
             return As(key, create, () => new Dictionary<string, string>());

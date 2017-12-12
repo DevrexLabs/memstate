@@ -1,7 +1,7 @@
+using System;
+
 namespace Memstate
 {
-    using System;
-
     public class ModelLoader
     {
         private static readonly Action<Event> NoopEventHandler = e => { };
@@ -16,7 +16,7 @@ namespace Memstate
         public TModel Load<TModel>(IJournalReader reader)
             where TModel : new()
         {
-            TModel model = new TModel();
+            var model = new TModel();
 
             return Load(reader, model);
         }
@@ -28,6 +28,7 @@ namespace Memstate
                 try
                 {
                     journalRecord.Command.ExecuteImpl(model, NoopEventHandler);
+
                     LastRecordNumber = journalRecord.RecordNumber;
                 }
                 catch

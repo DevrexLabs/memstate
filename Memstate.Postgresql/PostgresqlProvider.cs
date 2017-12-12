@@ -1,25 +1,26 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    using System.Threading.Tasks;
-    using Npgsql;
-
     public class PostgresqlProvider : StorageProvider
     {
         private readonly ILogger<PostgresqlProvider> _log;
+        
         private readonly MemstateSettings _settings;
-        private readonly PostgresqlSettings _postgreSqlSettings;
+
         private bool _initialized;
 
         public PostgresqlProvider(MemstateSettings settings)
         {
             _log = settings.CreateLogger<PostgresqlProvider>();
             _settings = settings;
-            _postgreSqlSettings = new PostgresqlSettings(settings);
+            
+            Settings = new PostgresqlSettings(settings);
         }
 
-        public PostgresqlSettings Settings => _postgreSqlSettings;
+        public PostgresqlSettings Settings { get; }
 
         public override void Initialize()
         {
@@ -28,13 +29,18 @@ namespace Memstate.Postgresql
                 return;
             }
             
-            var sql = _postgreSqlSettings.InitSql.Value;
-            using (var connection = new NpgsqlConnection(_postgreSqlSettings.ConnectionString))
+            var sql = Settings.InitSql.Value;
+            
+            using (var connection = new NpgsqlConnection(Settings.ConnectionString))
+                
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                command.CommandText = string.Format(sql, _postgreSqlSettings.SubscriptionStream, _postgreSqlSettings.Table);
+                
+                command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
+                
                 _log.LogTrace($"Executing SQL '{command.CommandText}'");
+                
                 command.ExecuteNonQuery();
             }
 

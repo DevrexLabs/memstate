@@ -81,6 +81,7 @@ namespace Memstate.Tcp
         {
             var result = _engine.Execute(request.Query);
             var response = new QueryResponse(result, request.Id);
+
             OnMessage.Invoke(response);
         }
 
@@ -88,6 +89,7 @@ namespace Memstate.Tcp
         {
             var result = _engine.Execute(request.Command);
             var response = new CommandResponse(result, request.Id);
+
             OnMessage.Invoke(response);
         }
 

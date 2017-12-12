@@ -13,9 +13,13 @@ namespace Memstate
     public class MessageProcessor<T> : IDisposable
     {
         private readonly BlockingCollection<T> _messageQueue;
+
         private readonly CancellationTokenSource _cancellationSource;
+
         private readonly CancellationToken _cancellationToken;
+
         private readonly Func<T, Task> _handler;
+
         private readonly ManualResetEvent _resetEvent = new ManualResetEvent(false);
 
         public MessageProcessor(Func<T, Task> handler)
@@ -24,6 +28,7 @@ namespace Memstate
             _messageQueue = new BlockingCollection<T>();
             _cancellationSource = new CancellationTokenSource();
             _cancellationToken = _cancellationSource.Token;
+
             Task.Run(ProcessMessages);
         }
 
@@ -42,11 +47,16 @@ namespace Memstate
             while (!_messageQueue.IsCompleted)
             {
                 var message = _messageQueue.TakeOrDefault(_cancellationToken);
-                if (message == null) break;
+
+                if (message == null)
+                {
+                    break;
+                }
+
                 await _handler.Invoke(message).ConfigureAwait(false);
             }
+
             _resetEvent.Set();
         }
-
     }
 }

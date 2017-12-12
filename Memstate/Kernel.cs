@@ -33,7 +33,10 @@ namespace Memstate
                 {
                     _lock.EnterWriteLock();
 
-                    return command.ExecuteImpl(_model, eventHandler);
+                    using (new AttachedEventHandler(_model, eventHandler))
+                    {
+                        return command.ExecuteImpl(_model, eventHandler);
+                    }
                 }
                 finally
                 {
@@ -56,6 +59,37 @@ namespace Memstate
                 {
                     _lock.ExitReadLock();
                 }
+            }
+        }
+
+        private class AttachedEventHandler : IDisposable
+        {
+            private readonly IDomainEventSource _model;
+
+            private readonly Action<Event> _handler;
+
+            public AttachedEventHandler(object model, Action<Event> handler)
+            {
+                if (!(model is IDomainEventSource))
+                {
+                    return;
+                }
+
+                _model = (IDomainEventSource) model;
+
+                _handler = handler;
+
+                _model.EventRaised += handler;
+            }
+
+            public void Dispose()
+            {
+                if (_model == null)
+                {
+                    return;
+                }
+
+                _model.EventRaised -= _handler;
             }
         }
     }

@@ -46,6 +46,10 @@ namespace Memstate
 
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
 
+        public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
+
+        public string ModelCreator { get; set; } = typeof(DefaultModelCreator).AssemblyQualifiedName;
+
         public StorageProvider CreateStorageProvider()
         {
             var provider = StorageProviders.Create(StorageProvider, this);
@@ -58,6 +62,15 @@ namespace Memstate
         public ILogger<T> CreateLogger<T>()
         {
             return LoggerFactory.CreateLogger<T>();
+        }
+
+        public IModelCreator CreateModelCreator()
+        {
+            var type = Type.GetType(ModelCreator);
+
+            var modelCreator = (IModelCreator) Activator.CreateInstance(type, Array.Empty<object>());
+
+            return modelCreator;
         }
 
         public override string ToString()

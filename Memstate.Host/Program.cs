@@ -65,6 +65,7 @@ namespace Memstate.Host
             catch (Exception exception)
             {
                 Console.WriteLine(exception.Message);
+                Console.WriteLine(exception.StackTrace);
 
                 return -1;
             }

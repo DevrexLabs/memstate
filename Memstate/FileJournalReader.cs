@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,31 +6,57 @@ namespace Memstate
 {
     public class FileJournalReader : IJournalReader
     {
-        private readonly Stream _journalStream;
+        private readonly string _fileName;
+
+        private readonly MemstateSettings _settings;
 
         private readonly ISerializer _serializer;
 
         public FileJournalReader(string fileName, MemstateSettings settings)
         {
-            _journalStream = settings.FileSystem.OpenRead(fileName);
+            _fileName = fileName;
+            _settings = settings;
             _serializer = settings.CreateSerializer();
         }
 
         public Task DisposeAsync()
         {
-            return Task.Run((Action) _journalStream.Dispose);
+            return Task.CompletedTask;
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            foreach (var records in _serializer.ReadObjects<JournalRecord[]>(_journalStream))
+            foreach (var stream in Files())
             {
-                foreach (var record in records)
+                using (stream)
                 {
-                    if (record.RecordNumber >= fromRecord)
+                    foreach (var records in _serializer.ReadObjects<JournalRecord[]>(stream))
                     {
-                        yield return record;
+                        foreach (var record in records)
+                        {
+                            if (record.RecordNumber >= fromRecord)
+                            {
+                                yield return record;
+                            }
+                        }
                     }
+                }
+            }
+        }
+
+        private IEnumerable<Stream> Files()
+        {
+            if (_settings.FileSystem.Exists(_fileName))
+            {
+                yield return _settings.FileSystem.OpenRead(_fileName);
+            }
+            else
+            {
+                var index = 0;
+
+                while (_settings.FileSystem.Exists(string.Format(_fileName, index)))
+                {
+                    yield return _settings.FileSystem.OpenRead(string.Format(_fileName, index++));
                 }
             }
         }

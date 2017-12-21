@@ -11,6 +11,8 @@
 
         public string FileNameSuffix { get; set; } = ".journal";
 
-        public string FileName => Memstate?.StreamName + FileNameSuffix;
+        public string FileName => Memstate?.StreamName + "_{0}" + FileNameSuffix;
+
+        public int PageSize { get; set; } = 65536;
     }
 }

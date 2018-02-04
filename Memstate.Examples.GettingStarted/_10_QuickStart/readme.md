@@ -17,7 +17,7 @@ The Memstate.Core library is a single assembly. Grab the latest Memstate.Core.dl
 
 Create a class that derives from `Model` and add members to hold data, usually collections. Mark the class and any referenced types with the `Serializable` attribute. An instance of this class is your in-memory database.
 
-- example : [CustomerModel.cs](QuickStartClasses/CustomerModel.cs)
+- example : [LoyaltyDB.cs](QuickStartClasses/LoyaltyDB.cs)
 
 ## Create commands
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type

@@ -6,11 +6,14 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
 {
     public class QuickStart
     {
+
+        // Hi all, here's some important notes on writing tests for .net core and standard,
+        // in case you want to create your own tests.
+        // https://github.com/nunit/docs/wiki/.NET-Core-and-.NET-Standard
+
         [Test]
         public async Task Simple_end_to_end_sample()
         {
-            return;
-
             var fileSystem = new InMemoryFileSystem();
 
             // hosting the engine 

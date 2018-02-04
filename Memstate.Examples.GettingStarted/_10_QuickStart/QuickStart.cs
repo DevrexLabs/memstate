@@ -38,7 +38,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
 
             // executing queries
             // -----------------
-            // prove statement above
+
 
             // Now, demonstrate that the model has been persisted to disk
 

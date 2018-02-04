@@ -3,7 +3,7 @@
 namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 {
     [Serializable]
-    public class CustomerID
+    public struct CustomerID
     {
         public CustomerID(int iD)
         {

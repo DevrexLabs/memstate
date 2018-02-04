@@ -15,6 +15,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
             ID = new CustomerID(id);
             LoyaltyPointBalance = loyaltyPointBalance;
         }
+
         public CustomerID ID { get; }
 
         public int LoyaltyPointBalance { get; }

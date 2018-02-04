@@ -1,13 +1,13 @@
 ﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 {
 
-    public class EarnPoints : Command<CustomerModel, Customer>
+    public class EarnPointsCommand : Command<LoyaltyDB, Customer>
     {
-        public EarnPoints()
+        public EarnPointsCommand()
         {
         }
 
-        public EarnPoints(CustomerID id, int points)
+        public EarnPointsCommand(CustomerID id, int points)
         {
             ID = id;
             Points = points;
@@ -19,7 +19,7 @@
         //[JsonProperty]
         public int Points { get; private set; }
 
-        public Customer Execute(CustomerModel model)
+        public Customer Execute(LoyaltyDB model)
         {
             var customer = model.Customers[ID];
             var newPoints = customer.LoyaltyPointBalance + Points;

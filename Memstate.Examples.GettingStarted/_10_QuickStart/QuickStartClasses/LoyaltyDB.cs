@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 {
     [Serializable]
-    public class CustomerModel
+    public class LoyaltyDB
     {
-        public CustomerModel()
+        public LoyaltyDB()
         {
             for (int i = 1; i < 11; i++)
             {

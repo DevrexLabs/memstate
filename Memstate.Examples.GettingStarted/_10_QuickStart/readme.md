@@ -17,13 +17,13 @@ The Memstate.Core library is a single assembly. Grab the latest Memstate.Core.dl
 
 Create a class that derives from `Model` and add members to hold data, usually collections. Mark the class and any referenced types with the `Serializable` attribute. An instance of this class is your in-memory database.
 
-Example : [QuickStartClasses\CustomerModel.cs](QuickStartClasses/CustomerModel.cs)
+- example : [CustomerModel.cs](QuickStartClasses/CustomerModel.cs)
 
 ## Create commands
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-Example : [QuickStartClasses\EarnPoints.cs](QuickStartClasses/EarnPoints.cs)
-Example : [QuickStartClasses\SpendPoints.cs](QuickStartClasses/SpendPoints.cs)
+- example : [EarnPointsCommand.cs](QuickStartClasses/EarnPointsCommand.cs)
+- example : [SpendPointsCommand.cs](QuickStartClasses/SpendPointsCommand.cs)
 
 ## Hosting the engine
 `Engine.For<M>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.

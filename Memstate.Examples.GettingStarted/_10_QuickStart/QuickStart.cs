@@ -9,17 +9,19 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
         [Fact]
         public async Task Simple_end_to_end_sample()
         {
-            // prerequisites 
-            // add project reference Memstate
+            var fileSystem = new InMemoryFileSystem();
 
             // hosting the engine 
             // ------------------
-            var settings = new MemstateSettings();
-            var model = await new EngineBuilder(settings).BuildAsync<CustomerDB>().ConfigureAwait(false);
+            var settings = new MemstateSettings
+            {
+                FileSystem = fileSystem
+            };
+
+            var model = await new EngineBuilder(settings).BuildAsync<CustomerModel>().ConfigureAwait(false);
 
             // todo Need to use the simple configuration that will result in state being persisted to disk
             // ------------------
-
 
             // executing commands
             // ------------------
@@ -27,11 +29,9 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             { 
                 var id1 = new CustomerID(1);
                 var id2 = new CustomerID(2);
-                var customer1a = await model.ExecuteAsync(new EarnPoints(id1, 3));
-                var customer1b = await model.ExecuteAsync(new SpendPoints(id1, 1));
-                var customer2 = await model.ExecuteAsync(new EarnPoints(id1, 1));
-
-                // #ADH is customer1a and 1b the same instance?
+                await model.ExecuteAsync(new EarnPoints(id1, 3));
+                await model.ExecuteAsync(new SpendPoints(id1, 1));
+                await model.ExecuteAsync(new EarnPoints(id2, 1));
             }
 
             // at this point we should have customer 1 with 40 points and customer 2 with 2 loyalty points

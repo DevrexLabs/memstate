@@ -1,7 +1,7 @@
 ﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 {
 
-    public class SpendPoints : Command<CustomerDB, Customer>
+    public class SpendPoints : Command<CustomerModel, Customer>
     {
         public SpendPoints()
         {
@@ -19,7 +19,7 @@
         //[JsonProperty]
         public int Points { get; private set; }
 
-        public Customer Execute(CustomerDB model)
+        public Customer Execute(CustomerModel model)
         {
             var customer = model.Customers[ID];
             var newPoints = customer.LoyaltyPointBalance - Points;

@@ -7,7 +7,7 @@ namespace Memstate.Postgresql
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
 
-        public const string DefaultConnectionString = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
+        public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
         public const string InitSqlResourceName = "Memstate.Postgresql.init_sql";
 

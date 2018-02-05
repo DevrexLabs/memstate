@@ -34,7 +34,9 @@ namespace Memstate.Postgresql.Tests
         [Fact]
         public void DefaultConnectionStringIsUsed()
         {
-            Assert.Equal(PostgresqlSettings.DefaultConnectionString, _settings.ConnectionString);
+            var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresqlSettings.DefaultConnectionString);
+            var actualBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            Assert.True(defaultBuilder.EquivalentTo(actualBuilder));
         }
 
         [Fact]
@@ -87,6 +89,27 @@ namespace Memstate.Postgresql.Tests
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.Equal(expected, connectionStringBuilder.Database);
             Assert.Contains(expected, connectionStringBuilder.ToString());
+        }
+
+        [Fact]
+        public void PasswordFromArgumentsOverridesConnectionString()
+        {
+            var expected = Guid.NewGuid().ToString();
+            var settings = new MemstateSettings("--Memstate:StorageProviders:Postgresql:Password", expected);
+            var pgSettings = new PostgresqlSettings(settings);
+            Assert.Equal(expected, pgSettings.Password);
+        }
+
+        [Fact]
+        public void PasswordFromEnvironmentVariableOverridesConnectionString()
+        {
+            string key = "Memstate:StorageProviders:Postgresql:Password";
+            var expected = Guid.NewGuid().ToString();
+            Environment.SetEnvironmentVariable(key, expected);
+            var settings = new MemstateSettings();
+            var pgSettings = new PostgresqlSettings(settings);
+            Assert.Equal(expected, pgSettings.Password);
+            Environment.SetEnvironmentVariable(key, null);
         }
     }
 }

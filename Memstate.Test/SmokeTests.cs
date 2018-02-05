@@ -49,7 +49,7 @@ namespace Memstate.Tests
     public class SmokeTests
     {
         [Test]
-        public void Test1()
+        public void KernelCanExecuteCommand()
         {
             var config = new MemstateSettings();
             var model = new List<string>();

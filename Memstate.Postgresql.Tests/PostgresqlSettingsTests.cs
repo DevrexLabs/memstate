@@ -100,7 +100,7 @@ namespace Memstate.Postgresql.Tests
             Assert.Equal(expected, pgSettings.Password);
         }
 
-        [Fact]
+        [Fact(Skip="Interferes with same ENV var on appveyor!")]
         public void PasswordFromEnvironmentVariableOverridesConnectionString()
         {
             string key = "Memstate:StorageProviders:Postgresql:Password";

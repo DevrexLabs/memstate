@@ -2,7 +2,6 @@
 
 namespace Memstate.Tests.Proxy
 {
-
     public class MethodMapTests
     {
         private readonly MethodMap<TestModel> _map = MethodMap.MapFor<TestModel>();

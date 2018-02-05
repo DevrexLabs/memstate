@@ -1,8 +1,10 @@
+using NUnit.Framework;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace Memstate.Tests.DispatchProxy
 {
-    using System.Linq;
-    using Xunit;
-
+    [TestFixture]
     public class OperationAttributeMapToTests
     {
         internal class SetCustomerCommand : Command<ITestModel>
@@ -38,9 +40,10 @@ namespace Memstate.Tests.DispatchProxy
             }
         }
 
-        [Fact]
-        public void MapsToCommand()
+        [Test]
+        public async Task MapsToCommand()
         {
+            //Arrange
             var settings  = new MemstateSettings();
             settings.FileSystem = new InMemoryFileSystem();
             var storageProvider = settings.CreateStorageProvider();
@@ -48,10 +51,18 @@ namespace Memstate.Tests.DispatchProxy
             var engine = builder.Build<ITestModel>(new TestModel());
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();
+
+            //Act
             proxy.SetCustomer(new Customer());
+
+            //release the lock on the journal
+            await engine.DisposeAsync();
             var journalEntry = storageProvider.CreateJournalReader().GetRecords().FirstOrDefault();
+
+            // If MapTo is correct, a SetCustomerCommand will be written to the journal
+            // if not, then a ProxyCommand will be written
             Assert.NotNull(journalEntry);
-            Assert.IsType<SetCustomerCommand>(journalEntry.Command);
+            Assert.IsInstanceOf<SetCustomerCommand>(journalEntry.Command);
         }
     }
 }

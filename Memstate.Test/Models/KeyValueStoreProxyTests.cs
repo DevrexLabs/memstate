@@ -48,7 +48,7 @@ namespace Memstate.Test.Models
         [Fact]
         public void Remove_throws_when_key_not_exists()
         {
-            Assert.Throws<InvalidOperationException>(() => _keyValueStore.Remove("KEY"));
+            Assert.ThrowsAny<Exception>(() => _keyValueStore.Remove("KEY"));
         }
     }
 }

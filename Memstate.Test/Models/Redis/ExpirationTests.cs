@@ -11,6 +11,7 @@ namespace Memstate.Test.Models.Redis
     public class ExpirationTests
     {
         [Test]
+        [Ignore("Expiration not yet implemented")]
         public void Expires()
         {
             const string key = "key";

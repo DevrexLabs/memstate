@@ -34,7 +34,13 @@ namespace Memstate.Postgresql.Tests
         [Fact]
         public void DefaultConnectionStringIsUsed()
         {
+            var key = "Memstate:StorageProviders:Postgresql:Password";
             var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresqlSettings.DefaultConnectionString);
+
+            //Appveyor workaround
+            //test failed on Appveyor because the pgsql password env variable is set
+            defaultBuilder.Password = Environment.GetEnvironmentVariable(key) ?? defaultBuilder.Password;
+
             var actualBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.True(defaultBuilder.EquivalentTo(actualBuilder));
         }

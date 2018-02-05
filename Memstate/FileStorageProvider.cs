@@ -6,10 +6,9 @@ namespace Memstate
     public class FileStorageProvider : StorageProvider
     {
         private readonly FileStorageSettings _fileStorageSettings;
-
         private readonly MemstateSettings _settings;
-
         private FileJournalWriter _currentWriter;
+
 
         public FileStorageProvider(MemstateSettings settings)
         {
@@ -32,9 +31,8 @@ namespace Memstate
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             var fileName = _fileStorageSettings.FileName;
-            var pageSize = _fileStorageSettings.PageSize;
 
-            _currentWriter = new FileJournalWriter(_settings, fileName, nextRecordNumber, pageSize);
+            _currentWriter = new FileJournalWriter(_settings, fileName, nextRecordNumber);
 
             return _currentWriter;
         }

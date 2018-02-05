@@ -90,7 +90,7 @@ namespace Memstate.Tests
         {
             var settings = new MemstateSettings();
             var fileName = Path.GetTempFileName();
-            var journalWriter = new FileJournalWriter(settings, fileName, 0, int.MaxValue);
+            var journalWriter = new FileJournalWriter(settings, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
             var sub = subSource.Subscribe(0, records.Add);

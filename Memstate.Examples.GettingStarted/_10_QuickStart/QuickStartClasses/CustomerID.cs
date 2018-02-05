@@ -9,7 +9,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
         {
             ID = iD;
         }
-        public int ID { get; }
-        public override int GetHashCode() { return ID;}
+        public int ID { get; set; }
+        public override int GetHashCode() { return ID; }
     }
 }

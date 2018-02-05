@@ -19,12 +19,13 @@
         //[JsonProperty]
         public int Points { get; private set; }
 
-        public Customer Execute(LoyaltyDB model)
+        public override Customer Execute(LoyaltyDB model)
         {
             var customer = model.Customers[ID];
             var newPoints = customer.LoyaltyPointBalance - Points;
-            customer = new Customer(ID, newPoints);
-            return customer;
+            var customerWithNewBalance = new Customer(ID, newPoints);
+            model.Customers[ID] = customerWithNewBalance;
+            return customerWithNewBalance;
         }
     }
 

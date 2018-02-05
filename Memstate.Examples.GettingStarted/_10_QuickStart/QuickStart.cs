@@ -20,7 +20,8 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             // ------------------
             var settings = new MemstateSettings
             {
-                FileSystem = fileSystem
+                FileSystem = fileSystem,
+
             };
 
             var model = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
@@ -33,8 +34,8 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             var id1 = new CustomerID(1);
             var id2 = new CustomerID(2);
 
-            for (int i = 1; i < 20; i++)
-            { 
+            for (int i = 1; i < 21; i++)
+            {
                 await model.ExecuteAsync(new EarnPointsCommand(id1, 3));
                 await model.ExecuteAsync(new SpendPointsCommand(id1, 1));
                 await model.ExecuteAsync(new EarnPointsCommand(id2, 1));
@@ -44,9 +45,10 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
 
             // executing queries
             // -----------------
+            
             var customers = await model.ExecuteAsync(new GetCustomersQuery(id1, id2));
             Assert.AreEqual(40, customers[id1].LoyaltyPointBalance);
-            Assert.AreEqual(40, customers[id2].LoyaltyPointBalance);
+            Assert.AreEqual(20, customers[id2].LoyaltyPointBalance);
 
             // Now, demonstrate that the model has been persisted to disk
             // await model.DisposeAsync();

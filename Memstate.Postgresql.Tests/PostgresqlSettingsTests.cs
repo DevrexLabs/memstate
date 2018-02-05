@@ -1,14 +1,14 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 using Xunit.Abstractions;
+using Npgsql;
 
 namespace Memstate.Postgresql.Tests
 {
     public class PostgresqlSettingsTests
     {
         private readonly PostgresqlSettings _settings;
-
         private readonly MemstateSettings _memstateSettings;
-
         private readonly ITestOutputHelper _log;
 
         public PostgresqlSettingsTests(ITestOutputHelper log)
@@ -47,6 +47,46 @@ namespace Memstate.Postgresql.Tests
         public void TableNameStartsWithStreamName()
         {
             Assert.StartsWith(_memstateSettings.StreamName, _settings.Table);
+        }
+
+        [Fact]
+        public void HostOverridesConnectionString()
+        {
+            var expected = Guid.NewGuid().ToString();
+            _settings.Host = expected;
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            Assert.Equal(expected, connectionStringBuilder.Host);
+            Assert.Contains(expected, connectionStringBuilder.ToString());
+        }
+
+        [Fact]
+        public void PasswordOverridesConnectionString()
+        {
+            var expected = Guid.NewGuid().ToString();
+            _settings.Password = expected;
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            Assert.Equal(expected, connectionStringBuilder.Password);
+            Assert.Contains(expected, connectionStringBuilder.ToString());
+        }
+
+        [Fact]
+        public void UsernameOverridesConnectionString()
+        {
+            var expected = Guid.NewGuid().ToString();
+            _settings.Username = expected;
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            Assert.Equal(expected, connectionStringBuilder.Username);
+            Assert.Contains(expected, connectionStringBuilder.ToString());
+        }
+
+        [Fact]
+        public void DatabaseOverridesConnectionString()
+        {
+            var expected = Guid.NewGuid().ToString();
+            _settings.Database = expected;
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            Assert.Equal(expected, connectionStringBuilder.Database);
+            Assert.Contains(expected, connectionStringBuilder.ToString());
         }
     }
 }

@@ -11,5 +11,6 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
         }
         public int ID { get; set; }
         public override int GetHashCode() { return ID; }
+        public override string ToString() => $"{ID,0000}";
     }
 }

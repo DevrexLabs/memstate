@@ -20,5 +20,6 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 
         public int LoyaltyPointBalance { get; }
 
+        public override string ToString() => $"{ID}, {LoyaltyPointBalance} points";
     }
 }

@@ -1,0 +1,25 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+init:
+- ps: >-
+    wget https://eventstore.org/downloads/EventStore-OSS-Win-v4.1.0.zip -o c:\eventstore.zip
+
+    expand-archive c:\eventstore.zip c:\eventstore
+
+    start-process c:\eventstore\EventStore.ClusterNode.exe
+environment:
+  Memstate:StorageProviders:Postgresql:Password: Password12!
+services: postgresql
+before_build:
+- cmd: dotnet restore
+build:
+  verbosity: minimal
+before_test:
+- cmd: SET Memstate:StorageProviders:Postgresql:Password=Password12!
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/aaafc554375bbf8b6a4a
+  method: POST
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true

@@ -22,8 +22,8 @@ Create a class that derives from `Model` and add members to hold data, usually c
 ## Create commands
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-- example : [EarnPointsCommand.cs](QuickStartClasses/EarnPointsCommand.cs)
-- example : [SpendPointsCommand.cs](QuickStartClasses/SpendPointsCommand.cs)
+- example : [EarnPointsCommand.cs](QuickStartClasses/Commands/EarnPoints.cs)
+- example : [SpendPointsCommand.cs](QuickStartClasses/Commands/SpendPoints.cs)
 
 ## Hosting the engine
 `new EngineBuilder(settings).BuildAsync<T>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
@@ -46,7 +46,7 @@ db.Execute(new EarnPoints(id, 100));
 ```
 
 ## Executing queries
-You can use either ad-hoc linq queries passed as lambdas to the engine or you can write strongly typed query classes.
+You can  write strongly typed query classes.
 
 ```csharp
 

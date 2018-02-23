@@ -14,8 +14,12 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <RepositoryUrl>http://github.com/DevrexLabs/memstate</RepositoryUrl>
     <PackageProjectUrl>http://github.com/DevrexLabs/memstate</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>

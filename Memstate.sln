@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Benchmarks", "Memstate.Benchmarks\Memstate.Benchmarks.csproj", "{DC012469-986E-4953-9E95-BCCF7CD3745A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Examples.GettingStarted", "Memstate.Examples.GettingStarted\Memstate.Examples.GettingStarted.csproj", "{F7FA464E-B543-4F02-9DBD-930CF26D4D6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.GettingStarted", "Memstate.Examples.GettingStarted\Memstate.Examples.GettingStarted.csproj", "{F7FA464E-B543-4F02-9DBD-930CF26D4D6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

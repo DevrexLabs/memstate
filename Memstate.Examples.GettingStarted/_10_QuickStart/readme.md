@@ -109,3 +109,5 @@ Customer[] customers = engine.Execute(new Top10Customers());
 ## Summary
 
 We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.
+
+* For a full end to end working example, see [QuickStart.cs](QuickStart.cs)

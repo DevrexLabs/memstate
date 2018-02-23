@@ -67,6 +67,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             Assert.AreEqual(20, allCustomers.Count);
             Assert.AreEqual(200, allCustomers[5].LoyaltyPointBalance);
             Assert.AreEqual(300, allCustomers[12].LoyaltyPointBalance);
+
             await model2.DisposeAsync();
         }
 

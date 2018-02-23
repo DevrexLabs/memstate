@@ -49,15 +49,8 @@ db.Execute(new EarnPoints(id, 100));
 You can use either ad-hoc linq queries passed as lambdas to the engine or you can write strongly typed query classes.
 
 ```csharp
-// can't serialize lambdas, need local engine
-var localEngine = (ILocalEngine<TaskModel>) engine;
 
-//ad-hoc lambda query
-var tasksDue = localEngine.Execute(db => db.Todos
-  .Where(t => DateTime.Today > t.DueBy)
-  .OrderByDesc(t => t.DueDy).ToArray());
-
-// executing a strongly typed query
+// executing a query
 [Serializable]
 public class Top10Customers : Query<LoyaltyDB, Customer[]>
 {
@@ -68,7 +61,7 @@ public class Top10Customers : Query<LoyaltyDB, Customer[]>
     }
 }
 
-var customers = engine.Execute(new Top10Customers());
+Customer[] customers = engine.Execute(new Top10Customers());
 ```
 
 ## Summary

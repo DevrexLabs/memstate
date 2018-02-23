@@ -23,6 +23,7 @@
             var newPoints = customer.LoyaltyPointBalance - Points;
             var customerWithNewBalance = new Customer(ID, newPoints);
             model.Customers[ID] = customerWithNewBalance;
+            // It is safe to return live customer objects, because customer is immutable.
             return customerWithNewBalance;
         }
     }

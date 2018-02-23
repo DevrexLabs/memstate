@@ -17,15 +17,17 @@ The Memstate.Core library is a single assembly. Grab the latest Memstate.Core.dl
 
 Create a class that derives from `Model` and add members to hold data, usually collections. Mark the class and any referenced types with the `Serializable` attribute. An instance of this class is your in-memory database.
 
-- example : [LoyaltyDB.cs](QuickStartClasses/LoyaltyDB.cs)
+* example : [LoyaltyDB.cs](QuickStartClasses/LoyaltyDB.cs)
 
 ## Create commands
+
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-- example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
-- example : [SpendPoints.cs](QuickStartClasses/Commands/SpendPoints.cs)
+* example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
+* example : [SpendPoints.cs](QuickStartClasses/Commands/SpendPoints.cs)
 
 ## Hosting the engine
+
 `new EngineBuilder(settings).BuildAsync<T>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
 
 ```csharp
@@ -34,18 +36,22 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 ```
 
 ## Executing commands
+
 Create a command object and pass it to the engine for execution:
 
 ```csharp
 // The engine will execute the command against the model and persist to the command journal.
 
 int id =1;
-await db.ExecuteAsync(new EarnPoints(id, 100));
+var customer = await db.ExecuteAsync(new EarnPoints(id, 100));
+Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points.");
+
 // or
-db.Execute(new EarnPoints(id, 100));
+var customer = db.Execute(new EarnPoints(id, 100));
 ```
 
 ## Executing queries
+
 You can  write strongly typed query classes.
 
 ```csharp
@@ -65,4 +71,5 @@ Customer[] customers = engine.Execute(new Top10Customers());
 ```
 
 ## Summary
+
 We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.

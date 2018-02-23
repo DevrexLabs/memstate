@@ -1,21 +1,20 @@
-﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
+﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Commands
 {
 
-    public class EarnPointsCommand : Command<LoyaltyDB, Customer>
+    public class EarnPoints : Command<LoyaltyDB, Customer>
     {
-        public EarnPointsCommand()
+        public EarnPoints()
         {
         }
 
-        public EarnPointsCommand(int id, int points)
+        public EarnPoints(int id, int points)
         {
             ID = id;
             Points = points;
         }
 
-        public int ID { get; private set; }
-
-        public int Points { get; private set; }
+        public int ID { get; }
+        public int Points { get; }
 
         public override Customer Execute(LoyaltyDB model)
         {

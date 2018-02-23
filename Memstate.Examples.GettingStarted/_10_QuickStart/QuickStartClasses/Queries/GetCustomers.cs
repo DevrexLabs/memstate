@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
+namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Queries
 {
 
-    public class GetCustomersQuery : Query<LoyaltyDB, Dictionary<int, Customer>>
+    public class GetCustomers : Query<LoyaltyDB, Dictionary<int, Customer>>
     {
-        public GetCustomersQuery(){ 
+        public GetCustomers(){ 
         }
 
-        public GetCustomersQuery(params int[] ids)
+        public GetCustomers(params int[] ids)
         {
             IDs = ids;
         }

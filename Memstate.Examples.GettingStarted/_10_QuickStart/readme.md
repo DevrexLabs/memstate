@@ -26,10 +26,11 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 - example : [SpendPointsCommand.cs](QuickStartClasses/SpendPointsCommand.cs)
 
 ## Hosting the engine
-`Engine.For<M>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
+`new EngineBuilder(settings).BuildAsync<T>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
 
 ```csharp
-IEngine<TaskModel> engine = Engine.For<CustomerModel>();
+  var settings = new MemstateSettings { StreamName = "LoyaltyDbFile" };
+  var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
 ```
 
 ## Executing commands
@@ -38,10 +39,10 @@ Create a command object and pass it to the engine for execution:
 ```csharp
 // The engine will execute the command against the model and persist to the command journal.
 
-var id = new CustomerID(1);
-await model.ExecuteAsync(new EarnPoints(id, 100));
+int id =1;
+await db.ExecuteAsync(new EarnPoints(id, 100));
 // or
-model.Execute(new EarnPoints(id, 100));
+db.Execute(new EarnPoints(id, 100));
 ```
 
 ## Executing queries
@@ -52,7 +53,7 @@ You can use either ad-hoc linq queries passed as lambdas to the engine or you ca
 var localEngine = (ILocalEngine<TaskModel>) engine;
 
 //ad-hoc lambda query
-var tasksDue = localEngine.Execute(db => db.Tasks
+var tasksDue = localEngine.Execute(db => db.Todos
   .Where(t => DateTime.Today > t.DueBy)
   .OrderByDesc(t => t.DueDy).ToArray());
 

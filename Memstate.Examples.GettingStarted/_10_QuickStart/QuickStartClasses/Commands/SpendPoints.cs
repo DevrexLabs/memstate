@@ -1,13 +1,13 @@
-﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
+﻿namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Commands
 {
 
-    public class SpendPointsCommand : Command<LoyaltyDB, Customer>
+    public class SpendPoints : Command<LoyaltyDB, Customer>
     {
-        public SpendPointsCommand()
+        public SpendPoints()
         {
         }
 
-        public SpendPointsCommand(int id, int points)
+        public SpendPoints(int id, int points)
         {
             ID = id;
             Points = points;

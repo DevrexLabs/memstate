@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses;
+using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Commands;
+using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Queries;
 using NUnit.Framework;
 using Wire.Compilation;
 
@@ -35,7 +37,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             Print("AND I initialise the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
-                await model1.ExecuteAsync(new InitCustomerCommand(i + 1, 10));
+                await model1.ExecuteAsync(new InitCustomer(i + 1, 10));
             }
 
             Print("THEN a journal file should now exist on the filesystem");
@@ -43,8 +45,8 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
 
             Print("WHEN customer 5 and customer 12 each earn 190 and 290 loyalty points respectively");
 
-            var c1 = await model1.ExecuteAsync(new EarnPointsCommand(5, 190));
-            var c2 = await model1.ExecuteAsync(new EarnPointsCommand(12, 290));
+            var c1 = await model1.ExecuteAsync(new EarnPoints(5, 190));
+            var c2 = await model1.ExecuteAsync(new EarnPoints(12, 290));
 
             Print("THEN the balance for them will have increased to 200 and 300 loyalty points for customer 5 and 12 respectively");
             Assert.AreEqual(200, c1.LoyaltyPointBalance);
@@ -60,7 +62,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             var model2 = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            var allCustomers = await model2.ExecuteAsync(new GetAllCustomersQuery());
+            var allCustomers = await model2.ExecuteAsync(new AllCustomers());
 
             Print("AND the database should be restored to the exact same state it was after the last command was executed");
             Assert.AreEqual(20, allCustomers.Count);

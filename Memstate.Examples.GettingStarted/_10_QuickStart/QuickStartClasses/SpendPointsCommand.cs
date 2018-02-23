@@ -7,16 +7,14 @@
         {
         }
 
-        public SpendPointsCommand(CustomerID id, int points)
+        public SpendPointsCommand(int id, int points)
         {
             ID = id;
             Points = points;
         }
 
-        //[JsonProperty]
-        public CustomerID ID { get; private set; }
+        public int ID { get; private set; }
 
-        //[JsonProperty]
         public int Points { get; private set; }
 
         public override Customer Execute(LoyaltyDB model)

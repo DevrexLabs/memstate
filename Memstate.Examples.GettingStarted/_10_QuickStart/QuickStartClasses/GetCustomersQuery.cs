@@ -4,22 +4,22 @@ using System.Collections.Generic;
 namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
 {
 
-    public class GetCustomersQuery : Query<LoyaltyDB, Dictionary<CustomerID, Customer>>
+    public class GetCustomersQuery : Query<LoyaltyDB, Dictionary<int, Customer>>
     {
         public GetCustomersQuery(){ 
         }
 
-        public GetCustomersQuery(params CustomerID[] ids)
+        public GetCustomersQuery(params int[] ids)
         {
             IDs = ids;
         }
 
-        public CustomerID[] IDs { get; private set; }
+        public int[] IDs { get; private set; }
 
         // It is safe to return live customer objects, because customer is immutable.
-        public override Dictionary<CustomerID, Customer> Execute(LoyaltyDB model)
+        public override Dictionary<int, Customer> Execute(LoyaltyDB model)
         {
-            var customers = new Dictionary<CustomerID, Customer>();
+            var customers = new Dictionary<int, Customer>();
             foreach (var id in IDs)
             {
                 if (model.Customers.ContainsKey(id))

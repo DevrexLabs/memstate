@@ -1,13 +1,13 @@
+using NUnit.Framework;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+
 namespace Memstate.Tests
 {
-    using System.Collections.Concurrent;
-    using System.Threading.Tasks;
-
-    using Xunit;
-
+    [TestFixture]
     public class BatcherTests
     {
-        [Fact]
+        [Test]
         public async Task Batcher_terminates_when_disposed()
         {
             var config = new MemstateSettings();
@@ -15,7 +15,7 @@ namespace Memstate.Tests
             await batcher.DisposeAsync().ConfigureAwait(false);
         }
 
-        [Fact]
+        [Test]
         public void TryTake_returns_false_when_marked_for_completion()
         {
             var blockingCollection = new BlockingCollection<int>();

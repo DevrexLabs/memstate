@@ -64,7 +64,7 @@ namespace Memstate.Tests
         }
 
         [MemberData(nameof(PayloadSizes))]
-        [Theory(Skip = "skip")]
+        [Theory(Skip="doesn't terminate")]
         public async void When_stream_is_blocked_cancelling_throws_a_TaskCancelledException(int payloadSize)
         {
             //Arrange

@@ -1,4 +1,5 @@
 ﻿using System;
+using Npgsql;
 
 namespace Memstate.Postgresql
 {
@@ -6,21 +7,57 @@ namespace Memstate.Postgresql
     {
         public const string ConfigurationKey = "StorageProviders:Postgresql";
 
-        public const string DefaultConnectionString = "Host=localhost; Database=postgres; User ID=postgres; Password=postgres;";
+        public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
         public const string InitSqlResourceName = "Memstate.Postgresql.init_sql";
 
         private readonly MemstateSettings _memstateSettings;
 
+        private string _connectionStringTemplate = DefaultConnectionString;
+
         public PostgresqlSettings(MemstateSettings settings)
             : base(settings, ConfigurationKey)
         {
             Ensure.NotNull(settings, nameof(settings));
-
             _memstateSettings = settings;
         }
 
-        public string ConnectionString { get; set; } = DefaultConnectionString;
+        /// <summary>
+        /// Password to connect to the database, overrides value in ConnectionString if set
+        /// </summary>
+        public string Password { get; set; }
+
+        /// <summary>
+        /// Username to connect to the database, overrides value in ConnectionString if set
+        /// </summary>
+        public string Username { get; set; }
+
+        /// <summary>
+        /// Name of the database, overrides value in ConnectionString if set
+        /// </summary>
+        public string Database { get; set; }
+
+        /// <summary>
+        /// Name of host to connect to, overrides value in ConnectionString if set
+        /// </summary>
+        public string Host { get; set; }
+
+        public string ConnectionString
+        {
+            get
+            {
+                var builder = new NpgsqlConnectionStringBuilder(_connectionStringTemplate);
+                if (Host != null) builder.Host = Host;
+                if (Username != null) builder.Username = Username;
+                if (Database != null) builder.Database = Database;
+                if (Password != null) builder.Password = Password;
+                return builder.ToString();
+            }
+            set
+            {
+                _connectionStringTemplate = value;
+            }
+        }
 
         public string TableSuffix { get; set; } = "_commands";
 

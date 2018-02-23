@@ -1,16 +1,19 @@
-﻿namespace Memstate.Tests.Proxy
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Xunit;
+﻿using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Memstate.Tests.Proxy
+{
+
+    [TestFixture]
     public class ProxyTest
     {
-        private readonly ITestModel _proxy;
-        private readonly Engine<ITestModel> _engine;
+        private ITestModel _proxy;
+        private Engine<ITestModel> _engine;
 
-        public ProxyTest()
+        [SetUp]
+        public void Setup()
         {
             var config = new MemstateSettings().WithInmemoryStorage();
             ITestModel model = new TestModel();
@@ -18,60 +21,63 @@
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 
-        [Fact]
+        [Test]
         public void CanSetProperty()
         {
             int expected = _proxy.CommandsExecuted + 1;
             _proxy.MyProperty = 42;
-            Assert.Equal(expected, _proxy.CommandsExecuted);
+            Assert.AreEqual(expected, _proxy.CommandsExecuted);
         }
 
-        [Fact]
+        [Test]
         public void CanExecuteCommandMethod()
         {
             _proxy.IncreaseNumber();
-            Assert.Equal(1, _proxy.CommandsExecuted);
+            Assert.AreEqual(1, _proxy.CommandsExecuted);
         }
 
-        [Fact]
+        [Test]
         public void CanExecuteCommandWithResultMethod()
         {
-            Assert.Equal("MEMSTATE", _proxy.Uppercase("memstate"));
-            Assert.Equal(1, _proxy.CommandsExecuted);
+            Assert.AreEqual("MEMSTATE", _proxy.Uppercase("memstate"));
+            Assert.AreEqual(1, _proxy.CommandsExecuted);
         }
 
-        [Fact]
+        [Test]
+        [Ignore("Isolation is yet to be implemented")]
         public void ThrowsExceptionOnYieldQuery()
         {
-            Assert.ThrowsAny<Exception>(() => _proxy.GetNames().Count());
+            Assert.Throws<Exception>(() => _proxy.GetNames().Count());
         }
 
-        [Fact]
+        [Test]
         public void CanExecuteQueryMethod()
         {
             var number = _proxy.GetCommandsExecuted();
-            Assert.Equal(0, number);
+            Assert.AreEqual(0, number);
         }
 
-        [Fact]
+        [Test]
+        [Ignore("Isolation is yet to be implemented")]
         public void QueryResultsAreCloned()
         {
             _proxy.AddCustomer("Robert");
             Customer robert = _proxy.GetCustomers().First();
             Customer robert2 = _proxy.GetCustomers().First();
-            Assert.NotEqual(robert, robert2);
+            Assert.AreNotEqual(robert, robert2);
         }
 
-        [Fact]
+        [Test]
         public void SafeQueryResultsAreNotCloned()
         {
             _proxy.AddCustomer("Robert");
             Customer robert = _proxy.GetCustomersCloned().First();
             Customer robert2 = _proxy.GetCustomersCloned().First();
-            Assert.Equal(robert, robert2);
+            Assert.AreEqual(robert, robert2);
         }
 
-        [Fact]
+        [Test]
+        [Ignore("Isolation is yet to be designed")]
         public void ResultIsIsolated_attribute_is_recognized()
         {
             var map = MethodMap.MapFor<MethodMapTests.TestModel>();
@@ -80,72 +86,73 @@
             Assert.True(operationInfo.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
         }
 
-        [Fact]
-        public void GenericQuery()
+        [Test]
+        [Ignore("Isolation is yet to be designed and implemented")]
+        public void Query_result_is_cloned()
         {
             var customer = new Customer();
             var clone = _proxy.GenericQuery(customer);
-            Assert.NotSame(clone, customer);
-            Assert.IsType<Customer>(clone);
+            Assert.AreNotSame(clone, customer);
+            Assert.IsInstanceOf<Customer>(clone);
         }
 
-        [Fact]
+        [Test]
         public void GenericCommand()
         {
             _proxy.GenericCommand(DateTime.Now);
-            Assert.Equal(1, _proxy.CommandsExecuted);
+            Assert.AreEqual(1, _proxy.CommandsExecuted);
         }
 
-        [Fact]
+        [Test]
         public void ComplexGeneric()
         {
             double result = _proxy.ComplexGeneric(new KeyValuePair<string, double>("dog", 42.0));
-            Assert.Equal(42.0, result, precision: 4);
-            Assert.Equal(1, _proxy.CommandsExecuted);
+            Assert.AreEqual(42.0, result, 0.0001);
+            Assert.AreEqual(1, _proxy.CommandsExecuted);
         }
 
-        [Fact]
+        [Test]
         public void Indexer()
         {
             _proxy.AddCustomer("Homer");
-            Assert.Equal(1, _proxy.CommandsExecuted);
+            Assert.AreEqual(1, _proxy.CommandsExecuted);
 
             var customer = _proxy[0];
-            Assert.Equal("Homer", customer.Name);
+            Assert.AreEqual("Homer", customer.Name);
 
             customer.Name = "Bart";
             _proxy[0] = customer;
-            Assert.Equal(2, _proxy.CommandsExecuted);
+            Assert.AreEqual(2, _proxy.CommandsExecuted);
             var customers = _proxy.GetCustomers();
             Assert.True(customers.Single().Name == "Bart");
         }
 
-        [Fact]
+        [Test]
         public void DefaultArgs()
         {
             var result = _proxy.DefaultArgs(10, 10);
-            Assert.Equal(62, result);
+            Assert.AreEqual(62, result);
 
             result = _proxy.DefaultArgs(10, 10, 10);
-            Assert.Equal(30, result);
+            Assert.AreEqual(30, result);
         }
 
-        [Fact]
+        [Test]
         public void NamedArgs()
         {
             var result = _proxy.DefaultArgs(b: 4, a: 2);
-            Assert.Equal(48, result);
+            Assert.AreEqual(48, result);
         }
 
-        [Fact]
+        [Test]
         public void ExplicitGeneric()
         {
             var dt = _proxy.ExplicitGeneric<DateTime>();
-            Assert.IsType<DateTime>(dt);
-            Assert.Equal(default(DateTime), dt);
+            Assert.IsInstanceOf<DateTime>(dt);
+            Assert.AreEqual(default(DateTime), dt);
         }
 
-        [Fact]
+        [Test]
         public void Proxy_throws_InnerException()
         {
             Assert.Throws<CommandAbortedException>(() =>

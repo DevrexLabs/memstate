@@ -1,14 +1,14 @@
-using System;
+
+using Memstate.JsonNet;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Memstate.JsonNet;
-using Xunit;
-using Xunit.Abstractions;
+using System.Threading.Tasks;
 
 namespace Memstate.Tests
 {
-    using System.Threading.Tasks;
+    using Memstate.Wire;
 
     class AddStringCommand : Command<List<string>, int>
     {
@@ -26,44 +26,39 @@ namespace Memstate.Tests
         }
     }
 
+    [TestFixture]
     public class CommandTests
     {
         public static IEnumerable<object[]> Serializers()
         {
             yield return new object[] {new JsonSerializerAdapter()};
+            yield return new object[] {new WireSerializerAdapter(new MemstateSettings())};
         }
 
-        [MemberData(nameof(Serializers))]
-        [Theory]
+        [TestCaseSource(nameof(Serializers))]
+        [Test]
         public void Command_keeps_id_after_serialization(ISerializer serializer)
         {
             var original = new AddStringCommand("dummy");
             var clone = serializer.Clone(original);
-            Assert.Equal(original.Id, clone.Id);
+            Assert.AreEqual(original.Id, clone.Id);
         }
     }
 
+    [TestFixture]
     public class SmokeTests
     {
-        private readonly ITestOutputHelper _log;
-
-        public SmokeTests(ITestOutputHelper log)
-        {
-            _log = log;
-        }
-
-        [Fact]
-        public void Test1()
+        [Test]
+        public void KernelCanExecuteCommand()
         {
             var config = new MemstateSettings();
             var model = new List<string>();
             Kernel k = new Kernel(config, model);
             var numStrings = (int) k.Execute(new AddStringCommand(string.Empty), e => { });
-            Assert.Equal(1, numStrings);
-            _log.WriteLine("hello test");
+            Assert.AreEqual(1, numStrings);
         }
 
-        [Fact]
+        [Test]
         public void SmokeTest()
         {
             var config = new MemstateSettings();
@@ -81,16 +76,16 @@ namespace Memstate.Tests
 
             foreach (var task in tasks)
             {
-                Assert.Equal(expected++, task.Result);
+                Assert.AreEqual(expected++, task.Result);
             }
         }
 
-        [Fact]
+        [Test]
         public async Task FileJournalSmokeTest()
         {
             var settings = new MemstateSettings();
             var fileName = Path.GetTempFileName();
-            var journalWriter = new FileJournalWriter(settings, fileName, 0, int.MaxValue);
+            var journalWriter = new FileJournalWriter(settings, fileName, 0);
             var subSource = new FileJournalSubscriptionSource(journalWriter);
             var records = new List<JournalRecord>();
             var sub = subSource.Subscribe(0, records.Add);
@@ -104,7 +99,7 @@ namespace Memstate.Tests
             sub.Dispose();
             subSource.Dispose();
 
-            Assert.Equal(1000, records.Count);
+            Assert.AreEqual(1000, records.Count);
 
 
             var reader = new FileJournalReader(fileName, settings);

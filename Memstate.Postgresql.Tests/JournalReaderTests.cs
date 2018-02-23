@@ -19,10 +19,8 @@ namespace Memstate.Postgresql.Tests
 
         public JournalReaderTests()
         {
-            var settings = new MemstateSettings();
-
+            var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
             _provider = new PostgresqlProvider(settings);
-
             _provider.Initialize();
 
             _journalReader = _provider.CreateJournalReader();
@@ -64,19 +62,10 @@ namespace Memstate.Postgresql.Tests
             {
                 connection.Open();
 
-                command.CommandText = string.Format(
-                    @"
-INSERT INTO {0}
-(
-    command
-)
-VALUES
-(
-    @command
-);",
+                command.CommandText = string.Format("INSERT INTO {0} (command) VALUES(@command);",
                     _provider.Settings.Table);
 
-                command.Parameters.AddWithValue("@command", data);
+                command.Parameters.AddWithValue("@command", Convert.ToBase64String(data));
 
                 Assert.Equal(1, command.ExecuteNonQuery());
             }
@@ -92,14 +81,7 @@ VALUES
                 connection.Open();
 
                 command.CommandText = string.Format(
-                    @"
-SELECT
-    id,
-    written
-FROM
-    {0}
-ORDER BY
-    id ASC;",
+                    "SELECT id, written FROM {0} ORDER BY id ASC;",
                     _provider.Settings.Table);
 
                 using (var reader = command.ExecuteReader())

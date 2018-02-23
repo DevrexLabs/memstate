@@ -11,6 +11,7 @@ namespace Memstate.Test.Models.Redis
     public class ExpirationTests
     {
         [Test]
+        [Ignore("Expiration not yet implemented")]
         public void Expires()
         {
             const string key = "key";
@@ -26,7 +27,7 @@ namespace Memstate.Test.Models.Redis
             Assert.AreEqual(expected.Value, expires);
         }
 
-        [Test]
+        [Test, Ignore("Expiration not implemented")]
         public void ExpiresMultiple()
         {
             var target = new RedisModel();
@@ -70,7 +71,7 @@ namespace Memstate.Test.Models.Redis
         }
 
         [Test]
-        [Ignore("Requires access to Engine from the model.")]
+        [Ignore("Expiration not implemented")]
         public void PurgeTimer()
         {
             var settings = new MemstateSettings();

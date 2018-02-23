@@ -19,12 +19,48 @@ Create a class that derives from `Model` and add members to hold data, usually c
 
 * example : [LoyaltyDB.cs](QuickStartClasses/LoyaltyDB.cs)
 
+```csharp
+    [Serializable]
+    public class LoyaltyDB
+    {
+        public LoyaltyDB() {}
+        public IDictionary<int, Customer> Customers { get; } = new Dictionary<int, Customer>();
+    }
+```
+
 ## Create commands
 
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-* example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
 * example : [SpendPoints.cs](QuickStartClasses/Commands/SpendPoints.cs)
+* example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
+
+```csharp
+    public class EarnPoints : Command<LoyaltyDB, Customer>
+    {
+        public EarnPoints()
+        {
+        }
+
+        public EarnPoints(int id, int points)
+        {
+            ID = id;
+            Points = points;
+        }
+
+        public int ID { get; }
+        public int Points { get; }
+
+        public override Customer Execute(LoyaltyDB model)
+        {
+            var customer = model.Customers[ID];
+            var newPoints = customer.LoyaltyPointBalance + Points;
+            var customerWithNewBalance = new Customer(ID, newPoints);
+            model.Customers[ID] = customerWithNewBalance;
+            return customerWithNewBalance;
+        }
+    }
+```
 
 ## Hosting the engine
 

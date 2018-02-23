@@ -198,9 +198,9 @@ namespace Memstate.Tests
 	        ResultIsIsolated = true;
 	    }
 
-        public override int Execute(TestModel model)
+        public override int Execute(TestModel db)
         {
-            return model.CommandsExecuted;
+            return db.CommandsExecuted;
         }
     }
 

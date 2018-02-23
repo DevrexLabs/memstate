@@ -1,33 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Queries
 {
-
-    public class GetCustomers : Query<LoyaltyDB, Dictionary<int, Customer>>
+    public class GetCustomers : Query<LoyaltyDB, IDictionary<int, Customer>>
     {
-        public GetCustomers(){ 
-        }
-
-        public GetCustomers(params int[] ids)
-        {
-            IDs = ids;
-        }
-
-        public int[] IDs { get; private set; }
-
-        // It is safe to return live customer objects, because customer is immutable.
-        public override Dictionary<int, Customer> Execute(LoyaltyDB model)
-        {
-            var customers = new Dictionary<int, Customer>();
-            foreach (var id in IDs)
-            {
-                if (model.Customers.ContainsKey(id))
-                {
-                    customers[id] = model.Customers[id];
-                }
-            }
-            return customers;
-        }
-}
-
+        public override IDictionary<int, Customer> Execute(LoyaltyDB db) => new Dictionary<int, Customer>(db.Customers);
+    }
 }

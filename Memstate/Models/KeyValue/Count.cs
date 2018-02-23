@@ -6,9 +6,9 @@ namespace Memstate.Models.KeyValue
     /// <typeparam name="T"></typeparam>
     public class Count<T> : Query<KeyValueStore<T>, int>
     {
-        public override int Execute(KeyValueStore<T> model)
+        public override int Execute(KeyValueStore<T> db)
         {
-            return model.Count();
+            return db.Count();
         }
     }
 }

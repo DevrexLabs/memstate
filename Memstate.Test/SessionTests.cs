@@ -135,7 +135,7 @@ namespace Memstate.Tests
 
         internal class FailingQuery : Query<KeyValueStore<int>, int>
         {
-            public override int Execute(KeyValueStore<int> model)
+            public override int Execute(KeyValueStore<int> db)
             {
                 throw new Exception("the innermost exception");
             }

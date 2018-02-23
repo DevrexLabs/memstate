@@ -13,9 +13,9 @@ namespace Memstate.Tests
 
         class AccountsSummed : Query<AccountModel, int>
         {
-            public override int Execute(AccountModel model)
+            public override int Execute(AccountModel db)
             {
-                return model.Values.Sum();
+                return db.Values.Sum();
             }
         }
         class AccountTransfer : Command<AccountModel>

@@ -57,19 +57,18 @@ var tasksDue = localEngine.Execute(db => db.Todos
   .Where(t => DateTime.Today > t.DueBy)
   .OrderByDesc(t => t.DueDy).ToArray());
 
+// executing a strongly typed query
 [Serializable]
-public class TasksDueBefore : Memstate.Core.Query<TaskModel, IEnumerable<Task>>
+public class Top10Customers : Query<LoyaltyDB, Customer[]>
 {
-  public DateTime DueDate{get;set;}
-
-  public IEnumerable<Task> override Execute(TaskModel model)
-  {
-    return model.Tasks.Where(t => DueDate > t.DueBy).ToArray();
-  }
+    public override Customer[] Execute(LoyaltyDB db) {
+        return db.Customers
+            .OrderByDescending(c => c.Value.LoyaltyPointBalance)
+            .Take(10).Select(c => c.Value).ToArray();
+    }
 }
-// executing the strongly typed query
-var query = new TasksDueBefore{DueDate = DateTime.Today.AddDays(1)};
-IEnumerable<Task> tasksDue = engine.Execute(query);
+
+var customers = engine.Execute(new Top10Customers());
 ```
 
 ## Summary

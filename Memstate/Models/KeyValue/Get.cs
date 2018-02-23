@@ -9,9 +9,9 @@
 
         public string Key { get; }
 
-        public override KeyValueStore<T>.Node Execute(KeyValueStore<T> model)
+        public override KeyValueStore<T>.Node Execute(KeyValueStore<T> db)
         {
-            return model.Get(Key);
+            return db.Get(Key);
         }
     }
 }

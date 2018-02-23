@@ -33,7 +33,6 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             Print("   (using Wire format  & local filesystem storage)");
             var settings = new MemstateSettings { StreamName = Filename };
             var model1 = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
-
             Print("AND I initialise the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
@@ -62,7 +61,7 @@ namespace Memstate.Examples.GettingStarted._10_QuickStart
             var model2 = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            var allCustomers = await model2.ExecuteAsync(new AllCustomers());
+            var allCustomers = await model2.ExecuteAsync(new GetCustomers());
 
             Print("AND the database should be restored to the exact same state it was after the last command was executed");
             Assert.AreEqual(20, allCustomers.Count);

@@ -11,9 +11,9 @@ namespace Memstate.Examples.TodoMvc.Domain.Lists
         
         public Guid ListId { get; }
 
-        public override TaskList Execute(TodoModel model)
+        public override TaskList Execute(TodoModel db)
         {
-            var list = model.Lists[ListId];
+            var list = db.Lists[ListId];
 
             return list;
         }

@@ -22,8 +22,8 @@ Create a class that derives from `Model` and add members to hold data, usually c
 ## Create commands
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-- example : [EarnPointsCommand.cs](QuickStartClasses/Commands/EarnPoints.cs)
-- example : [SpendPointsCommand.cs](QuickStartClasses/Commands/SpendPoints.cs)
+- example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
+- example : [SpendPoints.cs](QuickStartClasses/Commands/SpendPoints.cs)
 
 ## Hosting the engine
 `new EngineBuilder(settings).BuildAsync<T>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.

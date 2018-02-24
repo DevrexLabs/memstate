@@ -21,6 +21,23 @@ The benefits of using Memstate are huge:
 * Open source
 * Free for commercial use
 
+**Did we mention how simple Memstate is to use?**
+
+```csharp
+    // host db engine - database will be save to disk as "DemoDatabase.journal"
+    // perfect for xamarin, android, mac, nix, iot, windows, wearable, cloud
+    var settings = new MemstateSettings { StreamName = "DemoDatabase" };
+    var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
+
+    int id = 1;
+    await db.ExecuteAsync(new InitCustomerIfNotExist(id, 10));
+    var customer = await db.ExecuteAsync(new EarnPoints(id, 20));
+    Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points."); 
+
+    var top10 = await db.ExecuteAsync(new Top10Customers());
+    top10.ToList().ForEach(Console.WriteLine);
+```
+
 
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, an LLC based in Sweden.

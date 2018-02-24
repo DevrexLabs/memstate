@@ -1,4 +1,4 @@
-# Quickstart
+# Quickstart Guide
 
 Here's a complete guide to get you started with developing your first Memstate application!
 The following topics are covered:
@@ -50,6 +50,11 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 
         public int ID { get; }
         public int Points { get; }
+
+        // it is safe to return a live customer object linked to the Model because
+        // (1) the class is serializable and a remote client will get a serialized copy
+        // and (2) in this particular case Customer is immutable.
+        // if you have mutable classes, then please rather return a view, e.g. CustomerBalance or CustomerView class 
 
         public override Customer Execute(LoyaltyDB model)
         {
@@ -110,4 +115,4 @@ Customer[] customers = engine.Execute(new Top10Customers());
 
 We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.
 
-* For a full end to end working example, see [QuickStart.cs](QuickStart.cs)
+* For a full end to end working example see [QuickStart.cs](QuickStart.cs)

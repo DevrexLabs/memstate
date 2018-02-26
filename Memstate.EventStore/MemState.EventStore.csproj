@@ -8,7 +8,6 @@
     <Product>Memstate EventStore storage driver</Product>
     <Description>Use the EventStore as a backing store with Memstate.</Description>
     <Copyright>2017 Devrex Labs</Copyright>
-    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="eventstore.clientapi.netcore" Version="4.0.0-alpha-1" />

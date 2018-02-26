@@ -26,7 +26,7 @@ The benefits of using Memstate are huge:
 ```csharp
     // host db engine using default settings - database will be save to disk as "DemoDatabase.journal"  
     var settings = new MemstateSettings { StreamName = "DemoDatabase" };
-    var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
+    var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>();
 
     int id = 1;
     await db.ExecuteAsync(new InitCustomerIfNotExist(id, 10));
@@ -48,23 +48,23 @@ Devrex Labs provide commercial support and consulting services for OrigoDB and M
 ## Background and Objectives
 Devrex Labs also maintain OrigoDB, an in-memory database engine for .NET Framework. Memstate is a redesign based on our experience building and working with OrigoDB, taking the best parts, learning from mistakes and setting some new objectives.
 
-* **Performance** - OrigoDB will max out at 3K writes per second (WPS). With Memstate we're aiming at 100K WPS, which we almost reached our POC. Note that this is *write* operations, bounded by disk i/o. Read operations are cpu bound and in the millions per second depending on how complex the model is.
+* **Performance** - We're aiming at 100K WPS, which we almost reached our POC. Note that this is *write* operations, bounded by disk i/o. Read operations are cpu bound and in the millions per second depending on how complex the model is. (OrigoDB will max out at 3K writes per second (WPS).)
 
-* **Simplified Replication** - OrigoDB Server has it's own replicated state machine implementation with a designated primary and a number of replicas. There is no (solid) leader election or consensus algorithm in place, changing server roles is a manual process. Memstate relies on a distributed backing store for message ordering such as EventStore, Kafka or Kinesis. Each node simply subscribes to the stream of commands from the underlying backing store and isn't aware of the other nodes. There is no primary, each node can process both commands and queries. 
+* **Simplified Replication** - Memstate relies on a distributed backing store for message ordering such as EventStore, Kafka or Kinesis. Each node simply subscribes to the stream of commands from the underlying backing store and isn't aware of the other nodes. There is no primary, each node can process both commands and queries. (Compared to OrigoDB Server which has it's own replicated state machine implementation with a designated primary and a number of replicas. There is no (solid) leader election or consensus algorithm in place, changing server roles is a manual process. )
 
     This new replication scheme has higher availability (because any node can accept writes) at the expense of some consistency: 
 
-* **Server and Engine integrated in same project** - OrigoDB server is a commercial product based on the engine. It ships with the engine version it was compiled against, a source of many headaches. Memstate server and engine are now in the same libary and tested together.
+* **Server and Engine integrated in same project** - Memstate server and engine are now in the same libary and tested together. With OrigoDB the server is a commercial product based on the engine. It ships with the engine version it was compiled against, a source of many headaches. 
 
-* **Multi-platform support** - OrigoDB runs on .NET Framework only after dropping support for mono a few years ago. Memstate is a .NET Standard 1.6 library.
+* **Multi-platform support** - Memstate is a .NET Standard 1.6 library. OrigoDB runs on .NET Framework only after dropping support for mono a few years ago. 
 
-* **Interoperability** - OrigoDB relies heavily on `BinaryFormatter`, which is the default wire and disk format. Origo does support protobuf and newtonsoftjson and it can also expose an http api endpoint to the model. With Memstate we hope to take this even further.
+* **Interoperability** - Origo supports protobuf and newtonsoftjson and it can also expose an http api endpoint to the model and we hope to take this even further. OrigoDB relies heavily on `BinaryFormatter`, which is the default wire and disk format. 
 
-* **Streaming** - OrigoDB results needed to be fully transferred to the client before processing could begin. With Memstate, we are aiming to support streaming when the result type is `IEnumerable`.
+* **Streaming** - We are aiming to support streaming when the result type is `IEnumerable`. OrigoDB results needed to be fully transferred to the client before processing could begin. 
 
 * **Reactive** - Command execution triggers sytem and user-defined events which are pushed to subscribing tcp clients.
 
-* **Async processing model** - OrigoDB `Engine.Execute(Command)` is a blocking call that will serialize, append and flush the command to the log before executing. This imposes an ultimate limit on the number of commands per second processed. Internally, the OrigoDB engine is thread safe but does not spawn any threads or tasks of it's own. In order to achieve higher throughput, Memstate writes and flushes commands in batches, using heavily on async/await all the way to the core.
+* **Async processing model** - In order to achieve higher throughput, Memstate writes and flushes commands in batches, using heavily on async/await all the way to the core. OrigoDB `Engine.Execute(Command)` is a blocking call that will serialize, append and flush the command to the log before executing. This imposes an ultimate limit on the number of commands per second processed. Internally, the OrigoDB engine is thread safe but does not spawn any threads or tasks of it's own. 
 
 * **Cloud ready** - solid support for monitoring, control, observability, cloud based storage, prebaked VM images on Azure and AWS.
 

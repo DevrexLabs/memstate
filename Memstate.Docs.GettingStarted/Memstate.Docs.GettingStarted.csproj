@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <StartupObject></StartupObject>
+    <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="microsoft.net.test.sdk" Version="15.5.0" />
+    <PackageReference Include="nunit" Version="3.9.0" />
+    <PackageReference Include="nunit3testadapter" Version="3.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+    <ProjectReference Include="..\Memstate\Memstate.csproj" />
+  </ItemGroup>
+
+</Project>

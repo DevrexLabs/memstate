@@ -18,7 +18,7 @@ namespace Memstate
 
         public Type[] GenericTypeArguments { get; set; }
 
-        public override object Execute(T model)
+        public override object Execute(T db)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace Memstate
                     method = method.MakeGenericMethod(GenericTypeArguments);
                 }
 
-                return method.Invoke(model, Arguments);
+                return method.Invoke(db, Arguments);
             }
             catch (TargetInvocationException ex)
             {

@@ -52,7 +52,7 @@ Devrex Labs also maintain OrigoDB, an in-memory database engine for .NET Framewo
 
 * **Simplified Replication** - Memstate relies on a distributed backing store for message ordering such as EventStore, Kafka or Kinesis. Each node simply subscribes to the stream of commands from the underlying backing store and isn't aware of the other nodes. There is no primary, each node can process both commands and queries. (Compared to OrigoDB Server which has it's own replicated state machine implementation with a designated primary and a number of replicas. There is no (solid) leader election or consensus algorithm in place, changing server roles is a manual process. )
 
-    This new replication scheme has higher availability (because any node can accept writes) at the expense of some consistency: 
+    Memstate's new replication scheme has higher availability (because any node can accept writes) at the expense of some consistency: 
 
 * **Server and Engine integrated in same project** - Memstate server and engine are now in the same libary and tested together. With OrigoDB the server is a commercial product based on the engine. It ships with the engine version it was compiled against, a source of many headaches. 
 

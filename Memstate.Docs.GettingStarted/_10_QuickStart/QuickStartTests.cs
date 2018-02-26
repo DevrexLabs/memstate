@@ -1,16 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses;
-using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Commands;
-using Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses.Queries;
+using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses;
+using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Commands;
+using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Queries;
 using NUnit.Framework;
-using Wire.Compilation;
 
-namespace Memstate.Examples.GettingStarted._10_QuickStart
+namespace Memstate.Docs.GettingStarted._10_QuickStart
 {
-    public class QuickStart
+    public class QuickStartTests
     {
         private string Filename = "smoke_test_with_defaults";
         private string JournalFile = "smoke_test_with_defaults.journal";

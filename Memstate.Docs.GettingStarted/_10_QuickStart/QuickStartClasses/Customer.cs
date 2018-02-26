@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memstate.Examples.GettingStarted._10_QuickStart.QuickStartClasses
+namespace Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses
 {
     [Serializable]
     public class Customer

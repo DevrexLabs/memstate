@@ -39,7 +39,7 @@ The benefits of using Memstate are huge:
 
 ## Quickstart - getting started
 
-[Full quick start getting started sample code here...](/Memstate.Examples.GettingStarted/_10_QuickStart)
+[Full quick start getting started sample code here...](/Memstate.Docs.GettingStarted/_10_QuickStart)
 
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, an LLC based in Sweden.

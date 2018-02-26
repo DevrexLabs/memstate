@@ -27,6 +27,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Benchmarks", "Mems
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.GettingStarted", "Memstate.Examples.GettingStarted\Memstate.Examples.GettingStarted.csproj", "{F7FA464E-B543-4F02-9DBD-930CF26D4D6D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{44351BD9-3D60-4E28-B9F6-F7FCED3EC3BA}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		build.bat = build.bat
+		build.cake = build.cake
+		build.ps1 = build.ps1
+		COPYRIGHT = COPYRIGHT
+		LICENSE_GPL = LICENSE_GPL
+		LICENSE_LGPL = LICENSE_LGPL
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

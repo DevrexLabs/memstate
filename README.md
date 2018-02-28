@@ -93,14 +93,12 @@ All operations (commands) are written to persistent storage and used to restore 
 ## Storage backend
 Distribution in a memstate cluster requires a message streaming backend. The backend provides a global ordering of commands. 
 
-* **EventStore** - the recommended default backend, a perfect fit in terms of performance, durability, reliability, extensibility and interoperability.
+* **EventStore** - The recommended default backend, a perfect fit in terms of performance, durability, reliability, extensibility and interoperability.
 
-* **PostgreSQL** - (in progress) We use PostgreSQL notifications to push commands to the nodes. This is promising because it will allow you to use RDS on AWS.
+* **PostgreSQL** - We use PostgreSQL notifications to push commands to the nodes. This is promising because it will allow you to use RDS on AWS.
 
 * **File system** - simple append only journaling. Single memstate node only.
 
 * **Kinesis** (AWS) - discontinued, end to end latency is too poor.
 
 * **Kafka** (evaluating) 
-
-

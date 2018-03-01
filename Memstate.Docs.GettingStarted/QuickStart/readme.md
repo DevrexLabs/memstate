@@ -1,4 +1,7 @@
-# Quickstart Guide
+QuickStart Guide (getting started) | [Modelling](LoyaltyDB.cs)
+
+
+# Quickstart Guide (getting started)
 
 Here's a complete guide to get you started with developing your first Memstate application!
 The following topics are covered:
@@ -17,7 +20,7 @@ The Memstate.Core library is a single assembly. Grab the latest Memstate.Core.dl
 
 Create a class that derives from `Model` and add members to hold data, usually collections. Mark the class and any referenced types with the `Serializable` attribute. An instance of this class is your in-memory database.
 
-* example : [LoyaltyDB.cs](QuickStartClasses/LoyaltyDB.cs)
+* example : [LoyaltyDB.cs](LoyaltyDB.cs)
 
 ```csharp
     [Serializable]
@@ -32,8 +35,8 @@ Create a class that derives from `Model` and add members to hold data, usually c
 
 Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>` where `M` is the type of your model and `R` is the result type
 
-* example : [SpendPoints.cs](QuickStartClasses/Commands/SpendPoints.cs)
-* example : [EarnPoints.cs](QuickStartClasses/Commands/EarnPoints.cs)
+* example : [SpendPoints.cs](Commands/SpendPoints.cs)
+* example : [EarnPoints.cs](Commands/EarnPoints.cs)
 
 ```csharp
     public class EarnPoints : Command<LoyaltyDB, Customer>
@@ -111,8 +114,12 @@ public class Top10Customers : Query<LoyaltyDB, Customer[]>
 Customer[] customers = engine.Execute(new Top10Customers());
 ```
 
+## Transactions
+
+(TBD) tests and documentation currently in progress.
+
 ## Summary
 
 We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.
 
-* For a full end to end working example see [QuickStart.cs](QuickStart.cs)
+* For a full end to end working example see [QuickStartTests.cs](QuickStartTests.cs)

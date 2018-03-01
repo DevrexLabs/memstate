@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses;
-using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Commands;
-using Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Queries;
+using Memstate.Docs.GettingStarted.QuickStart.Commands;
+using Memstate.Docs.GettingStarted.QuickStart.Queries;
 using NUnit.Framework;
 
-namespace Memstate.Docs.GettingStarted._10_QuickStart
+namespace Memstate.Docs.GettingStarted.QuickStart
 {
     public class QuickStartTests
     {

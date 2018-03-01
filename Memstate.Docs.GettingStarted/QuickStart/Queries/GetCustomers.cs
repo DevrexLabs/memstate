@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Queries
+namespace Memstate.Docs.GettingStarted.QuickStart.Queries
 {
     public class GetCustomers : Query<LoyaltyDB, IDictionary<int, Customer>>
     {

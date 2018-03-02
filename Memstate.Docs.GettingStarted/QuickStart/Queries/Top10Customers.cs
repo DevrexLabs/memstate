@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses.Queries
+namespace Memstate.Docs.GettingStarted.QuickStart.Queries
 {
     [Serializable]
     public class Top10Customers : Query<LoyaltyDB, Customer[]>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Memstate.Docs.GettingStarted._10_QuickStart.QuickStartClasses
+namespace Memstate.Docs.GettingStarted.QuickStart
 {
     [Serializable]
     public class LoyaltyDB

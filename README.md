@@ -1,5 +1,7 @@
 # Memstate
 
+[Memstate](./README.md) | [QuickStart Guide](/Memstate.Docs.GettingStarted/QuickStart)  | [Modelling](/Memstate.Docs.GettingStarted/Modelling) | [Built in Models](/Memstate.Docs.GettingStarted/BuiltInModels) | [Configuration](/Memstate.Docs.GettingStarted/Configuration) | [Storage](/Memstate.Docs.GettingStarted/Storage) | [Client API](/Memstate.Docs.GettingStarted/ClientAPI) | [Security](/Memstate.Docs.GettingStarted/Security)
+
 [![Join the chat at https://gitter.im/DevrexLabs/memstate](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/DevrexLabs/memstate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 In-memory event-sourced ACID-transactional distributed object graph engine. Memstate is written in C# for .NET Standard 1.6. Memstate runs either embedded in your process or as a separate server process.
 
@@ -11,6 +13,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is a poi
 Memstate has many possible use cases but is designed primarily to handle complex OLTP workloads by replacing the datastore, data access and business logic layer in a typical enterprise application. It's also a great fit for stateful microservices.
 
 The benefits of using Memstate are huge:
+
 * Productivity/Cost - *Way* less code to write and maintain, typically less than 50%
 * Quality - strongly typed and compiled C# means less bugs and problems
 * Performance - In-memory is orders of magnitude faster than reading/writing to disk
@@ -39,7 +42,7 @@ The benefits of using Memstate are huge:
 
 ## Quickstart - getting started
 
-[Full quick start getting started sample code here...](/Memstate.Docs.GettingStarted/_10_QuickStart)
+[Full quick start getting started sample code here...](/Memstate.Docs.GettingStarted/QuickStart)
 
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, an LLC based in Sweden.

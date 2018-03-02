@@ -1,4 +1,4 @@
-QuickStart Guide (getting started) | [Modelling](LoyaltyDB.cs)
+QuickStart Guide (getting started) | [Modelling](../Modelling)
 
 
 # Quickstart Guide (getting started)

@@ -1,6 +1,6 @@
 # Quickstart Guide (getting started)
 
-[QuickStart Guide](../QuickStart)  | [Modelling](../Modelling) | [Built in Models](../BuiltInModels) | [Configuration](../Configuration) [Storage](../Storage) | [Client API](../ClientAPI) | [Security](../Security)
+[QuickStart Guide](../QuickStart)  | [Modelling](../Modelling) | [Built in Models](../BuiltInModels) | [Configuration](../Configuration) | [Storage](../Storage) | [Client API](../ClientAPI) | [Security](../Security)
 
 Here's a complete guide to get you started with developing your first Memstate application!
 The following topics are covered:

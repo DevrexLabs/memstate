@@ -1,6 +1,6 @@
 # Memstate
 
-[Memstate](readme.md) | [QuickStart Guide](QuickStart)  | [Modelling](Modelling) | [Built in Models](BuiltInModels) | [Configuration](Configuration) [Storage](Storage) | [Client API](ClientAPI) | [Security](Security)
+[Memstate](readme.md) | [QuickStart Guide](Memstate.Docs.GettingStarted\QuickStart)  | [Modelling](Memstate.Docs.GettingStarted\Modelling) | [Built in Models](Memstate.Docs.GettingStarted\BuiltInModels) | [Configuration](Memstate.Docs.GettingStarted\Configuration) [Storage](StorageMemstate.Docs.GettingStarted\) | [Client API](ClientAPIMemstate.Docs.GettingStarted\) | [Security](Memstate.Docs.GettingStarted\Security)
 
 [![Join the chat at https://gitter.im/DevrexLabs/memstate](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/DevrexLabs/memstate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 In-memory event-sourced ACID-transactional distributed object graph engine. Memstate is written in C# for .NET Standard 1.6. Memstate runs either embedded in your process or as a separate server process.

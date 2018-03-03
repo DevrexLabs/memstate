@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Memstate.Docs.GettingStarted.QuickStart.Commands;
 using Memstate.Docs.GettingStarted.QuickStart.Queries;
+using Memstate.JsonNet;
 using NUnit.Framework;
 
 namespace Memstate.Docs.GettingStarted.QuickStart
@@ -18,10 +20,6 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             if (File.Exists(JournalFile)) File.Delete(JournalFile);
         }
-
-        // Hi all, here's some important notes on writing tests for .net core and standard,
-        // in case you want to create your own tests.
-        // https://github.com/nunit/docs/wiki/.NET-Core-and-.NET-Standard
 
         [Test]
         public async Task Simple_end_to_end_getting_started_using_default_settings_with_filesytem_storage()
@@ -68,11 +66,36 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             await model2.DisposeAsync();
         }
 
+        [Test]
+        public async Task Simple_end_to_end_with_human_readable_json_journal_file()
+        {
+            var settings = new MemstateSettings { StreamName = "json-example" };
+            settings.Serializers.Register("a-unique-key", _ => new JsonSerializerAdapter(settings));
+            settings.Serializer = "a-unique-key";
+            var model1 = await new EngineBuilder(settings).BuildAsync<LedgerDB>();
+            await model1.ExecuteAsync(new InitAccount(accountNumber: 1, openingBalance: 100.11M, currency: '£'));
+            await model1.ExecuteAsync(new InitAccount(accountNumber: 2, openingBalance: 200.22M, currency: '£'));
+            await model1.ExecuteAsync(new Transfer(fromAccount: 1, toAccount: 2, amount: 0.01M, currency:'£'));
+            var accounts = await model1.ExecuteAsync(new GetAccounts());
+            await model1.DisposeAsync();
+            accounts.ForEach(Console.WriteLine);
+
+            // to open this journal file in an editor, delete the line below or set a breakpoint
+            // file will be located in Memstate.Docs.GettingStarted\bin\Debug\netcoreapp2.0\json-example.journal
+            // File.Delete("json-example.journal");
+        }
+
         private void Print(string text)
         {
             Console.WriteLine(text);
         }
 
-
     }
 }
+
+// references
+// ----------
+// Hi all, here's some important notes on writing tests for .net core and standard,
+// in case you want to create your own tests.
+// https://github.com/nunit/docs/wiki/.NET-Core-and-.NET-Standard
+

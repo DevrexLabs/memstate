@@ -94,8 +94,9 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             StringAssert.Contains("M200.22", lines[1]);
             StringAssert.Contains("M0.01", lines[2]);
 
-            // to open the journal file in an editor, delete the line below or set a breakpoint
-            // journal file will be located in Memstate.Docs.GettingStarted\bin\Debug\netcoreapp2.0\json-example.journal
+            // to view the journal file in an editor comment out the File.Delete in the test Setup/teardown.
+            // The journal file will be located in 
+            // Memstate.Docs.GettingStarted\bin\Debug\netcoreapp2.0\json-example.journal
         }
 
         private void Print(string text)

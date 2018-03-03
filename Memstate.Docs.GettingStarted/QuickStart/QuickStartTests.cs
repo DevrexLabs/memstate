@@ -65,8 +65,6 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             await model2.DisposeAsync();
         }
 
-        // now that you've seen the basics, we'll move a bit quicker and skip all the printing.
-
         [Test]
         public async Task Simple_end_to_end_with_human_readable_json_journal_file()
         {

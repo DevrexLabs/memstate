@@ -80,9 +80,9 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             await model1.DisposeAsync();
             accounts.ForEach(Console.WriteLine);
 
-            // to open this journal file in an editor, delete the line below or set a breakpoint
-            // file will be located in Memstate.Docs.GettingStarted\bin\Debug\netcoreapp2.0\json-example.journal
-            // File.Delete("json-example.journal");
+            // to open the journal file in an editor, delete the line below or set a breakpoint
+            // journal file will be located in Memstate.Docs.GettingStarted\bin\Debug\netcoreapp2.0\json-example.journal
+            File.Delete("json-example.journal");
         }
 
         private void Print(string text)

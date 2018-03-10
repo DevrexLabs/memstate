@@ -32,7 +32,7 @@ namespace Memstate.Models.Geo
 
         public override string ToString()
         {
-            return $"(Lat:{Latitude}, Lon:{Longitude})";
+            return $"(Lat: {Latitude}, Lon: {Longitude})";
         }
 
         public ArcDistance DistanceTo(GeoPoint other)

@@ -24,15 +24,12 @@ namespace Memstate
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            foreach (var records in _serializer.ReadObjects<JournalRecord[]>(_journalStream))
+            foreach (var record in _serializer.ReadObjects<JournalRecord>(_journalStream))
             {
-                foreach (var record in records)
-                {
                     if (record.RecordNumber >= fromRecord)
                     {
                         yield return record;
                     }
-                }
             }
         }
     }

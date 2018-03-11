@@ -17,7 +17,14 @@ namespace Memstate.Wire
 
         public void WriteObject(Stream stream, object @object)
         {
-            _serializer.Serialize(@object, stream);
+            if (@object is JournalRecord[])
+            {
+                foreach(var record in (@object as JournalRecord[]))
+                {
+                    _serializer.Serialize(record, stream);
+                }
+            }
+            else _serializer.Serialize(@object, stream);
         }
 
         public object ReadObject(Stream stream)

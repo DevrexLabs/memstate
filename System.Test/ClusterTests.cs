@@ -48,7 +48,7 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
-                await reader.EnsureAsync(writer.LastRecordNumber);
+                await reader.EnsureVersionAsync(writer.LastRecordNumber);
                 
                 var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
 
@@ -195,7 +195,7 @@ namespace System.Test
             foreach (var engine in engines)
             {
                 _log.WriteLine("Counting strings");
-                await engine.EnsureAsync(recordsWritten - 1).ConfigureAwait(false);
+                await engine.EnsureVersionAsync(recordsWritten - 1).ConfigureAwait(false);
                 var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
 
                 _log.WriteLine($"Count: {strings.Count}");

@@ -1,6 +1,6 @@
 namespace Memstate
 {
-    public enum OperationType
+    internal enum OperationType
     {
         Disallowed,
         Command,

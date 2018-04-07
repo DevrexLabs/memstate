@@ -1,20 +1,14 @@
 ﻿using System;
-using Newtonsoft.Json;
 
 namespace Memstate.Test.EventfulTestDomain
 {
-    public class Deleted : Event
+    public class Created : Event
     {
-        private Deleted()
-        {
-        }
-
-        public Deleted(Guid userId)
+        public Created(Guid userId)
         {
             UserId = userId;
         }
 
-        [JsonProperty]
         public Guid UserId { get; private set; }
     }
 }

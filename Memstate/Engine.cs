@@ -33,7 +33,7 @@ namespace Memstate
         /// </summary>
         private long _lastRecordNumber;
 
-        public event CommandExecutedDelegate CommandExecuted = delegate { };
+        public event CommandExecuted CommandExecuted = delegate { };
 
         public Engine(
             MemstateSettings settings,

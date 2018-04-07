@@ -10,7 +10,7 @@ namespace Memstate
     /// Uses an unbounded blocking collection. Calling Dispose will  drain the messages
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MessageProcessor<T> : IDisposable
+    internal class MessageProcessor<T> : IDisposable
     {
         private readonly BlockingCollection<T> _messageQueue;
 

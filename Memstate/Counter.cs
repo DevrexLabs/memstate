@@ -2,7 +2,7 @@
 
 namespace Memstate
 {
-    public class Counter
+    internal class Counter
     {
         private readonly long _initialValue;
         

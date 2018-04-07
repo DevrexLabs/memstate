@@ -2,7 +2,7 @@
 
 namespace Memstate
 {
-    public class JournalSubscription : IJournalSubscription
+    internal class JournalSubscription : IJournalSubscription
     {
         public readonly Guid Id = Guid.NewGuid();
 

@@ -1,20 +1,17 @@
 ﻿using System;
-using Newtonsoft.Json;
 
 namespace Memstate.Tcp
 {
     internal class SubscribeRequest : Request
     {
-        public SubscribeRequest(Type type, IEventFilter[] filters)
+        public SubscribeRequest(Type type, IEventFilter filter)
         {
             Type = type;
-            Filters = filters;
+            Filter = filter;
         }
 
-        [JsonProperty]
         public Type Type { get; private set; }
 
-        [JsonProperty]
-        public IEventFilter[] Filters { get; private set; }
+        public IEventFilter Filter { get; private set; }
     }
 }

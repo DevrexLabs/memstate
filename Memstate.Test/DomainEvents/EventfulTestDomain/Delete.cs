@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace Memstate.Test.EventfulTestDomain
 {
@@ -10,11 +9,10 @@ namespace Memstate.Test.EventfulTestDomain
         {
             UserId = userId;
         }
-        
-        [JsonProperty]
+
         public Guid UserId { get; private set; }
         
-        public override void Execute(UsersModel model, Action<Event> raise)
+        public override void Execute(UsersModel model)
         {
             var user = model.Users.Values.FirstOrDefault(u => u.Id == UserId);
 
@@ -25,7 +23,7 @@ namespace Memstate.Test.EventfulTestDomain
 
             model.Users.Remove(user.Username);
 
-            raise(new Deleted(user.Id));
+            RaiseEvent(new Deleted(user.Id));
         }
     }
 }

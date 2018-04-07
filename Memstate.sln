@@ -3,27 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.EventStore", "Memstate.EventStore\Memstate.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.EventStore", "Memstate.EventStore\Memstate.EventStore.csproj", "{9F7315C3-CCC1-4C7D-BBD8-E1AA51388CE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate", "Memstate\Memstate.csproj", "{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate", "Memstate\Memstate.csproj", "{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Host", "Memstate.Host\Memstate.Host.csproj", "{6FB2441B-9638-4591-96C0-F181E339BFFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Host", "Memstate.Host\Memstate.Host.csproj", "{6FB2441B-9638-4591-96C0-F181E339BFFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Test", "Memstate.Test\Memstate.Test.csproj", "{370CF2A7-3E4F-4314-BED9-043BF8555E2A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Test", "Memstate.Test\Memstate.Test.csproj", "{370CF2A7-3E4F-4314-BED9-043BF8555E2A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{437BA763-466E-46D7-9AB9-E5AA3B697CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Test", "System.Test\System.Test.csproj", "{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Test", "System.Test\System.Test.csproj", "{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql.Tests", "Memstate.Postgresql.Tests\Memstate.Postgresql.Tests.csproj", "{9EBD979B-00EE-472B-9D7F-94E4E72C5202}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Postgresql.Tests", "Memstate.Postgresql.Tests\Memstate.Postgresql.Tests.csproj", "{9EBD979B-00EE-472B-9D7F-94E4E72C5202}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Benchmarks", "Memstate.Benchmarks\Memstate.Benchmarks.csproj", "{DC012469-986E-4953-9E95-BCCF7CD3745A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Benchmarks", "Memstate.Benchmarks\Memstate.Benchmarks.csproj", "{DC012469-986E-4953-9E95-BCCF7CD3745A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{44351BD9-3D60-4E28-B9F6-F7FCED3EC3BA}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,7 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{44351BD9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C51C66C9-3784-4C06-BAC5-EEE4B6684B69}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Docs.GettingStarted", "Memstate.Docs.GettingStarted\Memstate.Docs.GettingStarted.csproj", "{1C144C3F-B32E-419C-B432-8050EF122401}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Docs.GettingStarted", "Memstate.Docs.GettingStarted\Memstate.Docs.GettingStarted.csproj", "{1C144C3F-B32E-419C-B432-8050EF122401}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F9764AB9-8B67-4D1C-8CD8-CE87034B93CC}"
 EndProject

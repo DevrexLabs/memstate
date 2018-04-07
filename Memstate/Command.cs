@@ -11,29 +11,26 @@ namespace Memstate
 
         public Guid Id { get; set; }
 
-        public abstract object ExecuteImpl(object model, Action<Event> raise);
+        public abstract object ExecuteImpl(object model);
+
+        protected void RaiseEvent(Event @event) {
+            EventRaised.Invoke(@event);
+        }
+
+        public event Action<Event> EventRaised = _ => { };
     }
 
     public abstract class Command<TModel> : Command
     {
-        public virtual void Execute(TModel model, Action<Event> raise)
-        {
-            if (raise == null)
-            {
-                throw new NotSupportedException("One of Execute(TModel, Action<Event>) or Execute(TModel) must be overridden.");
-            }
-
-            Execute(model);
-        }
 
         public virtual void Execute(TModel model)
         {
-            Execute(model, null);
+            Execute(model);
         }
 
-        public override object ExecuteImpl(object model, Action<Event> raise)
+        public override object ExecuteImpl(object model)
         {
-            Execute((TModel) model, raise);
+            Execute((TModel) model);
 
             return null;
         }
@@ -41,24 +38,14 @@ namespace Memstate
 
     public abstract class Command<TModel, TResult> : Command
     {
-        public virtual TResult Execute(TModel model, Action<Event> raise)
+        public virtual TResult Execute(TModel model)
         {
-            if (raise == null)
-            {
-                throw new NotSupportedException("One of Execute(TModel, Action<Event>) or Execute(TModel) must be overridden.");
-            }
-
             return Execute(model);
         }
 
-        public virtual TResult Execute(TModel model)
+        public override object ExecuteImpl(object model)
         {
-            return Execute(model, null);
-        }
-
-        public override object ExecuteImpl(object model, Action<Event> raise)
-        {
-            return Execute((TModel) model, raise);
+            return Execute((TModel) model);
         }
     }
 }

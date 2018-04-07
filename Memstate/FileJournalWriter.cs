@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Memstate
 {
-    public class FileJournalWriter : BatchingJournalWriter
+    internal class FileJournalWriter : BatchingJournalWriter
     {
         private readonly Stream _journalStream;
 

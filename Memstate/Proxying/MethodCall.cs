@@ -2,7 +2,7 @@
 
 namespace Memstate
 {
-    public class MethodCall
+    internal class MethodCall
     {
         public MethodCall(MethodInfo targetTargetMethod, object[] args)
         {

@@ -10,7 +10,8 @@ using Microsoft.Extensions.Logging;
 namespace Memstate.Tcp
 {
     /// <summary>
-    /// TCP Server implementation. Listens for tcp connections and 
+    /// TCP Server implementation.
+    /// Listens for tcp connections and spins off a <c>Session</c> for each incoming request.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class MemstateServer<T> where T : class

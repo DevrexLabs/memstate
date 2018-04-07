@@ -8,7 +8,7 @@ namespace Memstate
     /// Provides thread safe access to the in-memory object graph,
     /// executes commands and queries
     /// </summary>
-    public class Kernel
+    internal class Kernel
     {
         private readonly object _model;
 
@@ -32,14 +32,12 @@ namespace Memstate
                 try
                 {
                     _lock.EnterWriteLock();
-
-                    using (new AttachedEventHandler(_model, eventHandler))
-                    {
-                        return command.ExecuteImpl(_model, eventHandler);
-                    }
+                    command.EventRaised += eventHandler;
+                    return command.ExecuteImpl(_model);
                 }
                 finally
                 {
+                    command.EventRaised -= eventHandler;
                     _lock.ExitWriteLock();
                 }
             }
@@ -61,36 +59,5 @@ namespace Memstate
                 }
             }
         }
-
-        private class AttachedEventHandler : IDisposable
-        {
-            private readonly IDomainEventSource _model;
-
-            private readonly Action<Event> _handler;
-
-            public AttachedEventHandler(object model, Action<Event> handler)
-            {
-                if (!(model is IDomainEventSource))
-                {
-                    return;
-                }
-
-                _model = (IDomainEventSource) model;
-
-                _handler = handler;
-
-                _model.EventRaised += handler;
-            }
-
-            public void Dispose()
-            {
-                if (_model == null)
-                {
-                    return;
-                }
-
-                _model.EventRaised -= _handler;
-            }
-        }
-    }
+   }
 }

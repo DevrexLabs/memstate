@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -9,35 +10,41 @@ namespace Memstate.Tcp
     /// Handles incoming messages and emits outgoing messages 
     /// for a given client connection.
     /// </summary>
-    internal class Session<T> : IHandle<Message> where T : class
+    internal class Session<T> : IDisposable, IHandle<Message> where T : class
     {
         private readonly Engine<T> _engine;
 
         private readonly ILogger _logger;
 
-        private readonly Dictionary<Type, IEventFilter[]> _subscriptions = new Dictionary<Type, IEventFilter[]>();
-
-        private readonly HashSet<IEventFilter> _globalFilters = new HashSet<IEventFilter>();
+        private readonly ConcurrentDictionary<Type, EventMatcher> _subscriptions; 
 
         public Session(MemstateSettings config, Engine<T> engine)
         {
             _engine = engine;
             _logger = config.LoggerFactory.CreateLogger<Session<T>>();
+            _engine.CommandExecuted += SendMatchingEvents;
+            _subscriptions = new ConcurrentDictionary<Type, EventMatcher>();
+        }
 
-            _engine.CommandExecuted += (record, local, events) =>
+        private void SendMatchingEvents(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
+        {
+            var matchingEvents = events
+                .Where(e => _subscriptions.Values.Any(matcher => matcher.IsMatch(e)))
+                .ToArray();
+
+            if (matchingEvents.Length > 0)
             {
-                var filteredEvents = from e in events
-                    let filters = _subscriptions.GetOrDefault(e.GetType(), Array.Empty<IEventFilter>())
-                    where _globalFilters.All(f => f.Accept(e)) && (_subscriptions.Count == 0 || filters.Any() && filters.All(f => f.Accept(e)))
-                    select e;
-
-                var message = new EventsResponse(filteredEvents.ToArray());
-
-                OnMessage.Invoke(message);
-            };
+                _logger.LogTrace("Sending {0} events", matchingEvents.Length);
+                OnMessage.Invoke(new EventsRaised(matchingEvents));
+            }
         }
 
         public event Action<Message> OnMessage = _ => { };
+
+        public void Dispose()
+        {
+            _engine.CommandExecuted -= SendMatchingEvents;
+        }
 
         public void Handle(Message message)
         {
@@ -65,9 +72,6 @@ namespace Memstate.Tcp
                         HandleImpl(request);
                         break;
 
-                    case FilterRequest request:
-                        HandleImpl(request);
-                        break;
                 }
             }
             catch (Exception ex)
@@ -100,23 +104,32 @@ namespace Memstate.Tcp
 
         private void HandleImpl(SubscribeRequest request)
         {
-            _subscriptions[request.Type] = request.Filters;
-
+            _subscriptions[request.Type] = new EventMatcher(request.Type, request.Filter);
             OnMessage.Invoke(new SubscribeResponse(request.Id));
         }
 
         private void HandleImpl(UnsubscribeRequest request)
         {
-            _subscriptions.Remove(request.Type);
-
+            _subscriptions.TryRemove(request.Type, out var _);
             OnMessage.Invoke(new UnsubscribeResponse(request.Id));
         }
 
-        private void HandleImpl(FilterRequest request)
+        private class EventMatcher
         {
-            _globalFilters.Add(request.Filter);
+            public Type Type { get; private set; }
 
-            OnMessage.Invoke(new FilterResponse(request.Id));
+            public IEventFilter Filter { get; private set; }
+
+            public EventMatcher(Type type, IEventFilter filter)
+            {
+                Type = type;
+                Filter = filter;
+            }
+
+            public bool IsMatch(Event @event)
+            {
+                return Type == @event.GetType() && Filter.Accept(@event);
+            }
         }
     }
 }

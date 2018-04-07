@@ -1,4 +1,4 @@
 ﻿namespace Memstate
 {
-    public delegate void RecordsWrittenHandler(JournalRecord[] records);
+    internal delegate void RecordsWrittenHandler(JournalRecord[] records);
 }

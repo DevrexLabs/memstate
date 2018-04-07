@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Memstate
 {
-    public class NullJournalReader : IJournalReader
+    internal class NullJournalReader : IJournalReader
     {
         public Task DisposeAsync()
         {

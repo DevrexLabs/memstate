@@ -3,21 +3,17 @@ using System.Threading.Tasks;
 
 namespace Memstate
 {
+
     public class LocalClient<TModel> : Client<TModel> where TModel : class
     {
         private readonly Engine<TModel> _engine;
 
-        private readonly ClientEvents _events;
-
-        public override IClientEvents Events => _events;
+        private readonly EventHandlers<TModel> _eventHandlers;
 
         public LocalClient(Engine<TModel> engine)
         {
             _engine = engine;
-
-            _events = new ClientEvents();
-
-            engine.CommandExecuted += (record, local, events) => _events.Handle(events);
+            _eventHandlers = new EventHandlers<TModel>(_engine);
         }
 
         public LocalClient(Func<TModel> creator, MemstateSettings settings)
@@ -58,6 +54,19 @@ namespace Memstate
         public override Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
             return _engine.ExecuteAsync(query);
+        }
+
+
+        public override Task UnsubscribeAsync<T>()
+        {
+            _eventHandlers.ClearHandler<T>();
+            return Task.CompletedTask;
+        }
+
+        public override Task SubscribeAsync<T>(Action<T> handler, IEventFilter filter = null)
+        {
+            _eventHandlers.SetHandler<T>(handler, filter);
+            return Task.CompletedTask;
         }
     }
 }

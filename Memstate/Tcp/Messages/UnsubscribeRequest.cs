@@ -1,5 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
 
 namespace Memstate.Tcp
 {
@@ -10,7 +9,6 @@ namespace Memstate.Tcp
             Type = type;
         }
 
-        [JsonProperty]
         public Type Type { get; private set; }
     }
 }

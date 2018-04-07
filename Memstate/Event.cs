@@ -10,7 +10,6 @@ namespace Memstate
             Id = Guid.NewGuid();
         }
 
-        [JsonProperty]
         public Guid Id { get; private set; }
     }
 }

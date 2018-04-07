@@ -21,7 +21,7 @@ namespace Memstate.Models.KeyValue
 
         public int? ExpectedVersion { get; }
 
-        public override int Execute(KeyValueStore<T> model, Action<Event> eventHandler)
+        public override int Execute(KeyValueStore<T> model)
         {
             return model.Set(Key, Value, ExpectedVersion);
         }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    public class Batcher<T> : IAsyncDisposable
+    internal class Batcher<T> : IAsyncDisposable
     {
         private readonly int _maxBatchSize;
 

@@ -2,7 +2,7 @@
 
 namespace Memstate
 {
-    public class NullSubscriptionSource : IJournalSubscriptionSource
+    internal class NullSubscriptionSource : IJournalSubscriptionSource
     {
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {

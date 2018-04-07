@@ -9,63 +9,59 @@ using Microsoft.Extensions.Logging;
 
 namespace Memstate
 {
-    public class MemstateClient<TModel> : Client<TModel> where TModel : class
+    public class RemoteClient<TModel> : Client<TModel> where TModel : class
     {
         private readonly MemstateSettings _config;
 
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// The tcp connection to the server
+        /// </summary>
         private TcpClient _tcpClient;
 
+        /// <summary>
+        /// Serializer used to serialize and deserialize messages
+        /// </summary>
         private readonly ISerializer _serializer;
 
+        /// <summary>
+        /// Stream that we read and write messages to/from
+        /// </summary>
         private NetworkStream _stream;
 
+        /// <summary>
+        /// Requests that have been sent awaiting responses
+        /// </summary>
         private readonly Dictionary<Guid, TaskCompletionSource<Message>> _pendingRequests;
 
-        private MessageProcessor<Message> _messageWriter;
+        /// <summary>
+        /// Queue of messages to be sent to the server
+        /// </summary>
+        private MessageProcessor<Message> _messageDispatcher;
 
-        private Task _messageReader;
+        /// <summary>
+        /// Task that processes incoming messages from the server
+        /// </summary>
+        private Task _messageHandler;
 
         private readonly Counter _counter = new Counter();
 
         private readonly CancellationTokenSource _cancellationSource;
 
-        private readonly ClientEvents _events;
+        private readonly Dictionary<Type, Action<Event>> _eventHandlers;
 
-        public MemstateClient(MemstateSettings config)
+        public RemoteClient(MemstateSettings config)
         {
             _config = config;
             _serializer = config.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
-            _logger = _config.LoggerFactory.CreateLogger<MemstateClient<TModel>>();
+            _logger = _config.LoggerFactory.CreateLogger<RemoteClient<TModel>>();
             _cancellationSource = new CancellationTokenSource();
 
-            _events = new ClientEvents();
-
-            _events.SubscriptionAdded += async (type, filters) =>
-            {
-                var request = new SubscribeRequest(type, filters.ToArray());
-
-                await SendAndReceive(request);
-            };
-
-            _events.SubscriptionRemoved += async type =>
-            {
-                var request = new UnsubscribeRequest(type);
-
-                await SendAndReceive(request);
-            };
-
-            _events.GlobalFilterAdded += async filter =>
-            {
-                var request = new FilterRequest(filter);
-
-                await SendAndReceive(request);
-            };
+            _eventHandlers = new Dictionary<Type, Action<Event>>();
         }
 
-        public override IClientEvents Events => _events;
 
         public async Task ConnectAsync(string host = "localhost", int port = 3001)
         {
@@ -73,8 +69,8 @@ namespace Memstate
             await _tcpClient.ConnectAsync(host, port);
             _stream = _tcpClient.GetStream();
             _logger.LogInformation($"Connected to {host}:{port}");
-            _messageWriter = new MessageProcessor<Message>(WriteMessage);
-            _messageReader = Task.Run(ReceiveMessages);
+            _messageDispatcher = new MessageProcessor<Message>(WriteMessage);
+            _messageHandler = Task.Run(ReceiveMessages);
         }
 
         private void Handle(Message message)
@@ -89,7 +85,7 @@ namespace Memstate
                     Handle(response);
                     break;
 
-                case EventsResponse response:
+                case EventsRaised response:
                     Handle(response);
                     break;
 
@@ -114,9 +110,19 @@ namespace Memstate
             CompleteRequest(requestId, response);
         }
 
-        private void Handle(EventsResponse response)
+        private void Handle(EventsRaised eventsRaised)
         {
-            _events.Handle(response.Events);
+            foreach(var @event in eventsRaised.Events)
+            {
+                if (_eventHandlers.TryGetValue(@event.GetType(), out var handler))
+                {
+                    handler.Invoke(@event);
+                }
+                else
+                {
+                    _logger.LogError("No handler for event type {0}", @event);
+                }
+            }
         }
 
         private void CompleteRequest(Guid requestId, Response response)
@@ -189,7 +195,7 @@ namespace Memstate
 
             _logger.LogTrace("SendAndReceive: queueing request id {0}, type {1}", request.Id, request.GetType());
 
-            _messageWriter.Enqueue(request);
+            _messageDispatcher.Enqueue(request);
 
             return await completionSource.Task;
         }
@@ -241,9 +247,20 @@ namespace Memstate
             return (TResult) response.Result;
         }
 
+        public override async Task UnsubscribeAsync<T>()
+        {
+            await SendAndReceive(new UnsubscribeRequest(typeof(T)));
+        }
+
+        public override async Task SubscribeAsync<T>(Action<T> handler, IEventFilter filter = null)
+        {
+            
+            await SendAndReceive(new SubscribeRequest(typeof(T), filter));
+        }
+
         public void Dispose()
         {
-            _messageWriter.Dispose();
+            _messageDispatcher.Dispose();
             _tcpClient.Dispose();
         }
     }

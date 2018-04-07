@@ -11,7 +11,7 @@ namespace Memstate.Test.EventfulTestDomain
 
         public string Username { get; set; }
 
-        public override User Execute(UsersModel model, Action<Event> raise)
+        public override User Execute(UsersModel model)
         {
             if (model.Users.TryGetValue(Username, out var user))
             {
@@ -22,7 +22,7 @@ namespace Memstate.Test.EventfulTestDomain
 
             model.Users.Add(Username, user);
 
-            raise(new Created(user.Id));
+            RaiseEvent(new Created(user.Id));
 
             return user;
         }

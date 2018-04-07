@@ -4,7 +4,7 @@ using App.Metrics.Timer;
 
 namespace Memstate
 {
-    public class KernelMetrics
+    internal class KernelMetrics
     {
         private readonly MemstateSettings _settings;
 

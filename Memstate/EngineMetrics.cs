@@ -6,7 +6,7 @@ using App.Metrics.Timer;
 
 namespace Memstate
 {
-    public class EngineMetrics
+    internal class EngineMetrics
     {
         private readonly MemstateSettings _settings;
 

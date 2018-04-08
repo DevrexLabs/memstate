@@ -5,8 +5,9 @@ using System.IO;
 namespace Memstate
 {
     /// <summary>
-    /// A virtual file system where each file is kept in memory as a MemoryStream.
-    /// The intended use case is for internal testing 
+    /// A file system where each file is kept in memory as a MemoryStream.
+    /// Useful as a mock file system for integration testing.
+    /// Faster than file i/o and no left over files in the file system
     /// </summary>
     public class InMemoryFileSystem : IVirtualFileSystem
     {
@@ -22,9 +23,7 @@ namespace Memstate
             lock (_files)
             {
                 var stream = OpenOrCreateStream(path);
-
                 stream.Position = stream.Length;
-
                 return stream;
             }
         }
@@ -39,9 +38,7 @@ namespace Memstate
                 }
 
                 var result = OpenOrCreateStream(path);
-
                 result.Position = 0;
-
                 return result;
             }
         }
@@ -53,7 +50,7 @@ namespace Memstate
 
         private MemoryStream OpenOrCreateStream(string path)
         {
-            Ensure.That(() => !_lockedFiles.Contains(path), "Can't open locked file: " + path);
+            if (_lockedFiles.Contains(path)) throw new IOException("File is locked");
 
             if (!_files.ContainsKey(path))
             {

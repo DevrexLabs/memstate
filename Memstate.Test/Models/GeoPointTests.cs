@@ -5,12 +5,23 @@ using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using Memstate.Models.Geo;
+using System.IO;
 
 namespace Memstate.Test.Models
 {
     [TestFixture]
     public class GeoPointTests
     {
+
+        private static GeoSpatialIndex<String> _places;
+
+        /// <summary>
+        /// Used to extract a random sample of test data from the raw data (see end of file)
+        /// </summary>
+        private static Random _rnd;
+
+        private static int _seed;
+
         public class GeoLocation
         {
             public readonly string Name;
@@ -22,7 +33,8 @@ namespace Memstate.Test.Models
                 Name = name;
             }
         }
-        private static IEnumerable<object[]> Distances()
+
+        private static IEnumerable<object[]> TestCases()
         {
             yield return new object[]
                              {
@@ -30,7 +42,8 @@ namespace Memstate.Test.Models
                                  new GeoPoint(38.115556, 13.361389), 
                                  //Catania
                                  new GeoPoint(37.502669, 15.087269),
-                                 //expected distance
+
+                                 //expected distance between Palermo and Catania
                                  166.27415156960038
                              };
         }
@@ -38,30 +51,48 @@ namespace Memstate.Test.Models
 
         private static IEnumerable<GeoLocation> RandomSample()
         {
-            var rnd = new Random(43);
-            return TestData().Where(_ => rnd.NextDouble() < 0.001).Take(20);
+            return RandomTestData().Take(10);
         }
 
-        private static IEnumerable<GeoLocation> TestData()
+        private static IEnumerable<GeoLocation> RandomTestData()
         {
-            var rnd = new Random(42);
-            var seen = new HashSet<string>();
 
-            foreach (var arr in raw.Split('\n').Select(l => l.Split('\t')))
+            const double SampleSize = 0.001;
+
+            using (var reader = new StringReader(raw))
             {
-                var name = arr[0];
-                if (seen.Contains(name)) continue;
-                seen.Add(name);
-                var lat = Double.Parse(arr[1], CultureInfo.InvariantCulture);
-                var lon = Double.Parse(arr[2], CultureInfo.InvariantCulture);
-                var point = new GeoPoint(lat, lon);
-                yield return new GeoLocation(name, point);
+                while(true)
+                {
+                    var line = reader.ReadLine();
+                    if (line == null) break;
+
+                    var arr = line.Split('\t');
+                    var name = arr[0];
+
+                    var lat = Double.Parse(arr[1], CultureInfo.InvariantCulture);
+                    var lon = Double.Parse(arr[2], CultureInfo.InvariantCulture);
+                    var point = new GeoPoint(lat, lon);
+                    if (_rnd.NextDouble() < SampleSize) yield return new GeoLocation(name, point);
+                }
             }
         }
 
-        private static GeoSpatialIndex<String> _places;
 
-        [Test, TestCaseSource(nameof(Distances))]
+        [Test]
+        public void GeoPointToString()
+        {
+            var gp = new GeoPoint(10,10);
+            Assert.AreEqual("(Lat: 10, Lon: 10)", gp.ToString());
+        }
+
+        [Test]
+        public void DistanceToSelfShouldBeZero()
+        {
+            var gp = new GeoPoint(10, 10);
+            Assert.AreEqual(0D, gp.DistanceTo(gp).Radians, 0.0001);
+        }
+
+        [Test, TestCaseSource(nameof(TestCases))]
         public void Distance(GeoPoint a, GeoPoint b, double expectedDistance)
         {
             var actual = GeoPoint.Distance(a, b);
@@ -71,30 +102,38 @@ namespace Memstate.Test.Models
             Assert.AreEqual(expectedDistance, actual.ToKilometers(), faultTolerance);
         }
 
-
-        [SetUp]
-        public void Setup()
+        static GeoPointTests()
         {
+            _seed = new Random().Next();
+            _rnd = new Random(_seed);
+
             _places = new GeoSpatialIndex<string>();
-            foreach (var item in TestData())
+            foreach (var item in RandomTestData())
             {
                 _places.Add(item.Name, item.Point);
             }
+
         }
 
-
-        [Test, TestCaseSource("RandomSample")]
+        [Test, TestCaseSource(nameof(RandomSample))]
         public void WithinRadiusTest(GeoLocation sample)
         {
+            Console.WriteLine("random seed used: " + _seed);
+
             const double radius = 100;
 
+            Console.WriteLine($"Searching for places within {radius} km of {sample.Name}");
             var within = _places.WithinRadius(sample.Point, radius).OrderBy(p => p.Value).ToArray();
 
+            Console.WriteLine("Found " + within.Length);
             foreach (var keyValuePair in within)
             {
+                var kms = keyValuePair.Value.ToKilometers();
+                Console.WriteLine($"{keyValuePair.Key} at distance {kms} km" );
                 Assert.IsTrue(keyValuePair.Value.ToKilometers() <= radius);
             }
 
+            //Double check and print any errors
             var withinNames = new HashSet<string>(within.Select(kvp => kvp.Key));
             int failures = 0;
             foreach (var keyValuePair in _places)
@@ -104,12 +143,12 @@ namespace Memstate.Test.Models
                 if (distance.ToKilometers() > radius && withinNames.Contains(name))
                 {
                     failures++;
-                    Trace.WriteLine("false positive: " + name + ", d=" + distance );
+                    Console.WriteLine("false positive: " + name + ", d=" + distance );
                 }
                 if (distance.ToKilometers() <= radius && !withinNames.Contains(name))
                 {
                     failures++;
-                    Trace.WriteLine("false negative: " + name + ", d=" + distance);
+                    Console.WriteLine("false negative: " + name + ", d=" + distance);
                 }
                 
             }

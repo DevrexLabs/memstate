@@ -17,6 +17,10 @@ namespace Memstate
 
         private readonly IJournalWriter _journalWriter;
 
+        /// <summary>
+        /// Commands that have been sent to the journal but not yet receieved 
+        /// and processed on the subscription
+        /// </summary>
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
 
         private readonly IDisposable _commandSubscription;
@@ -48,7 +52,7 @@ namespace Memstate
             _settings = settings;
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
-            _commandSubscription = subscriptionSource.Subscribe(nextRecord, ApplyRecord);
+            _commandSubscription = subscriptionSource.Subscribe(nextRecord, OnRecordReceived);
             _metrics = new EngineMetrics(settings);
         }
 
@@ -131,23 +135,19 @@ namespace Memstate
             _logger.LogDebug("End Dispose");
         }
 
-        public Task EnsureAsync(long recordNumber)
+        /// <summary>
+        /// Wait until a specific record has beed executed
+        /// </summary>
+        /// <param name="recordNumber">The version </param>
+        /// <returns></returns>
+        public async Task EnsureVersionAsync(long recordNumber)
         {
             EnsureOperational();
 
-            var completionSource = new TaskCompletionSource<object>();
-
-            CommandExecuted += (journalRecord, isLocal, events) =>
+            while (Interlocked.Read(ref _lastRecordNumber) < recordNumber)
             {
-                if (journalRecord.RecordNumber >= recordNumber)
-                {
-                    completionSource.SetResult(null);
-                }
-            };
-
-            return Interlocked.Read(ref _lastRecordNumber) >= recordNumber
-                ? Task.CompletedTask
-                : completionSource.Task;
+                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+            }
         }
 
         internal object Execute(Query query)
@@ -194,8 +194,10 @@ namespace Memstate
         /// <summary>
         /// Handler for records obtained through the subscription
         /// </summary>
-        private void ApplyRecord(JournalRecord record)
+        private void OnRecordReceived(JournalRecord record)
         {
+
+            if (_stopped) return;
             TaskCompletionSource<object> completion = null;
 
             try
@@ -211,9 +213,9 @@ namespace Memstate
                     _pendingCommandsChanged.Set();
                 }
 
-                _logger.LogDebug("ApplyRecord: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
+                _logger.LogDebug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
 
-                var expected = Interlocked.Increment(ref _lastRecordNumber);
+                var expected = Interlocked.Read(ref _lastRecordNumber) + 1;
 
                 if (expected != record.RecordNumber)
                 {
@@ -223,9 +225,11 @@ namespace Memstate
 
                         throw new Exception($"Broken sequence, expected {expected}, got {record.RecordNumber}");
                     }
+                    
+                    expected = record.RecordNumber;
 
                     _logger.LogWarning(
-                        "ApplyRecord: RecordNumber out of order. Expected {0}, got {1}",
+                        "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
                         expected,
                         record.RecordNumber);
                 }
@@ -237,6 +241,7 @@ namespace Memstate
                 NotifyCommandExecuted(record, isLocalCommand, events);
 
                 completion?.SetResult(result);
+                Interlocked.Exchange(ref _lastRecordNumber, expected);
 
                 _metrics.CommandExecuted();
             }
@@ -244,7 +249,7 @@ namespace Memstate
             {
                 _metrics.CommandFailed();
 
-                _logger.LogError(default(EventId), ex, "ApplyRecord failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+                _logger.LogError(default(EventId), ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
 
                 completion?.SetException(ex);
             }

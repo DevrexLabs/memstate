@@ -43,6 +43,7 @@ namespace Memstate
             var records = commands.Select(ToJournalRecord).ToArray();
 
             _serializer.WriteObject(_journalStream, records);
+            _journalStream.Flush();
 
             RecordsWritten.Invoke(records);
         }

@@ -1,36 +1,37 @@
+using System;
+using System.IO;
+using NUnit.Framework;
+
 namespace Memstate.Tests
 {
-    using System;
-    using System.IO;
-
-    using Xunit;
-
+    [TestFixture]
     public class InMemoryFileSystemTests
     {
-        private readonly InMemoryFileSystem _sut;
+        private InMemoryFileSystem _sut;
 
-        private readonly string _fileName;
+        private string _fileName;
 
-        public InMemoryFileSystemTests()
+        [SetUp]
+        public void Setup()
         {
             _sut = new InMemoryFileSystem();
             _fileName = Guid.NewGuid().ToString();
         }
 
-        [Fact]
+        [Test]
         public void OpenNonExistingFileThrows()
         {
             Assert.Throws<FileNotFoundException>(() => _sut.OpenRead(_fileName));
         }
 
-        [Fact]
+        [Test]
         public void OpenLockedFileThrows()
         {
             var stream = _sut.OpenAppend(_fileName);
-            Assert.ThrowsAny<Exception>(() => _sut.OpenRead(_fileName));
+            Assert.Throws<IOException>(() => _sut.OpenRead(_fileName));
         }
 
-        [Fact]
+        [Test]
         public void BytesReadEqualBytesWritten()
         {
             const int NumBytes = 200;
@@ -43,8 +44,8 @@ namespace Memstate.Tests
             var bytesRead = new byte[NumBytes];
             readStream.Read(bytesRead, 0, NumBytes);
 
-            Assert.Equal(bytesWritten, bytesRead);
-            Assert.Equal(NumBytes, readStream.Length);
+            Assert.AreEqual(bytesWritten, bytesRead);
+            Assert.AreEqual(NumBytes, readStream.Length);
             readStream.Dispose();
         }
 

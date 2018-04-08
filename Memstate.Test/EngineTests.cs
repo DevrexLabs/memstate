@@ -1,11 +1,10 @@
 using System;
 using FakeItEasy;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace Memstate.Tests
 {
-    using System.Threading.Tasks;
-
     public class EngineTests
     {
         private readonly IJournalSubscriptionSource _fakeSubscriptionSource;

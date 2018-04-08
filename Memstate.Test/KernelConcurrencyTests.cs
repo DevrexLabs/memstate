@@ -1,12 +1,12 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Memstate.Tests
 {
+    [TestFixture]
     public class KernelConcurrencyTests
     {
         class AccountModel : Dictionary<int, int> { }
@@ -40,10 +40,11 @@ namespace Memstate.Tests
             }
         }
 
-        readonly AccountModel _bank;
-        readonly Kernel _kernel;
+        AccountModel _bank;
+        Kernel _kernel;
 
-        public KernelConcurrencyTests(ITestOutputHelper testOutputHelper)
+        [SetUp]
+        public void Setup()
         {
             var config = new MemstateSettings();
             _bank = new AccountModel();
@@ -63,29 +64,31 @@ namespace Memstate.Tests
             }
         }
 
-        [Fact]
-        public void Transactions_sum_up_to_zero()
+        [Test]
+        public async Task Transactions_sum_up_to_zero()
         {
+            const int NumTransactions = 100000;
+
             var commandTask = Task.Run(() =>
             {
-                foreach (var randomTransferCommand in RandomTransferCommands(100000))
+                foreach (var randomTransferCommand in RandomTransferCommands(NumTransactions / 2))
                 {
                     _kernel.Execute(randomTransferCommand, e => { });
                 }
             });
 
-            int totalSum = 0;
 
             var queryTask = Task.Run(() =>
             {
-                for (int i = 0; i < 1000000; i++)
+                for (int i = 0; i < NumTransactions / 2; i++)
                 {
                     var query = new AccountsSummed();
-                    totalSum += (int) _kernel.Execute(query);
+                    var sum =  _kernel.Execute(query);
+                    //the sum at any given point in time should always be 0
+                    Assert.AreEqual(0,sum);
                 }
             });
-            Task.WaitAll(commandTask, queryTask);
-            Assert.Equal(0, totalSum);
+            await Task.WhenAll(commandTask, queryTask);
         }
 
     }

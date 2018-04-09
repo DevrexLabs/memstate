@@ -71,6 +71,8 @@ namespace Memstate.Tcp
                     case UnsubscribeRequest request:
                         HandleImpl(request);
                         break;
+                    default:
+                        throw new Exception("unrecognized exception");
 
                 }
             }

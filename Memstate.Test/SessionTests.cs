@@ -76,7 +76,7 @@ namespace Memstate.Tests
             Assert.Equal(42, node.Value);
         }
 
-        [Fact(Skip="Broken when domain events were added")]
+        [Fact]
         public void Command_with_result_happy_path()
         {
             var commandRequest = new CommandRequest(new Set<int>("KEY", 42));
@@ -86,7 +86,7 @@ namespace Memstate.Tests
             Assert.Equal(1, (int)response.Result);
         }
 
-        [Fact(Skip="Broken when domain events were added")]
+        [Fact]
         public void Void_command_happy_path()
         {
             _testModel.Set("KEY", 100);
@@ -110,14 +110,14 @@ namespace Memstate.Tests
             Assert.Equal(request.Id, pong.ResponseTo);
         }
 
-        [Fact(Skip = "Broken when domain events added")]
+        [Fact]
         public void UnhandledMessageException()
         {
             var message = new UnknownMessage();
             _session.Handle(message);
 
             var response = AssertAndGetSingle<ExceptionResponse>();
-            Assert.IsType<RuntimeBinderException>(response.Exception);
+            Assert.IsType<Exception>(response.Exception);
             Assert.Equal(message.Id, response.ResponseTo);
         }
 

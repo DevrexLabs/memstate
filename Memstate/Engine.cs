@@ -54,6 +54,7 @@ namespace Memstate
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, OnRecordReceived);
             _metrics = new EngineMetrics(settings);
+            ExecutionContext.Current = new ExecutionContext(nextRecord);
         }
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
@@ -63,7 +64,6 @@ namespace Memstate
             EnsureOperational();
 
             var completionSource = new TaskCompletionSource<object>();
-
             _pendingLocalCommands[command.Id] = completionSource;
 
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
@@ -71,17 +71,15 @@ namespace Memstate
             using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
-
                 return (TResult) await completionSource.Task.ConfigureAwait(false);
             }
         }
 
-        public Task ExecuteAsync(Command<TModel> command)
+        public async Task ExecuteAsync(Command<TModel> command)
         {
             EnsureOperational();
 
             var completionSource = new TaskCompletionSource<object>();
-
             _pendingLocalCommands[command.Id] = completionSource;
 
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
@@ -89,21 +87,19 @@ namespace Memstate
             using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
-                return completionSource.Task;
+                await completionSource.Task.ConfigureAwait(false);
             }
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
             EnsureOperational();
-
             return await Task.Run(() => Execute(query)).ConfigureAwait(false);
         }
 
         public TResult Execute<TResult>(Command<TModel, TResult> command)
         {
             EnsureOperational();
-
             return ExecuteAsync(command).Result;
         }
 
@@ -144,7 +140,7 @@ namespace Memstate
         {
             EnsureOperational();
 
-            while (Interlocked.Read(ref _lastRecordNumber) < recordNumber)
+            while (LastRecordNumber < recordNumber)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
             }
@@ -203,55 +199,53 @@ namespace Memstate
             try
             {
                 var command = record.Command;
-
                 var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
 
                 if (isLocalCommand)
                 {
                     _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
-
                     _pendingCommandsChanged.Set();
                 }
 
                 _logger.LogDebug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
 
-                var expected = Interlocked.Read(ref _lastRecordNumber) + 1;
+                VerifyRecordSequence(record.RecordNumber);
 
-                if (expected != record.RecordNumber)
-                {
-                    if (!_settings.AllowBrokenSequence)
-                    {
-                        _stopped = true;
+                var ctx = ExecutionContext.Current;
+                ctx.Reset(record.RecordNumber);
 
-                        throw new Exception($"Broken sequence, expected {expected}, got {record.RecordNumber}");
-                    }
-                    
-                    expected = record.RecordNumber;
-
-                    _logger.LogWarning(
-                        "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
-                        expected,
-                        record.RecordNumber);
-                }
-
-                var events = new List<Event>();
-
-                var result = _kernel.Execute(record.Command, events.Add);
-
-                NotifyCommandExecuted(record, isLocalCommand, events);
+                var result = _kernel.Execute(record.Command);
+                Interlocked.Exchange(ref _lastRecordNumber, record.RecordNumber);
+                NotifyCommandExecuted(record, isLocalCommand, ctx.Events);
 
                 completion?.SetResult(result);
-                Interlocked.Exchange(ref _lastRecordNumber, expected);
-
                 _metrics.CommandExecuted();
+
+
             }
             catch (Exception ex)
             {
                 _metrics.CommandFailed();
-
                 _logger.LogError(default(EventId), ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
-
                 completion?.SetException(ex);
+            }
+        }
+
+        private void VerifyRecordSequence(long actualRecordNumber)
+        {
+            var expected = Interlocked.Read(ref _lastRecordNumber) + 1;
+            if (expected != actualRecordNumber)
+            {
+                if (!_settings.AllowBrokenSequence)
+                {
+                    _stopped = true;
+                    throw new Exception($"Broken sequence, expected {expected}, got {actualRecordNumber}");
+                }
+
+                _logger.LogWarning(
+                    "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
+                    expected,
+                    actualRecordNumber);
             }
         }
 

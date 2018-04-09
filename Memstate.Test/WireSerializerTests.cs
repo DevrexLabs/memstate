@@ -22,6 +22,7 @@ namespace Memstate.Tests
             Assert.AreEqual(poco.Name, clone.Name);
             Assert.AreEqual(poco.Age, clone.Age);
         }
+
     }
 
     internal class Poco {

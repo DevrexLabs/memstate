@@ -25,19 +25,17 @@ namespace Memstate
             logger.LogInformation("Created Kernel");
         }
 
-        public object Execute(Command command, Action<Event> eventHandler)
+        public object Execute(Command command)
         {
             using (_metrics.MeasureCommandExecution())
             {
                 try
                 {
                     _lock.EnterWriteLock();
-                    command.EventRaised += eventHandler;
                     return command.ExecuteImpl(_model);
                 }
                 finally
                 {
-                    command.EventRaised -= eventHandler;
                     _lock.ExitWriteLock();
                 }
             }

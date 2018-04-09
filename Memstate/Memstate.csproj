@@ -15,6 +15,12 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageProjectUrl>http://github.com/DevrexLabs/memstate</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
     <Platforms>AnyCPU;x64</Platforms>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.2.0</PackageVersion>
+    <Owners>Devrex Labs</Owners>
+    <Summary>Main Memstate library including Engine, Server and Clients</Summary>
+    <Title>Memstate</Title>
+    <PackageId>Memstate</PackageId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>default</LangVersion>
@@ -45,5 +51,6 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
     <PackageReference Include="Wire" Version="0.8.2" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
   </ItemGroup>
 </Project>

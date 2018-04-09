@@ -6,11 +6,20 @@
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <Product>Memstate EventStore storage driver</Product>
-    <Description>Use the EventStore as a backing store with Memstate.</Description>
+    <Description>Storage provider for Memstate based on EventStore</Description>
     <Copyright>2017 Devrex Labs</Copyright>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.2.0</PackageVersion>
+    <Owners>Devrex Labs</Owners>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
+    <Summary>Storage provider for Memstate</Summary>
+    <Title>Memstate.EventStore</Title>
+    <PackageId>Memstate.EventStore</PackageId>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="eventstore.clientapi.netcore" Version="4.0.0-alpha-1" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />

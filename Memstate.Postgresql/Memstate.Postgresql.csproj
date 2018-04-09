@@ -5,13 +5,19 @@
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <Product>Memstate.Postgresql backing storage module</Product>
-    <Description>Memstate module for using Postgresql as a backing store.</Description>
+    <Description>Storage provider for Memstate based on PostgreSQL</Description>
     <Copyright>2017 Devrex Labs</Copyright>
-    <PackageReleaseNotes />
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <ApplicationIcon />
     <Win32Resource />
+    <PackageId>Memstate.Postgres</PackageId>
+    <PackageVersion>0.2.0</PackageVersion>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <Owners>Devrex Labs</Owners>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
+    <Summary>Storage provider for Memstate based on PostgreSQL</Summary>
+    <Title>Memstate.Postgres</Title>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="PostgresEngineBuilder.cs" />
@@ -27,5 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="3.2.6" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
   </ItemGroup>
 </Project>

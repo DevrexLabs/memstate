@@ -9,41 +9,31 @@ namespace Memstate
             Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public abstract object ExecuteImpl(object model);
+        internal abstract object ExecuteImpl(object model);
 
         protected void RaiseEvent(Event @event) {
-            EventRaised.Invoke(@event);
+            ExecutionContext.Current.AddEvent(@event);
         }
-
-        public event Action<Event> EventRaised = _ => { };
     }
 
     public abstract class Command<TModel> : Command
     {
+        public abstract void Execute(TModel model);
 
-        public virtual void Execute(TModel model)
-        {
-            Execute(model);
-        }
-
-        public override object ExecuteImpl(object model)
+        internal override object ExecuteImpl(object model)
         {
             Execute((TModel) model);
-
             return null;
         }
     }
 
     public abstract class Command<TModel, TResult> : Command
     {
-        public virtual TResult Execute(TModel model)
-        {
-            return Execute(model);
-        }
+        public abstract TResult Execute(TModel model);
 
-        public override object ExecuteImpl(object model)
+        internal override object ExecuteImpl(object model)
         {
             return Execute((TModel) model);
         }

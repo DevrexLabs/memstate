@@ -2,7 +2,7 @@
 
 [Memstate](./README.md) | [QuickStart Guide](/Memstate.Docs.GettingStarted/QuickStart)  | [Modelling](/Memstate.Docs.GettingStarted/Modelling) | [Built in Models](/Memstate.Docs.GettingStarted/BuiltInModels) | [Configuration](/Memstate.Docs.GettingStarted/Configuration) | [Storage](/Memstate.Docs.GettingStarted/Storage) | [Client API](/Memstate.Docs.GettingStarted/ClientAPI) | [Security](/Memstate.Docs.GettingStarted/Security)
 
-[![Join the chat at https://gitter.im/DevrexLabs/memstate](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/DevrexLabs/memstate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # What is Memstate?
 In-memory event-sourced ACID-transactional replicated object graph engine. What? Can you say that again? Ok, it's an application server that keeps all your data in RAM. It runs without a database because all the transactions are recorded in a log and used to restore the state of the application at startup or when setting up a replica. You define the object model, commands and queries using C#. Besides being very simple Memstate is also very fast and will outperform any relational database.

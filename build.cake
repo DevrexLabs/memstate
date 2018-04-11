@@ -6,7 +6,7 @@ Task("Default")
 
 Task("Build")
   .Does(() =>{
-    DotNetBuild("./memstate.sln");
+    DotNetBuild("./src/memstate.sln");
   });
 
 Task("SystemTest")

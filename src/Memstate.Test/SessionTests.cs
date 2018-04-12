@@ -1,4 +1,4 @@
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +6,7 @@ namespace Memstate.Tests
     using Memstate.Models;
     using Memstate.Models.KeyValue;
     using Memstate.Tcp;
-    using Microsoft.CSharp.RuntimeBinder;
+
     using Xunit;
 
     public class SessionTests

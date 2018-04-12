@@ -1,15 +1,13 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
 
-namespace Memstate.Tests
+using Memstate.JsonNet;
+using Memstate.Test.EventfulTestDomain;
+using Memstate.Wire;
+
+namespace Memstate.Test
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-
-    using Memstate.JsonNet;
-    using Memstate.Test.EventfulTestDomain;
-    using Memstate.Wire;
-
     [TestFixture]
     public class SerializationTests
     {

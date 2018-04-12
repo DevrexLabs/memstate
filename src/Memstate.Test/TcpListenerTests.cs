@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     public class TcpListenerTests
     {

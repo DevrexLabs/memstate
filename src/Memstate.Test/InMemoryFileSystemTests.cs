@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using NUnit.Framework;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     [TestFixture]
     public class InMemoryFileSystemTests

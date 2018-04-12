@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Memstate.Models.KeyValue;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     [TestFixture]
     public class EngineOperationalTests

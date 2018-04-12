@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Memstate.Tests.DispatchProxy
+namespace Memstate.Test.DispatchProxy
 {
 
     public class ModelWithOverloads : IModelWithOverloads

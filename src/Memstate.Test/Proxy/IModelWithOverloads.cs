@@ -1,4 +1,4 @@
-﻿namespace Memstate.Tests.DispatchProxy
+﻿namespace Memstate.Test.DispatchProxy
 {
     public interface IModelWithOverloads
     {

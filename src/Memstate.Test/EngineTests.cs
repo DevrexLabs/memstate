@@ -3,7 +3,7 @@ using FakeItEasy;
 using Xunit;
 using System.Threading.Tasks;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     public class EngineTests
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Memstate.Tcp;
 using Xunit;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     public class PacketTests
     {

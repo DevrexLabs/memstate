@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Memstate.Tests.Proxy
+namespace Memstate.Test.Proxy
 {
 
     [TestFixture]

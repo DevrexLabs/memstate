@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Memstate.Tests.Proxy
+namespace Memstate.Test.Proxy
 {
     public class MethodMapTests
     {

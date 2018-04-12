@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Memstate.Tests.DispatchProxy
+namespace Memstate.Test.DispatchProxy
 {
     [TestFixture]
     public class OperationAttributeMapToTests

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     [Serializable]
     public class Customer

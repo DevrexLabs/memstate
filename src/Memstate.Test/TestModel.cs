@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     public interface ITestModel
     {

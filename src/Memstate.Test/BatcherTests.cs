@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     [TestFixture]
     public class BatcherTests

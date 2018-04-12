@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Memstate.Models;
 using Xunit;
 
-namespace Memstate.Tests.Models
+namespace Memstate.Test.Models
 {
     public class KeyValueStoreTests
     {

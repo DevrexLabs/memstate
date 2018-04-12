@@ -2,7 +2,7 @@
 using System.Linq;
 using Xunit;
 
-namespace Memstate.Tests.DispatchProxy
+namespace Memstate.Test.DispatchProxy
 {
     public class ProxyOverloadingTests
     {

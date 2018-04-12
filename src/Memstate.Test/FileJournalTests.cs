@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Memstate.Tests
+namespace Memstate.Test
 {
     using System;
     using System.IO;

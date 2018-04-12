@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Globalization;
-using System;
 
 namespace Memstate.JsonNet
 {
-    using System.Reflection;
     public class JsonSerializerAdapter : ISerializer
     {
         private readonly JsonSerializer _serializer;

@@ -7,6 +7,7 @@ using System;
 
 namespace Memstate.JsonNet
 {
+    using System.Reflection;
     public class JsonSerializerAdapter : ISerializer
     {
         private readonly JsonSerializer _serializer;
@@ -15,7 +16,7 @@ namespace Memstate.JsonNet
         {
             var settings = new JsonSerializerSettings
             {
-                ContractResolver = new DefaultContractResolver
+                ContractResolver = new PrivatePropertySetterContractResolver()
                 {
                     IgnoreSerializableAttribute = true,
                     SerializeCompilerGeneratedMembers = true

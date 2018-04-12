@@ -94,7 +94,7 @@ namespace Memstate
         public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
         {
             EnsureOperational();
-            return await Task.Run(() => Execute(query)).ConfigureAwait(false);
+            return await Task.Run(() => (TResult)Execute(query)).ConfigureAwait(false);
         }
 
         public TResult Execute<TResult>(Command<TModel, TResult> command)
@@ -112,7 +112,7 @@ namespace Memstate
 
         public TResult Execute<TResult>(Query<TModel, TResult> query)
         {
-            return (TResult) Execute((Query) query);
+            return (TResult)Execute((Query)query);
         }
 
         public async Task DisposeAsync()

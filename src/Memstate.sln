@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Test", "Memstate.T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{437BA763-466E-46D7-9AB9-E5AA3B697CA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Test", "System.Test\System.Test.csproj", "{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Test", "System.Test\System.Test.csproj", "{EFC78A26-AA12-45DD-815C-1D1BA0BE912F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql.Tests", "Memstate.Postgresql.Tests\Memstate.Postgresql.Tests.csproj", "{9EBD979B-00EE-472B-9D7F-94E4E72C5202}"
 EndProject

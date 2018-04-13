@@ -33,6 +33,5 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="3.2.7" />
-    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2" />
   </ItemGroup>
 </Project>

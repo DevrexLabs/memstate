@@ -1,6 +1,6 @@
 # Memstate
 
-[Memstate](./README.md) | [QuickStart Guide](/Memstate.Docs.GettingStarted/QuickStart)  | [Modelling](/Memstate.Docs.GettingStarted/Modelling) | [Built in Models](/Memstate.Docs.GettingStarted/BuiltInModels) | [Configuration](/Memstate.Docs.GettingStarted/Configuration) | [Storage](/Memstate.Docs.GettingStarted/Storage) | [Client API](/Memstate.Docs.GettingStarted/ClientAPI) | [Security](/Memstate.Docs.GettingStarted/Security)
+[Documentation](docs)
 
 [![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

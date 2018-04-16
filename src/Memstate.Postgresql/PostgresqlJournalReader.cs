@@ -9,17 +9,9 @@ namespace Memstate.Postgresql
 
     public class PostgresqlJournalReader : IJournalReader
     {
-        private const string SelectSql = @"
-SELECT
-    id,
-    written,
-    command
-FROM
-    {0}
-WHERE
-    id >= @id
-ORDER BY
-    id ASC";
+        private const string SelectSql = @"SELECT id, written, command FROM {0}
+                                           WHERE id >= @id
+                                           ORDER BY id ASC";
 
         private readonly ISerializer _serializer;
         

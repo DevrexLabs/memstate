@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Docs.GettingStarte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F9764AB9-8B67-4D1C-8CD8-CE87034B93CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Bundle", "Memstate.Bundle\Memstate.Bundle.csproj", "{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

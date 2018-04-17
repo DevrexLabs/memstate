@@ -5,9 +5,9 @@
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <Product>Memstate</Product>
-    <PackageId>Memstate.Bundle</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>All of the memstate components in a single bundle and compatible versions</Description>
+    <PackageId>Memstate.Host</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description></Description>
     <Copyright>Devrex Labs</Copyright>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>

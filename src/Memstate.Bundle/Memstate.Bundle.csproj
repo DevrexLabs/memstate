@@ -9,13 +9,17 @@
     <RepositoryType>git</RepositoryType>
     <Authors>Devrex Labs</Authors>
     <Version>1.0.1</Version>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
+    <Product>Memstate</Product>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
-    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgresql.csproj" />
-    <ProjectReference Include="..\Memstate\Memstate.csproj" />
+    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+    <ProjectReference Include="..\Memstate\Memstate.Core.csproj" />
   </ItemGroup>
 
 </Project>

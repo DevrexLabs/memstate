@@ -7,7 +7,7 @@
     <Version>0.2.1</Version>
     <Description>Memstate core engine, client and server library.
 Your data fits in RAM. Moving it back and forth between disk and memory is wasteful. Use Memstate to structure and manage your data in-memory, providing transparent persistence and transactions with strong ACID guarantees.</Description>
-    <Copyright>1998 Devrex Labs</Copyright>
+    <Copyright>Devrex Labs</Copyright>
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <PackageReleaseNotes>See http://github.com/devrexlabs/memstate/releases</PackageReleaseNotes>

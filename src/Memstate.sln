@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.EventStore", "Mems
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.JsonNet", "Memstate.JsonNet\Memstate.JsonNet.csproj", "{5E6F8072-FFB2-44A2-B824-C1900C538F3F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgresql", "Memstate.Postgresql\Memstate.Postgresql.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Postgres", "Memstate.Postgresql\Memstate.Postgres.csproj", "{2C4D0AD4-D213-467F-A1E8-B48FE26A78FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Examples.TodoMvc", "Memstate.Examples.TodoMvc\Memstate.Examples.TodoMvc.csproj", "{02A27644-C712-4A6E-83BB-9911E76CDB75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate", "Memstate\Memstate.csproj", "{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Core", "Memstate\Memstate.Core.csproj", "{7D760C33-9EA8-4DD6-B565-DF7ADD6E167F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Host", "Memstate.Host\Memstate.Host.csproj", "{6FB2441B-9638-4591-96C0-F181E339BFFB}"
 EndProject
@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Docs.GettingStarte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F9764AB9-8B67-4D1C-8CD8-CE87034B93CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Bundle", "Memstate.Bundle\Memstate.Bundle.csproj", "{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Memstate.Bundle", "Memstate.Bundle\Memstate.Bundle.csproj", "{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

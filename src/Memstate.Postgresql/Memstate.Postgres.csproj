@@ -4,9 +4,9 @@
     <Version>0.1.0-alpha</Version>
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
-    <Product>Memstate.Postgresql backing storage module</Product>
+    <Product>Memstate</Product>
     <Description>Storage provider for Memstate based on PostgreSQL</Description>
-    <Copyright>2017 Devrex Labs</Copyright>
+    <Copyright>Devrex Labs</Copyright>
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <ApplicationIcon />
@@ -18,6 +18,7 @@
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <Summary>Storage provider for Memstate based on PostgreSQL</Summary>
     <Title>Memstate.Postgres</Title>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="PostgresEngineBuilder.cs" />
@@ -26,12 +27,12 @@
     <EmbeddedResource Include="init_sql" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memstate\Memstate.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="3.2.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate\Memstate.Core.csproj" />
   </ItemGroup>
 </Project>

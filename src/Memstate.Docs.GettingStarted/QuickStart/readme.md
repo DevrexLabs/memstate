@@ -5,6 +5,7 @@
 Here's a complete guide to get you started with developing your first Memstate application!
 The following topics are covered:
 
+* Create a project
 * Adding the library to your project
 * Define the in-memory model
 * Create commands and queries
@@ -12,21 +13,30 @@ The following topics are covered:
 * Executing commands
 * Executing queries
 
-## Add the library
-The Memstate.Core library is a single assembly. Grab the latest Memstate.Core.dll from the [download page](/download) and add as a reference to your .NET project. Or install the [nuget package](http://nuget.org/List/Packages/Memstate) by typing `Install-Package Memstate -Version 0.1.0-alpha` in visual studio's package manager console.
+## Creating a project for your custom domain model
+Normally you would create a separate class library where you define the domain model. But for the quick start create a simple console application for either .NET Core or .NET Framework.
+
+## Add a reference to the Memstate libraries
+Add a reference to the [Memstate.Bundle nuget package](http://nuget.org/List/Packages/Memstate.Bundle)
 
 ## Define the in-memory model
-
-Create a class that derives from `Model` and add members to hold data, usually collections. Mark the class and any referenced types with the `Serializable` attribute. An instance of this class is your in-memory database.
+Define a root class to serve as the model and any supporting types such as entities. An instance of this class will be kept in-memory and represents the state of your application.
 
 * example : [LoyaltyDB.cs](LoyaltyDB.cs)
 
 ```csharp
-    [Serializable]
-    public class LoyaltyDB
+    public class LoyaltyModel
     {
-        public LoyaltyDB() {}
+        public LoyaltyModel() {}
         public IDictionary<int, Customer> Customers { get; } = new Dictionary<int, Customer>();
+    }
+```
+
+* example : [Customer.cs](Customer.cs)
+
+```csharp
+    public class Customer
+    {
     }
 ```
 
@@ -38,7 +48,7 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 * example : [EarnPoints.cs](Commands/EarnPoints.cs)
 
 ```csharp
-    public class EarnPoints : Command<LoyaltyDB, Customer>
+    public class EarnPoints : Command<LoyaltyModel, Customer>
     {
         public EarnPoints()
         {
@@ -58,7 +68,7 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
         // and (2) in this particular case Customer is immutable.
         // if you have mutable classes, then please rather return a view, e.g. CustomerBalance or CustomerView class 
 
-        public override Customer Execute(LoyaltyDB model)
+        public override Customer Execute(LoyaltyModel model)
         {
             var customer = model.Customers[ID];
             var newPoints = customer.LoyaltyPointBalance + Points;
@@ -75,7 +85,7 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 
 ```csharp
   var settings = new MemstateSettings { StreamName = "LoyaltyDbFile" };
-  var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>().ConfigureAwait(false);
+  var engine = await new EngineBuilder(settings).BuildAsync<LoyaltyModel>();
 ```
 
 ## Executing commands
@@ -85,12 +95,10 @@ Create a command object and pass it to the engine for execution:
 ```csharp
 // The engine will execute the command against the model and persist to the command journal.
 
-int id =1;
-var customer = await db.ExecuteAsync(new EarnPoints(id, 100));
+int id = 1;
+var earnPointsCommand = new EarnPoints(id,100);
+var customer = await engine.ExecuteAsync(earnPointsCommand);
 Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points.");
-
-// or
-var customer = db.Execute(new EarnPoints(id, 100));
 ```
 
 ## Executing queries
@@ -101,10 +109,10 @@ You can  write strongly typed query classes.
 
 // executing a query
 [Serializable]
-public class Top10Customers : Query<LoyaltyDB, Customer[]>
+public class Top10Customers : Query<LoyaltyModel, Customer[]>
 {
-    public override Customer[] Execute(LoyaltyDB db) {
-        return db.Customers
+    public override Customer[] Execute(LoyaltyModel model) {
+        return model.Customers
             .OrderByDescending(c => c.Value.LoyaltyPointBalance)
             .Take(10).Select(c => c.Value).ToArray();
     }

@@ -8,6 +8,7 @@
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Authors>Devrex Labs</Authors>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

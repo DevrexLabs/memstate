@@ -26,6 +26,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memstate\Memstate.Core.csproj" />
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
   </ItemGroup>
 </Project>

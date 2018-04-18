@@ -18,7 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
-    <ProjectReference Include="..\Memstate\Memstate.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DomainEvents\EventfulTestDomain\" />

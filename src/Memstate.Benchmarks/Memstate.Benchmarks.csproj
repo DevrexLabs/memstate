@@ -10,7 +10,6 @@
     <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
     <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
-    <ProjectReference Include="..\Memstate\Memstate.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />

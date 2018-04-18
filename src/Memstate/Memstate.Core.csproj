@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Memstate</AssemblyName>
+    <AssemblyName>Memstate.Core</AssemblyName>
     <RootNamespace>Memstate</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.2.1</Version>

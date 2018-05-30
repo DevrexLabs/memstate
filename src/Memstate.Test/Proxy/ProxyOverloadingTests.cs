@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Memstate.Test.DispatchProxy
 {
     public class ProxyOverloadingTests
     {
-        private readonly IModelWithOverloads _db;
+        private IModelWithOverloads _db;
 
-        public ProxyOverloadingTests()
+        [SetUp]
+        public void Setup()
         {
             var settings = new MemstateSettings().WithInmemoryStorage();
             var storageProvider = settings.CreateStorageProvider();
@@ -19,61 +20,61 @@ namespace Memstate.Test.DispatchProxy
             _db = client.GetDispatchProxy();
         }
 
-        [Fact]
+        [Test]
         public void CanCallNoArgMethod()
         {
             _db.Meth();
-           Assert.Equal(1, _db.GetCalls());
+           Assert.AreEqual(1, _db.GetCalls());
         }
 
-        [Fact]
+        [Test]
         public void CanCallOverloadWithAnArgument()
         {
             var inc = _db.Meth(42);
-            Assert.Equal(43, inc);
+            Assert.AreEqual(43, inc);
         }
 
-        [Fact]
+        [Test]
         public void CanCallWithParams()
         {
             
             var numbers = new[] {1, 2, 3, 4, 5};
             var sum = numbers.Sum();
             var result = _db.Meth(1,2,3,4,5);
-            Assert.Equal(sum, result);
+            Assert.AreEqual(sum, result);
         }
 
-        [Fact]
+        [Test]
         public void CanCallUsingNamedArgs()
         {
             var result = _db.Inc(with: 100, number: 200);
-            Assert.Equal(300, result);
+            Assert.AreEqual(300, result);
         }
 
-        [Fact]
+        [Test]
         public void CanCallWithArrayAsParams()
         {
             var numbers = new[] { 1, 2, 3, 4, 5 };
             var sum = numbers.Sum();
             var result = _db.Meth(numbers);
-            Assert.Equal(sum,result);
+            Assert.AreEqual(sum,result);
         }
 
-        [Fact]
+        [Test]
         public void CanHandleOptionalArgs()
         {
             var result = _db.Inc(20);
-            Assert.Equal(21, result);
+            Assert.AreEqual(21, result);
 
             result = _db.Inc(20, 5);
-            Assert.Equal(25,result);
+            Assert.AreEqual(25,result);
         }
 
 
         /// <summary>
         /// It should not be possible to use ref or out args
         /// </summary>
-        [Fact]
+        [Test]
         public void RefArgsNotAllowed()
         {
             Assert.Throws<Exception>(() =>
@@ -83,7 +84,7 @@ namespace Memstate.Test.DispatchProxy
             });
         }
 
-        [Fact]
+        [Test]
         public void OutArgsNotAllowed()
         {
             Assert.Throws<Exception>(() =>

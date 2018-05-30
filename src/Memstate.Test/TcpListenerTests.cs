@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace Memstate.Test
 {
@@ -12,7 +12,7 @@ namespace Memstate.Test
         /// Verifies the assumption that the blocking TcpListener
         /// Accept*Async calls will return when the listener is stopped.
         /// </summary>
-        [Fact]
+        [Test]
         public void Accept_throws_when_Socket_is_closed()
         {
             TcpListener listener = new TcpListener(IPAddress.Any, 43675);
@@ -20,7 +20,10 @@ namespace Memstate.Test
             Task<TcpClient> task = listener.AcceptTcpClientAsync();
             Task.Delay(1000);
             listener.Stop();
-            Assert.Throws<AggregateException>(() => task.Result);
+            Assert.Throws<AggregateException>(() =>
+            {
+                TcpClient unused = task.Result;
+            });
         }
     }
 }

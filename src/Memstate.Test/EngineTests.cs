@@ -1,19 +1,20 @@
 using System;
 using FakeItEasy;
-using Xunit;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace Memstate.Test
 {
     public class EngineTests
     {
-        private readonly IJournalSubscriptionSource _fakeSubscriptionSource;
-        private readonly IJournalSubscription _fakeSubscription;
-        private readonly IJournalWriter _fakeJournalWriter;
-        private readonly Engine<Object> _engine;
-        private readonly int _nextRecordNumber;
-        
-        public EngineTests()
+        private IJournalSubscriptionSource _fakeSubscriptionSource;
+        private IJournalSubscription _fakeSubscription;
+        private IJournalWriter _fakeJournalWriter;
+        private Engine<Object> _engine;
+        private int _nextRecordNumber;
+
+        [SetUp]
+        public void Setup()
         {
             _fakeSubscriptionSource = A.Fake<IJournalSubscriptionSource>();
             _fakeSubscription = A.Fake<IJournalSubscription>();
@@ -28,15 +29,14 @@ namespace Memstate.Test
             _engine = new Engine<Object>(config, new Object(), _fakeSubscriptionSource, _fakeJournalWriter, _nextRecordNumber);
         }
 
-
-        [Fact]
+        [Test]
         public void Constructor_subscribes_to_journal_records_from_correct_recordNumber()
         {
             A.CallTo(() => _fakeSubscriptionSource.Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        [Fact]
+        [Test]
         public async Task Subscription_is_disposed_when_engine_is_disposed()
         {
             await _engine.DisposeAsync().ConfigureAwait(false);
@@ -45,7 +45,7 @@ namespace Memstate.Test
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        [Fact]
+        [Test]
         public async Task Writer_is_disposed_when_engine_is_disposed()
         { 
             await _engine.DisposeAsync().ConfigureAwait(false);

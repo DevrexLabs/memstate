@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Memstate</AssemblyName>
+    <AssemblyName>Memstate.Core</AssemblyName>
     <RootNamespace>Memstate</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.2.1</Version>
     <Description>Memstate core engine, client and server library.
 Your data fits in RAM. Moving it back and forth between disk and memory is wasteful. Use Memstate to structure and manage your data in-memory, providing transparent persistence and transactions with strong ACID guarantees.</Description>
-    <Copyright>1998 Devrex Labs</Copyright>
+    <Copyright>Devrex Labs</Copyright>
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <PackageReleaseNotes>See http://github.com/devrexlabs/memstate/releases</PackageReleaseNotes>
@@ -19,7 +19,6 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageVersion>0.2.0</PackageVersion>
     <Owners>Devrex Labs</Owners>
     <Summary>Main Memstate library including Engine, Server and Clients</Summary>
-    <Title>Memstate</Title>
     <PackageId>Memstate.Core</PackageId>
     <AssemblyVersion>0.2.1.0</AssemblyVersion>
     <FileVersion>0.2.1.0</FileVersion>

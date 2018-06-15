@@ -34,7 +34,7 @@ namespace Memstate.Postgresql.Tests
         [Fact]
         public void DefaultConnectionStringIsUsed()
         {
-            var key = "Memstate:StorageProviders:Postgresql:Password";
+            var key = "Memstate:StorageProviders:Postgres:Password";
             var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresqlSettings.DefaultConnectionString);
 
             //Appveyor workaround
@@ -101,7 +101,7 @@ namespace Memstate.Postgresql.Tests
         public void PasswordFromArgumentsOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
-            var settings = new MemstateSettings("--Memstate:StorageProviders:Postgresql:Password", expected);
+            var settings = new MemstateSettings("--Memstate:StorageProviders:Postgres:Password", expected);
             var pgSettings = new PostgresqlSettings(settings);
             Assert.Equal(expected, pgSettings.Password);
         }
@@ -109,7 +109,7 @@ namespace Memstate.Postgresql.Tests
         [Fact(Skip="Interferes with same ENV var on appveyor!")]
         public void PasswordFromEnvironmentVariableOverridesConnectionString()
         {
-            string key = "Memstate:StorageProviders:Postgresql:Password";
+            string key = "Memstate:StorageProviders:Postgres:Password";
             var expected = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(key, expected);
             var settings = new MemstateSettings();

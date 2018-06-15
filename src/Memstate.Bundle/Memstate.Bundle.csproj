@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>All of the core memstate components bundled in a single package for convenience</Description>
+    <Copyright>Devrex Labs</Copyright>
+    <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Devrex Labs</Authors>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
+    <Product>Memstate</Product>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+  </ItemGroup>
+
+</Project>

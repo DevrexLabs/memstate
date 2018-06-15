@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
-    <ProjectReference Include="..\Memstate\Memstate.csproj" />
   </ItemGroup>
 
   <ItemGroup>

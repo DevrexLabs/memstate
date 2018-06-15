@@ -1,4 +1,4 @@
-﻿using Xunit;
+﻿using NUnit.Framework;
 
 namespace Memstate.Test.Proxy
 {
@@ -56,70 +56,70 @@ namespace Memstate.Test.Proxy
         }
 
 
-        [Fact]
+        [Test]
         public void Maps_are_cached()
         {
             var map = MethodMap.MapFor<TestModel>();
-            Assert.Same(_map, map);
+            Assert.AreEqual(_map, map);
         }
 
-        [Fact]
+        [Test]
         public void Implicit_command_IsCommand()
         {
             var target = _map. GetOperationInfo("ImplicitCommand");
             Assert.True(target is CommandInfo<TestModel>);
         }
 
-        [Fact]
+        [Test]
         public void Explicit_command_IsCommand()
         {
             var target = _map.GetOperationInfo("ExplicitCommandWithResult");
             Assert.True(target is CommandInfo<TestModel>);
         }
 
-        [Fact]
+        [Test]
         public void Implicit_query_IsQuery()
         {
             var target = _map.GetOperationInfo("ImplicitQuery");
             Assert.True(target is QueryInfo<TestModel>);
         }
 
-        [Fact]
+        [Test]
         public void NoProxy_is_disallowed()
         {
             var target = _map.GetOperationInfo("NoProxyQuery");
             Assert.False(target.IsAllowed);
         }
 
-        [Fact]
+        [Test]
         public void Default_ResultIsIsolated_is_false_implicit()
         {
             var target = _map.GetOperationInfo("ImplicitQuery");
             Assert.False(target.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
         }
 
-        [Fact]
+        [Test]
         public void Default_ResultIsIsolated_is_false_for_explicit()
         {
             var target = _map.GetOperationInfo("ExplicitCommandWithResult");
             Assert.False(target.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
         }
 
-        [Fact]
+        [Test]
         public void Explicit_ResultIsIsolated_is_reported()
         {
             var target = _map.GetOperationInfo("MvccOperation");
             Assert.False(target.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
         }
 
-        [Fact]
+        [Test]
         public void Implicit_internal_command_is_mapped()
         {
             //will throw unless exists
             _map.GetOperationInfo("InternalMethod");
         }
 
-        [Fact]
+        [Test]
         public void Implicit_internal_query_is_mapped()
         {
             _map.GetOperationInfo("InternalQuery");

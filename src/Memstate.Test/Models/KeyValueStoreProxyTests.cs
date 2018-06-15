@@ -1,16 +1,18 @@
+using System.Collections.Generic;
 using Memstate.Models.KeyValue;
+using NUnit.Framework;
 
 namespace Memstate.Test.Models
 {
     using System;
     using Memstate.Models;
-    using Xunit;
 
     public class KeyValueStoreProxyTests
     {
-        private readonly IKeyValueStore<int> _keyValueStore;
+        private IKeyValueStore<int> _keyValueStore;
 
-        public KeyValueStoreProxyTests()
+        [SetUp]
+        public void Setup()
         {
             MemstateSettings config = new MemstateSettings();
             config.FileSystem = new InMemoryFileSystem();
@@ -20,35 +22,38 @@ namespace Memstate.Test.Models
             _keyValueStore = client.GetDispatchProxy();
         }
 
-        [Fact]
+        [Test]
         public void Set_stores_value()
         {
             _keyValueStore.Set("KEY", 1);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(1, node.Value);
+            Assert.AreEqual(1, node.Value);
         }
 
-        [Fact]
+        [Test]
         public void Set_new_key_yields_correct_version()
         {
             _keyValueStore.Set("KEY", 1);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(1, node.Version);
+            Assert.AreEqual(1, node.Version);
         }
 
-        [Fact]
+        [Test]
         public void Update_bumps_version()
         {
             _keyValueStore.Set("KEY", 1);
             _keyValueStore.Set("KEY", 2);
             var node = _keyValueStore.Get("KEY");
-            Assert.Equal(2, node.Version);
+            Assert.AreEqual(2, node.Version);
         }
 
-        [Fact]
+        [Test]
         public void Remove_throws_when_key_not_exists()
         {
-            Assert.ThrowsAny<Exception>(() => _keyValueStore.Remove("KEY"));
+            Assert.Throws<AggregateException> (() =>
+            {
+                _keyValueStore.Remove("KEY");
+            });
         }
     }
 }

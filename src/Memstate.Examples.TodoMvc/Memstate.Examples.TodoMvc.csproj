@@ -10,7 +10,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgresql.csproj" />
-    <ProjectReference Include="..\Memstate\Memstate.csproj" />
+    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
   </ItemGroup>
 </Project>

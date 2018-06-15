@@ -5,9 +5,9 @@
     <Version>0.1.0-alpha</Version>
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
-    <Product>Memstate JsonNet Serilization module</Product>
+    <Product>Memstate</Product>
     <Description>Json serialization for Memstate</Description>
-    <Copyright>2017 Devrex Labs</Copyright>
+    <Copyright>Devrex Labs</Copyright>
     <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
@@ -16,6 +16,7 @@
     <Summary>JSON Serializer for Memstate based on Newtonsoft JSON</Summary>
     <Title>Memstate.JsonNet</Title>
     <PackageId>Memstate.JsonNet</PackageId>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="JsonObjectToIntegerConverter.cs" />
@@ -25,6 +26,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Memstate\Memstate.csproj" />
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
   </ItemGroup>
 </Project>

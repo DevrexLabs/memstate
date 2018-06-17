@@ -1,7 +1,9 @@
-﻿namespace Memstate.Tcp
+﻿using System.Threading.Tasks;
+
+namespace Memstate.Tcp
 {
     internal interface IHandle<in T>
     {
-        void Handle(T message);
+        Task Handle(T message);
     }
 }

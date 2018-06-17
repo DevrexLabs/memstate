@@ -19,7 +19,7 @@ namespace Memstate.Host.Commands
 
             for (var i = 0; i < Writes; i++)
             {
-                tasks[i] = Engine.ExecuteAsync(new Set<int>($"key-{i}", i));
+                tasks[i] = Engine.Execute(new Set<int>($"key-{i}", i));
             }
 
             Task.WaitAll(tasks);

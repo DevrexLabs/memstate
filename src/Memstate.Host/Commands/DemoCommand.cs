@@ -35,7 +35,7 @@ namespace Memstate.Host.Commands
             _settings.WithInmemoryStorage();
             _settings.LoggerFactory.AddConsole((category, level) => true);
 
-            _engine = new EngineBuilder(_settings).Build<KeyValueStore<int>>();
+            _engine = await new EngineBuilder(_settings).Build<KeyValueStore<int>>();
 
             _host = new WebHostBuilder()
                 .UseKestrel()
@@ -69,13 +69,13 @@ namespace Memstate.Host.Commands
         {
             var random = new Random();
 
-            await _engine.ExecuteAsync(new Set<int>("key-0", 0));
+            await _engine.Execute(new Set<int>("key-0", 0));
 
             while (_running)
             {
                 for (var i = 0; i < random.Next(1, 100); i++)
                 {
-                    await _engine.ExecuteAsync(new Set<int>($"key-{i}", i));
+                    await _engine.Execute(new Set<int>($"key-{i}", i));
                 }
 
                 Thread.Sleep(random.Next(100, 5000));
@@ -90,7 +90,7 @@ namespace Memstate.Host.Commands
             {
                 for (var i = 0; i < random.Next(1, 100); i++)
                 {
-                    await _engine.ExecuteAsync(new Get<int>("key-0"));
+                    await _engine.Execute(new Get<int>("key-0"));
                 }
 
                 Thread.Sleep(random.Next(100, 5000));

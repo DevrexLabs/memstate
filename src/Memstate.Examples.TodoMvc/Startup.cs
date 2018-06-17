@@ -30,7 +30,7 @@ namespace Memstate.Examples.TodoMvc
             {
                 var settings = new MemstateSettings();
 
-                return await new EngineBuilder(settings).BuildAsync<TodoModel>().ConfigureAwait(false);
+                return await new EngineBuilder(settings).Build<TodoModel>().ConfigureAwait(false);
             });
         }
 

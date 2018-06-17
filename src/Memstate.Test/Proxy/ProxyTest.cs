@@ -17,7 +17,7 @@ namespace Memstate.Test.Proxy
         {
             var config = new MemstateSettings().WithInmemoryStorage();
             ITestModel model = new TestModel();
-            _engine = new EngineBuilder(config).Build(model);
+            _engine = new EngineBuilder(config).Build(model).Result;
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 

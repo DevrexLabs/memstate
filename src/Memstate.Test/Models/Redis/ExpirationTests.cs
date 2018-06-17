@@ -78,7 +78,7 @@ namespace Memstate.Test.Models.Redis
 
             settings.WithInmemoryStorage();
 
-            var engine = new EngineBuilder(settings).Build<IRedisModel>(new RedisModel());
+            var engine = new EngineBuilder(settings).Build<IRedisModel>(new RedisModel()).Result;
             var redis = new LocalClient<IRedisModel>(engine).GetDispatchProxy();
 
             var mre = new ManualResetEvent(false);
@@ -103,7 +103,7 @@ namespace Memstate.Test.Models.Redis
             Assert.AreEqual(redis.KeyCount(), 1);
             engine.DisposeAsync().GetAwaiter().GetResult();
 
-            engine = new EngineBuilder(settings).Build<IRedisModel>(new RedisModel());
+            engine = new EngineBuilder(settings).Build<IRedisModel>(new RedisModel()).Result;
             redis = new LocalClient<IRedisModel>(engine).GetDispatchProxy();
             Assert.AreEqual(redis.KeyCount(), 1);
             engine.DisposeAsync().GetAwaiter().GetResult();

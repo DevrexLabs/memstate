@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -130,7 +129,6 @@ namespace Memstate
             if (_pendingRequests.TryGetValue(requestId, out var completionSource))
             {
                 completionSource.SetResult(response);
-
                 _pendingRequests.Remove(requestId);
             }
             else
@@ -200,61 +198,41 @@ namespace Memstate
             return await completionSource.Task;
         }
 
-        internal override object Execute(Query query)
+        internal async override Task<object> ExecuteUntyped(Query query)
         {
-            // NOTE: Not sure if we need this method.
-            throw new NotImplementedException();
-        }
-
-        public override void Execute(Command<TModel> command)
-        {
-            ExecuteAsync(command).Wait();
-        }
-
-        public override TResult Execute<TResult>(Command<TModel, TResult> command)
-        {
-            return ExecuteAsync(command).Result;
-        }
-
-        public override TResult Execute<TResult>(Query<TModel, TResult> query)
-        {
-            return ExecuteAsync(query).Result;
+            var request = new QueryRequest(query);
+            var response = (QueryResponse)await SendAndReceive(request);
+            return response.Result;
         }
 
 
-        public override async Task ExecuteAsync(Command<TModel> command)
+        public override async Task Execute(Command<TModel> command)
         {
             var request = new CommandRequest(command);
-
             await SendAndReceive(request);
         }
 
-        public override async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
+        public override async Task<TResult> Execute<TResult>(Command<TModel, TResult> command)
         {
             var request = new CommandRequest(command);
-
             var response = (CommandResponse) await SendAndReceive(request);
-
             return (TResult) response.Result;
         }
 
-        public override async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
+        public override async Task<TResult> Execute<TResult>(Query<TModel, TResult> query)
         {
             var request = new QueryRequest(query);
-
             var response = (QueryResponse) await SendAndReceive(request);
-
             return (TResult) response.Result;
         }
 
-        public override async Task UnsubscribeAsync<T>()
+        public override async Task Unsubscribe<T>()
         {
             await SendAndReceive(new UnsubscribeRequest(typeof(T)));
         }
 
-        public override async Task SubscribeAsync<T>(Action<T> handler, IEventFilter filter = null)
+        public override async Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
         {
-            
             await SendAndReceive(new SubscribeRequest(typeof(T), filter));
         }
 

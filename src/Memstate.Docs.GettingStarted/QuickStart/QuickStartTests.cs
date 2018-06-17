@@ -29,11 +29,11 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print("   (using Wire format  & local filesystem storage)");
             var settings = new MemstateSettings { StreamName = Filename };
-            var engine = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>();
+            var engine = await new EngineBuilder(settings).Build<LoyaltyDB>();
             Print("AND I initialise the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
-                await engine.ExecuteAsync(new InitCustomer(i + 1, 10));
+                await engine.Execute(new InitCustomer(i + 1, 10));
             }
 
             Print("THEN a journal file should now exist on the filesystem");
@@ -41,8 +41,8 @@ namespace Memstate.Docs.GettingStarted.QuickStart
 
             Print("WHEN customer 5 and customer 12 each earn 190 and 290 loyalty points respectively");
 
-            var c1 = await engine.ExecuteAsync(new EarnPoints(5, 190));
-            var c2 = await engine.ExecuteAsync(new EarnPoints(12, 290));
+            var c1 = await engine.Execute(new EarnPoints(5, 190));
+            var c2 = await engine.Execute(new EarnPoints(12, 290));
 
             Print("THEN the balance for them will have increased to 200 and 300 loyalty points for customer 5 and 12 respectively");
             Assert.AreEqual(200, c1.LoyaltyPointBalance);
@@ -55,10 +55,10 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Assert.True(File.Exists(JournalFile));
 
             Print("WHEN I start up another engine");
-            engine = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>();
+            engine = await new EngineBuilder(settings).Build<LoyaltyDB>();
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            var allCustomers = await engine.ExecuteAsync(new GetCustomers());
+            var allCustomers = await engine.Execute(new GetCustomers());
 
             Print("AND the database should be restored to the exact same state it was after the last command was executed");
             Assert.AreEqual(20, allCustomers.Count);

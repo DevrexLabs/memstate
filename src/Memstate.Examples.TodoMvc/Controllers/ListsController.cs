@@ -19,7 +19,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            var lists = _model.Execute(new FindAll());
+            var lists = _model.Execute(new FindAll()).Result;
             
             return Json(lists);
         }
@@ -28,7 +28,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [HttpPost]
         public IActionResult Create(string name)
         {
-            var list = _model.Execute(new CreateList(name));
+            var list = _model.Execute(new CreateList(name)).Result;
             
             return Created(Url.RouteUrl("Lists.Details", new { listId = list.Id }), list);
         }
@@ -37,8 +37,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [HttpDelete]
         public IActionResult Delete(Guid listId)
         {
-            _model.Execute(new RemoveList(listId));
-
+            _model.Execute(new RemoveList(listId)).Wait();
             return Ok();
         }
 
@@ -46,8 +45,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [HttpGet]
         public IActionResult Details(Guid listId)
         {
-            var list = _model.Execute(new FindOne(listId));
-
+            var list = _model.Execute(new FindOne(listId)).Result;
             return Json(list);
         }
     }

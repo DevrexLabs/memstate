@@ -8,7 +8,7 @@
         {
             settings = settings ?? new MemstateSettings();
 
-            return new EngineBuilder(settings).BuildAsync<T>();
+            return new EngineBuilder(settings).Build<T>();
         }
     }
 }

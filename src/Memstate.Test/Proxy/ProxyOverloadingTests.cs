@@ -15,7 +15,7 @@ namespace Memstate.Test.DispatchProxy
             var storageProvider = settings.CreateStorageProvider();
             var model = new ModelWithOverloads();
             var engine = new EngineBuilder(settings, storageProvider)
-                .Build<IModelWithOverloads>(model);
+                .Build<IModelWithOverloads>(model).Result;
             var client = new LocalClient<IModelWithOverloads>(engine);
             _db = client.GetDispatchProxy();
         }

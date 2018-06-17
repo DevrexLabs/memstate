@@ -29,7 +29,7 @@ namespace Memstate.Host.Commands
 
             Logger = Settings.CreateLogger<Benchmark>();
 
-            Engine = new EngineBuilder(Settings).Build<KeyValueStore<int>>();
+            Engine = await new EngineBuilder(Settings).Build<KeyValueStore<int>>();
 
             var totals = new List<TimeSpan>(Runs);
 

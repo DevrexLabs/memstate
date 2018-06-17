@@ -19,7 +19,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [HttpPost]
         public IActionResult Create(Guid listId, string title, string description, DateTime? dueBy)
         {
-            var task = _model.Execute(new AddTask(listId, title, description, dueBy));
+            var task = _model.Execute(new AddTask(listId, title, description, dueBy)).Result;
 
             return Json(task);
         }
@@ -27,7 +27,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
         [Route("{taskId}", Name = "Tasks.Details")]
         public IActionResult Details(Guid listId, Guid taskId)
         {
-            var task = _model.Execute(new FindOne(listId, taskId));
+            var task = _model.Execute(new FindOne(listId, taskId)).Result;
 
             if (task == null)
             {

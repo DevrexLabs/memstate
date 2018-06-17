@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Memstate
 {
@@ -9,12 +10,12 @@ namespace Memstate
         {
         }
 
-        protected override object ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedQuery)
+        protected override Task<object> ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedQuery)
         {
-            return client.Execute((Query) mappedQuery);
+            return client.ExecuteUntyped((Query) mappedQuery);
         }
 
-        protected override object ExecuteProxy(Client<T> client, MethodCall methodCall, string signature)
+        protected override Task<object> ExecuteProxy(Client<T> client, MethodCall methodCall, string signature)
         {
             var genericArgs = methodCall.TargetMethod.GetGenericArguments();
 

@@ -75,7 +75,6 @@ namespace Memstate.Host
                 .First();
 
             var model = method.Invoke(null, new object[] {modelCreator});
-
             return model;
         }
 
@@ -83,7 +82,6 @@ namespace Memstate.Host
         private static T CreateModel<T>(IModelCreator modelCreator)
         {
             var model = modelCreator.Create<T>();
-
             return model;
         }
 
@@ -95,18 +93,14 @@ namespace Memstate.Host
                 .First();
 
             var server = method.Invoke(null, new[] {settings, model});
-
             return server;
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
         private static MemstateServer<T> CreateServer<T>(MemstateSettings settings, T model) where T : class
         {
-            var engine = new EngineBuilder(settings).Build(model);
-
-            var server = new MemstateServer<T>(settings, engine);
-
-            return server;
+            var engine = new EngineBuilder(settings).Build(model).Result;
+            return new MemstateServer<T>(settings, engine);
         }
     }
 }

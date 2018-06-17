@@ -82,7 +82,7 @@ namespace Memstate.Tcp
 
                 _log.LogDebug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
 
-                session.Handle(message);
+                await session.Handle(message);
             }
 
             outgoingMessages.CompleteAdding();

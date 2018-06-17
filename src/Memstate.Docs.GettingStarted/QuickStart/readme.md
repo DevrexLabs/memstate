@@ -97,7 +97,7 @@ Create a command object and pass it to the engine for execution:
 
 int id = 1;
 var earnPointsCommand = new EarnPoints(id,100);
-var customer = await engine.ExecuteAsync(earnPointsCommand);
+var customer = await engine.Execute(earnPointsCommand);
 Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points.");
 ```
 
@@ -118,7 +118,7 @@ public class Top10Customers : Query<LoyaltyModel, Customer[]>
     }
 }
 
-Customer[] customers = engine.Execute(new Top10Customers());
+Customer[] customers = await engine.Execute(new Top10Customers());
 ```
 
 ## Transactions

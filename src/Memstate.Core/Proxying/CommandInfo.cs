@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Memstate
 {
@@ -28,7 +29,7 @@ namespace Memstate
         {
         }
 
-        protected override object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature)
+        protected override Task<object> ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature)
         {
             var genericArgs = methodCall.TargetMethod.GetGenericArguments();
             var proxyCommand = new ProxyCommand<T>(signature, methodCall.Args, genericArgs);
@@ -36,7 +37,7 @@ namespace Memstate
             return engine.Execute(proxyCommand);
         }
 
-        protected override object ExecuteMapped(Client<T> engine, MethodCall methodCallMessage, object mappedCommand)
+        protected async override Task<object> ExecuteMapped(Client<T> engine, MethodCall methodCallMessage, object mappedCommand)
         {
             //Command<TModel>.Execute is void
             //Command<TModel,TResult>.Execute returns TResult 
@@ -45,8 +46,8 @@ namespace Memstate
             {
                 return engine.Execute((Command<T, object>) mappedCommand);
             }
-            engine.Execute((Command<T>) mappedCommand);
-            return null;
+            await engine.Execute((Command<T>) mappedCommand);
+            return Task.FromResult<object>(null);
         }
     }
 }

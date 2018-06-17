@@ -136,7 +136,7 @@ namespace System.Test
             settings.StreamName = _randomStreamName;
 
             var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            await engine.ExecuteAsync(new Reverse()).ConfigureAwait(false);
+            await engine.Execute(new Reverse()).ConfigureAwait(false);
             await engine.DisposeAsync().ConfigureAwait(false);
         }
 
@@ -154,14 +154,14 @@ namespace System.Test
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
                 var command = new AddStringCommand(number.ToString());
-                var count = await engine.ExecuteAsync(command).ConfigureAwait(false);
+                var count = await engine.Execute(command).ConfigureAwait(false);
                 Assert.Equal(number, count);
             }
 
             await engine.DisposeAsync().ConfigureAwait(false);
 
             engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+            var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
             Assert.Equal(NumRecords, strings.Count);
             await engine.DisposeAsync().ConfigureAwait(false);
         }

@@ -39,7 +39,7 @@ namespace Memstate.Benchmarks
             settings.StorageProvider = StorageProviderTypes.AssemblyQualifiedName;
             settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
             var engineBuilder = new EngineBuilder(settings);
-            _engine = engineBuilder.Build(new KeyValueStore<int>());
+            _engine = engineBuilder.Build(new KeyValueStore<int>()).Result;
         }
 
         [GlobalCleanup]
@@ -53,7 +53,7 @@ namespace Memstate.Benchmarks
         {
             var tasks = Enumerable
                 .Range(0, Iterations)
-                .Select(i => _engine.ExecuteAsync(new Set<int>(i.ToString(), i)));
+                .Select(i => _engine.Execute(new Set<int>(i.ToString(), i)));
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }

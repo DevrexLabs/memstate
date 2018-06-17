@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Memstate
 {
@@ -45,7 +46,7 @@ namespace Memstate
 
         protected bool IsMapped => OperationAttribute.MapTo != null;
 
-        public object Execute(Client<T> client, MethodCall methodCall, string signature)
+        public Task<object> Execute(Client<T> client, MethodCall methodCall, string signature)
         {
             if (IsMapped && TryGetMappedOperation(methodCall, out var mappedOperation))
             {
@@ -55,9 +56,9 @@ namespace Memstate
             return ExecuteProxy(client, methodCall, signature);
         }
 
-        protected abstract object ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedOperation);
+        protected abstract Task<object> ExecuteMapped(Client<T> client, MethodCall methodCall, object mappedOperation);
 
-        protected abstract object ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature);
+        protected abstract Task<object> ExecuteProxy(Client<T> engine, MethodCall methodCall, string signature);
 
         /// <summary>
         /// If operation attribute had a MapTo property selecting a Command or

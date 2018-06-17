@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate.Models.KeyValue;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host.Commands
@@ -16,11 +15,11 @@ namespace Memstate.Host.Commands
 
         protected override async Task Run()
         {
-            await Engine.ExecuteAsync(new Set<int>("key-0", 0));
+            await Engine.Execute(new Set<int>("key-0", 0));
             
             for (var i = 0; i < Reads; i++)
             {
-                Engine.Execute(new Get<int>("key-0"));
+                await Engine.Execute(new Get<int>("key-0"));
             }
         }
 

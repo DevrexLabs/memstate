@@ -5,6 +5,7 @@ namespace Memstate.Test
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Memstate.Models;
     using Memstate.Models.KeyValue;
     using Memstate.Tcp;
@@ -20,55 +21,55 @@ namespace Memstate.Test
         {
             var config = new MemstateSettings().WithInmemoryStorage();
             _testModel = new KeyValueStore<int>();
-            var engine = new EngineBuilder(config).Build(_testModel);
+            var engine = new EngineBuilder(config).Build(_testModel).Result;
             _session = new Session<KeyValueStore<int>>(config, engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;
         }
 
         [Test]
-        public void Incompatible_command_emits_ExceptionResponse()
+        public async Task Incompatible_command_emits_ExceptionResponse()
         {
             var command = new ProxyCommand<string>("dummy", null, null);
             var request = new CommandRequest(command);
-            _session.Handle(request);
+            await _session.Handle(request);
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
             Assert.IsAssignableFrom<InvalidCastException>(response.Exception);
         }
 
         [Test]
-        public void Query_that_throws_exception_emits_ExceptionResponse()
+        public async Task Query_that_throws_exception_emits_ExceptionResponse()
         {
             var query = new FailingQuery();
             var request = new QueryRequest(query);
 
-            _session.Handle(request);
+            await _session.Handle(request);
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
         }
 
         [Test]
-        public void Command_that_throws_exception_emits_ExceptionResponse()
+        public async Task Command_that_throws_exception_emits_ExceptionResponse()
         {
             var command = new Remove<int>("NON_EXISTING_KEY");
             var request = new CommandRequest(command);
 
-            _session.Handle(request);
+            await _session.Handle(request);
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
         }
 
         [Test]
-        public void QueryRequest_happy_path()
+        public async Task QueryRequest_happy_path()
         {
             _testModel.Set("KEY", 42);
             var query = new Get<int>("KEY");
             var queryRequest = new QueryRequest(query);
 
-            _session.Handle(queryRequest);
+            await _session.Handle(queryRequest);
 
             Assert.IsTrue(_messagesEmitted.Count == 1);
             var response = (QueryResponse)_messagesEmitted.Single();
@@ -78,22 +79,22 @@ namespace Memstate.Test
         }
 
         [Test]
-        public void Command_with_result_happy_path()
+        public async Task Command_with_result_happy_path()
         {
             var commandRequest = new CommandRequest(new Set<int>("KEY", 42));
-            _session.Handle(commandRequest);
+            await _session.Handle(commandRequest);
             var response = AssertAndGetSingle<CommandResponse>();
             Assert.AreEqual(commandRequest.Id, response.ResponseTo);
             Assert.AreEqual(1, (int)response.Result);
         }
 
         [Test]
-        public void Void_command_happy_path()
+        public async Task Void_command_happy_path()
         {
             _testModel.Set("KEY", 100);
             var request = new CommandRequest(new Remove<int>("KEY"));
 
-            _session.Handle(request);
+            await _session.Handle(request);
 
             Assert.AreEqual(0, _testModel.Count());
 
@@ -103,19 +104,19 @@ namespace Memstate.Test
         }
 
         [Test]
-        public void PingPong()
+        public async Task PingPong()
         {
             var request  = new Ping();
-            _session.Handle(request);
+            await _session.Handle(request);
             var pong = AssertAndGetSingle<Pong>();
             Assert.AreEqual(request.Id, pong.ResponseTo);
         }
 
         [Test]
-        public void UnhandledMessageException()
+        public async Task UnhandledMessageException()
         {
             var message = new UnknownMessage();
-            _session.Handle(message);
+            await _session.Handle(message);
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.IsAssignableFrom<Exception>(response.Exception);

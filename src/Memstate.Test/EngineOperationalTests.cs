@@ -32,7 +32,7 @@ namespace Memstate.Test
             _fakeSource.RecordHandler.Invoke(new JournalRecord(2, _now, new Set<int>("a", 10)));
 
             // engine should now be stopped and throw if transactions are attempted
-            Assert.Throws<Exception>(() => _engine.Execute(new Count<int>()));
+            Assert.Throws<Exception>(() => _engine.ExecuteUntyped(new Count<int>()));
         }
 
         [Test]
@@ -47,10 +47,10 @@ namespace Memstate.Test
             _fakeSource.RecordHandler.Invoke(new JournalRecord(2, _now, new Set<int>("d",300)));
 
             //Wait for the second record to be applied
-            await _engine.EnsureVersionAsync(2).ConfigureAwait(false);
+            await _engine.EnsureVersion(2).ConfigureAwait(false);
 
             //we should be able to execute a query
-            var numKeys = await _engine.ExecuteAsync(new Count<int>()).ConfigureAwait(false);
+            var numKeys = await _engine.Execute(new Count<int>()).ConfigureAwait(false);
             Assert.AreEqual(2, numKeys);
             Assert.AreEqual(2, _engine.LastRecordNumber);
         }

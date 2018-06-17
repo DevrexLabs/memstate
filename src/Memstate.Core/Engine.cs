@@ -59,60 +59,21 @@ namespace Memstate
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
 
-        public async Task<TResult> ExecuteAsync<TResult>(Command<TModel, TResult> command)
+        public async Task<TResult> Execute<TResult>(Command<TModel, TResult> command)
         {
-            EnsureOperational();
-
-            var completionSource = new TaskCompletionSource<object>();
-            _pendingLocalCommands[command.Id] = completionSource;
-
-            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
-
-            using (_metrics.MeasureCommandExecution())
-            {
-                _journalWriter.Send(command);
-                return (TResult) await completionSource.Task.ConfigureAwait(false);
-            }
+            return (TResult) await ExecuteUntyped(command);
         }
 
-        public async Task ExecuteAsync(Command<TModel> command)
+        public Task Execute(Command<TModel> command)
         {
-            EnsureOperational();
-
-            var completionSource = new TaskCompletionSource<object>();
-            _pendingLocalCommands[command.Id] = completionSource;
-
-            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
-
-            using (_metrics.MeasureCommandExecution())
-            {
-                _journalWriter.Send(command);
-                await completionSource.Task.ConfigureAwait(false);
-            }
+            return ExecuteUntyped(command);
         }
 
-        public async Task<TResult> ExecuteAsync<TResult>(Query<TModel, TResult> query)
+        public Task<TResult> Execute<TResult>(Query<TModel, TResult> query)
         {
             EnsureOperational();
-            return await Task.Run(() => (TResult)Execute(query)).ConfigureAwait(false);
-        }
-
-        public TResult Execute<TResult>(Command<TModel, TResult> command)
-        {
-            EnsureOperational();
-            return ExecuteAsync(command).Result;
-        }
-
-        public void Execute(Command<TModel> command)
-        {
-            EnsureOperational();
-
-            ExecuteAsync(command).Wait();
-        }
-
-        public TResult Execute<TResult>(Query<TModel, TResult> query)
-        {
-            return (TResult)Execute((Query)query);
+            var result = (TResult)ExecuteUntyped(query);
+            return Task.FromResult(result);
         }
 
         public async Task DisposeAsync()
@@ -136,7 +97,7 @@ namespace Memstate
         /// </summary>
         /// <param name="recordNumber">The version </param>
         /// <returns></returns>
-        public async Task EnsureVersionAsync(long recordNumber)
+        public async Task EnsureVersion(long recordNumber)
         {
             EnsureOperational();
 
@@ -146,7 +107,7 @@ namespace Memstate
             }
         }
 
-        internal object Execute(Query query)
+        internal object ExecuteUntyped(Query query)
         {
             EnsureOperational();
 
@@ -155,26 +116,25 @@ namespace Memstate
                 try
                 {
                     var result = _kernel.Execute(query);
-
                     _metrics.QueryExecuted();
-
                     return result;
                 }
                 catch (Exception)
                 {
                     _metrics.QueryFailed();
-
                     throw;
                 }
             }
         }
 
-        internal object Execute(Command command)
+        /// <summary>
+        /// Execute non-generically typed command
+        /// </summary>
+        internal Task<object> ExecuteUntyped(Command command)
         {
             EnsureOperational();
 
             var completionSource = new TaskCompletionSource<object>();
-
             _pendingLocalCommands[command.Id] = completionSource;
 
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
@@ -182,8 +142,7 @@ namespace Memstate
             using (_metrics.MeasureCommandExecution())
             {
                 _journalWriter.Send(command);
-
-                return completionSource.Task.ConfigureAwait(false).GetAwaiter().GetResult();
+                return completionSource.Task;
             }
         }
 
@@ -220,8 +179,6 @@ namespace Memstate
 
                 completion?.SetResult(result);
                 _metrics.CommandExecuted();
-
-
             }
             catch (Exception ex)
             {

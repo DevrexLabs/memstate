@@ -40,7 +40,7 @@ namespace System.Test
             foreach (var number in Enumerable.Range(1, records))
             {
                 var command = new AddStringCommand($"{number}");
-                var count = await writer.ExecuteAsync(command).ConfigureAwait(false);
+                var count = await writer.Execute(command).ConfigureAwait(false);
                 Assert.Equal(number, count);
             }
 
@@ -48,9 +48,9 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
-                await reader.EnsureVersionAsync(writer.LastRecordNumber);
+                await reader.EnsureVersion(writer.LastRecordNumber);
                 
-                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
                 Assert.Equal(records, strings.Count);
 
@@ -83,14 +83,14 @@ namespace System.Test
                 foreach (var number in Enumerable.Range(1, records))
                 {
                     var command = new AddStringCommand($"{number}");
-                    var count = await writer.ExecuteAsync(command).ConfigureAwait(false);
+                    var count = await writer.Execute(command).ConfigureAwait(false);
                     Assert.Equal(++totalCount, count);
                 }
 
                 await writer.DisposeAsync().ConfigureAwait(false);
             }
 
-            var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+            var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
             Assert.Equal(records * writers.Length, strings.Count);
 
@@ -126,7 +126,7 @@ namespace System.Test
                 foreach (var number in Enumerable.Range(1, records))
                 {
                     var command = new AddStringCommand($"{number}");
-                    var count = await writer.ExecuteAsync(command).ConfigureAwait(false);
+                    var count = await writer.Execute(command).ConfigureAwait(false);
                     Assert.Equal(++totalCount, count);
                 }
 
@@ -135,7 +135,7 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
-                var strings = await reader.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
                 Assert.Equal(records * writers.Length, strings.Count);
 
@@ -177,7 +177,7 @@ namespace System.Test
                             foreach (var number in Enumerable.Range(1, Records))
                             {
                                 var command = new AddStringCommand($"{index}.{number}");
-                                await writer.ExecuteAsync(command).ConfigureAwait(false);
+                                await writer.Execute(command).ConfigureAwait(false);
                             }
 
                             //await writer.DisposeAsync().ConfigureAwait(false);
@@ -195,8 +195,8 @@ namespace System.Test
             foreach (var engine in engines)
             {
                 _log.WriteLine("Counting strings");
-                await engine.EnsureVersionAsync(recordsWritten - 1).ConfigureAwait(false);
-                var strings = await engine.ExecuteAsync(new GetStringsQuery()).ConfigureAwait(false);
+                await engine.EnsureVersion(recordsWritten - 1).ConfigureAwait(false);
+                var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
                 _log.WriteLine($"Count: {strings.Count}");
 

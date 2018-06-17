@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Memstate.Tcp
@@ -46,7 +47,7 @@ namespace Memstate.Tcp
             _engine.CommandExecuted -= SendMatchingEvents;
         }
 
-        public void Handle(Message message)
+        public async Task Handle(Message message)
         {
             try
             {
@@ -57,7 +58,7 @@ namespace Memstate.Tcp
                         break;
 
                     case CommandRequest request:
-                        HandleImpl(request);
+                        await HandleImpl(request);
                         break;
 
                     case Ping ping:
@@ -73,7 +74,6 @@ namespace Memstate.Tcp
                         break;
                     default:
                         throw new Exception("unrecognized exception");
-
                 }
             }
             catch (Exception ex)
@@ -85,15 +85,15 @@ namespace Memstate.Tcp
 
         private void HandleImpl(QueryRequest request)
         {
-            var result = _engine.Execute(request.Query);
+            var result = _engine.ExecuteUntyped(request.Query);
             var response = new QueryResponse(result, request.Id);
 
             OnMessage.Invoke(response);
         }
 
-        private void HandleImpl(CommandRequest request)
+        private async Task HandleImpl(CommandRequest request)
         {
-            var result = _engine.Execute(request.Command);
+            var result = await _engine.ExecuteUntyped(request.Command);
             var response = new CommandResponse(result, request.Id);
 
             OnMessage.Invoke(response);

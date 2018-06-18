@@ -2,27 +2,24 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 namespace System.Test
 {
-    using Microsoft.Extensions.Logging;
-
+    [TestFixture]
     public class ClusterTests
     {
-        private readonly ITestOutputHelper _log;
-        private readonly string _randomStreamName;
+        private string _randomStreamName;
 
-        public ClusterTests(ITestOutputHelper log)
+        [SetUp]
+        public void Setup()
         {
-            _log = log;
-            _randomStreamName = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
+            _randomStreamName 
+                = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
         }
 
         // One writer, multiple readers
-        [Theory]
-        [ClassData(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteOneAndReadFromMany(MemstateSettings settings)
         {
             const int records = 100;
@@ -41,7 +38,7 @@ namespace System.Test
             {
                 var command = new AddStringCommand($"{number}");
                 var count = await writer.Execute(command).ConfigureAwait(false);
-                Assert.Equal(number, count);
+                Assert.AreEqual(number, count);
             }
 
             await writer.DisposeAsync().ConfigureAwait(false);
@@ -52,15 +49,14 @@ namespace System.Test
                 
                 var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
-                Assert.Equal(records, strings.Count);
+                Assert.AreEqual(records, strings.Count);
 
                 await reader.DisposeAsync().ConfigureAwait(false);
             }
         }
 
         // Multiple writers, one reader
-        [Theory]
-        [ClassData(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromOne(MemstateSettings settings)
         {
             const int records = 100;
@@ -84,7 +80,7 @@ namespace System.Test
                 {
                     var command = new AddStringCommand($"{number}");
                     var count = await writer.Execute(command).ConfigureAwait(false);
-                    Assert.Equal(++totalCount, count);
+                    Assert.AreEqual(++totalCount, count);
                 }
 
                 await writer.DisposeAsync().ConfigureAwait(false);
@@ -92,14 +88,13 @@ namespace System.Test
 
             var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
-            Assert.Equal(records * writers.Length, strings.Count);
+            Assert.AreEqual(records * writers.Length, strings.Count);
 
             await reader.DisposeAsync().ConfigureAwait(false);
         }
 
         // Multiple writers, multiple readers
-        [Theory]
-        [ClassData(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromMany(MemstateSettings settings)
         {
             const int records = 100;
@@ -127,7 +122,7 @@ namespace System.Test
                 {
                     var command = new AddStringCommand($"{number}");
                     var count = await writer.Execute(command).ConfigureAwait(false);
-                    Assert.Equal(++totalCount, count);
+                    Assert.AreEqual(++totalCount, count);
                 }
 
                 await writer.DisposeAsync().ConfigureAwait(false);
@@ -135,86 +130,81 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
+                await reader.EnsureVersion(totalCount);
                 var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
-                Assert.Equal(records * writers.Length, strings.Count);
+                Assert.AreEqual(totalCount, strings.Count);
 
                 await reader.DisposeAsync().ConfigureAwait(false);
             }
         }
 
         // Multiple writers, multiple readers, in parallel
-        [Theory]
-        [ClassData(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(typeof(TestConfigurations.Cluster))]
         public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
         {
             const int Records = 100;
 
             Configure(settings);
 
-            _log.WriteLine("Creating readers");
+            Console.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
             readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            _log.WriteLine("Readers created");
+            Console.WriteLine("Readers created");
 
-            _log.WriteLine("Creating writers");
+            Console.WriteLine("Creating writers");
             var writers = new Engine<List<string>>[3];
 
             writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            _log.WriteLine("Writers created");
+            Console.WriteLine("Writers created");
 
-            _log.WriteLine("Creating write tasks");
+            Console.WriteLine("Creating write tasks");
             var tasks = writers.Select(
                 (writer, index) => Task.Run(
                     async () =>
                         {
-                            _log.WriteLine($"Writing commands on writer-{index + 1}");
+                            Console.WriteLine($"Writing commands on writer-{index + 1}");
                             foreach (var number in Enumerable.Range(1, Records))
                             {
                                 var command = new AddStringCommand($"{index}.{number}");
                                 await writer.Execute(command).ConfigureAwait(false);
                             }
 
-                            //await writer.DisposeAsync().ConfigureAwait(false);
-                            _log.WriteLine($"Done writing commands on writer-{index + 1}");
+                            Console.WriteLine($"Done writing commands on writer-{index + 1}");
                         })).ToArray();
 
-            _log.WriteLine("Waiting on write tasks");
+            Console.WriteLine("Waiting on write tasks");
             await Task.WhenAll(tasks).ConfigureAwait(false);
             var recordsWritten = Records * writers.Length;
-            _log.WriteLine("Done waiting on write tasks");
+            Console.WriteLine("Done waiting on write tasks");
 
-            _log.WriteLine("Reading from all engines");
+            Console.WriteLine("Reading from all engines");
             var engines = readers.Concat(writers);
 
             foreach (var engine in engines)
             {
-                _log.WriteLine("Counting strings");
+                Console.WriteLine("Counting strings");
                 await engine.EnsureVersion(recordsWritten - 1).ConfigureAwait(false);
                 var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
-                _log.WriteLine($"Count: {strings.Count}");
+                Console.WriteLine($"Count: {strings.Count}");
 
-                Assert.Equal(recordsWritten, strings.Count);
+                Assert.AreEqual(recordsWritten, strings.Count);
 
-                _log.WriteLine("Disposing reader");
+                Console.WriteLine("Disposing reader");
                 await engine.DisposeAsync().ConfigureAwait(false);
-                _log.WriteLine("Disposed reader");
+                Console.WriteLine("Disposed reader");
             }
-            _log.WriteLine("Done reading from all engines");
-
+            Console.WriteLine("Done reading from all engines");
         }
 
         private void Configure(MemstateSettings settings)
         {
-            var logProvider = new TestOutputLoggingProvider(_log);
-            logProvider.MinimumLogLevel = LogLevel.Information;
-            settings.LoggerFactory.AddProvider(logProvider);
             settings.StreamName = _randomStreamName;
         }
     }

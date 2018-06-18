@@ -8,6 +8,7 @@ namespace System.Test
     using Memstate.JsonNet;
     using Memstate.Postgresql;
     using Memstate.Wire;
+    using Microsoft.Extensions.Logging;
 
     public class TestConfigurations : IEnumerable<object[]>
     {
@@ -31,6 +32,7 @@ namespace System.Test
                 {
                     var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
                     settings.Serializer = serializerName;
+                    settings.LoggerFactory.AddConsole();    
                     settings.FileSystem = new InMemoryFileSystem();
                     settings.StorageProvider = providerType.AssemblyQualifiedName;
                     settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
@@ -61,8 +63,8 @@ namespace System.Test
         {
             protected override IEnumerable<Type> ProviderTypes()
             {
-                //yield return typeof(PostgresqlProvider);
                 yield return typeof(EventStoreProvider);
+                //yield return typeof(PostgresqlProvider);
             }
         }
     }

@@ -75,7 +75,7 @@ namespace Memstate
 
         public override string ToString()
         {
-            return $"[Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}]";
+            return $"Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}";
         }
 
         private static IConfiguration Build(params string[] commandLineArguments)

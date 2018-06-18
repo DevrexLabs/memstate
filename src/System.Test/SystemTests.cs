@@ -1,35 +1,28 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Memstate;
+using NUnit.Framework;
+
 namespace System.Test
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Memstate;
 
-    using Microsoft.Extensions.Logging;
-
-    using Xunit;
-    using Xunit.Abstractions;
-
+    [TestFixture]
     public class SystemTests
     {
-        private readonly ITestOutputHelper _log;
-        private readonly string _randomStreamName;
+        private string _randomStreamName;
 
-        public SystemTests(ITestOutputHelper log)
+        [SetUp]
+        public void Setup()
         {
-            _log = log;
             _randomStreamName = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task CanWriteOne(MemstateSettings settings)
         {
-            var logProvider = new TestOutputLoggingProvider(_log);
-            logProvider.MinimumLogLevel = LogLevel.Trace;
-            settings.LoggerFactory.AddProvider(logProvider);
             settings.StreamName = _randomStreamName;
-            _log.WriteLine(settings.ToString());
+            Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
             provider.Initialize();
@@ -41,14 +34,12 @@ namespace System.Test
             var reader = provider.CreateJournalReader();
             var records = reader.GetRecords().ToArray();
             await reader.DisposeAsync().ConfigureAwait(false);
-            Assert.Single(records);
+            Assert.AreEqual(0, records.Length);
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task WriteAndReadCommands(MemstateSettings settings)
         {
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
             var provider = settings.CreateStorageProvider();
@@ -65,14 +56,12 @@ namespace System.Test
             var journalReader = provider.CreateJournalReader();
             var records = journalReader.GetRecords().ToArray();
             await journalReader.DisposeAsync().ConfigureAwait(false);
-            Assert.Equal(10000, records.Length);
+            Assert.AreEqual(10000, records.Length);
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task SubscriptionDeliversPreExistingCommands(MemstateSettings settings)
         {
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
             var provider = settings.CreateStorageProvider();
@@ -96,17 +85,15 @@ namespace System.Test
             {
                 subSource.Subscribe(0, records.Add);
                 await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.Equal(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
+                Assert.AreEqual(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
             }
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task SubscriptionDeliversFutureCommands(MemstateSettings settings)
         {
             const int NumRecords = 5;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
             var provider = settings.CreateStorageProvider();
@@ -125,14 +112,12 @@ namespace System.Test
             await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
             sub.Dispose();
 
-            Assert.Equal(NumRecords, records.Count);
+            Assert.AreEqual(NumRecords, records.Count);
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task Can_execute_void_commands(MemstateSettings settings)
         {
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
             var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
@@ -140,13 +125,11 @@ namespace System.Test
             await engine.DisposeAsync().ConfigureAwait(false);
         }
 
-        [Theory]
-        [ClassData(typeof(TestConfigurations))]
+        [TestCaseSource(typeof(TestConfigurations))]
         public async Task Smoke(MemstateSettings settings)
         {
             const int NumRecords = 100;
 
-            settings.LoggerFactory.AddProvider(new TestOutputLoggingProvider(_log));
             settings.StreamName = _randomStreamName;
 
             var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
@@ -155,14 +138,14 @@ namespace System.Test
             {
                 var command = new AddStringCommand(number.ToString());
                 var count = await engine.Execute(command).ConfigureAwait(false);
-                Assert.Equal(number, count);
+                Assert.AreEqual(number, count);
             }
 
             await engine.DisposeAsync().ConfigureAwait(false);
 
             engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
-            Assert.Equal(NumRecords, strings.Count);
+            Assert.AreEqual(NumRecords, strings.Count);
             await engine.DisposeAsync().ConfigureAwait(false);
         }
 

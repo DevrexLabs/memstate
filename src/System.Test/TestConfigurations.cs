@@ -24,7 +24,7 @@ namespace System.Test
                 .GetEnumerator();
         }
 
-        private IEnumerable<MemstateSettings> GetConfigurations()
+        public IEnumerable<MemstateSettings> GetConfigurations()
         {
             foreach (var serializerName in Serializers())
             {

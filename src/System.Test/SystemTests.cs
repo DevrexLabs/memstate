@@ -18,7 +18,12 @@ namespace System.Test
             _randomStreamName = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        public static IEnumerable<MemstateSettings> Configurations()
+        {
+            return new TestConfigurations().GetConfigurations();
+        }
+
+        [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteOne(MemstateSettings settings)
         {
             settings.StreamName = _randomStreamName;
@@ -34,13 +39,14 @@ namespace System.Test
             var reader = provider.CreateJournalReader();
             var records = reader.GetRecords().ToArray();
             await reader.DisposeAsync().ConfigureAwait(false);
-            Assert.AreEqual(0, records.Length);
+            Assert.AreEqual(1, records.Length);
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task WriteAndReadCommands(MemstateSettings settings)
         {
             settings.StreamName = _randomStreamName;
+            Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
             provider.Initialize();
@@ -59,10 +65,11 @@ namespace System.Test
             Assert.AreEqual(10000, records.Length);
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversPreExistingCommands(MemstateSettings settings)
         {
             settings.StreamName = _randomStreamName;
+            Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
             const int NumRecords = 50;
@@ -89,12 +96,12 @@ namespace System.Test
             }
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversFutureCommands(MemstateSettings settings)
         {
             const int NumRecords = 5;
-
             settings.StreamName = _randomStreamName;
+            Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
             var records = new List<JournalRecord>();
@@ -115,22 +122,23 @@ namespace System.Test
             Assert.AreEqual(NumRecords, records.Count);
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task Can_execute_void_commands(MemstateSettings settings)
         {
             settings.StreamName = _randomStreamName;
-
+            Console.WriteLine(settings);
             var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
             await engine.Execute(new Reverse()).ConfigureAwait(false);
             await engine.DisposeAsync().ConfigureAwait(false);
         }
 
-        [TestCaseSource(typeof(TestConfigurations))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task Smoke(MemstateSettings settings)
         {
             const int NumRecords = 100;
 
             settings.StreamName = _randomStreamName;
+            Console.WriteLine(settings);
 
             var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
 

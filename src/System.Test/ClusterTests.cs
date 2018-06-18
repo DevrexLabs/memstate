@@ -19,7 +19,7 @@ namespace System.Test
         }
 
         // One writer, multiple readers
-        [TestCaseSource(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteOneAndReadFromMany(MemstateSettings settings)
         {
             const int records = 100;
@@ -56,7 +56,7 @@ namespace System.Test
         }
 
         // Multiple writers, one reader
-        [TestCaseSource(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteManyAndReadFromOne(MemstateSettings settings)
         {
             const int records = 100;
@@ -94,7 +94,7 @@ namespace System.Test
         }
 
         // Multiple writers, multiple readers
-        [TestCaseSource(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteManyAndReadFromMany(MemstateSettings settings)
         {
             const int records = 100;
@@ -130,7 +130,7 @@ namespace System.Test
 
             foreach (var reader in readers)
             {
-                await reader.EnsureVersion(totalCount);
+                //await reader.EnsureVersion(totalCount);
                 var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 
                 Assert.AreEqual(totalCount, strings.Count);
@@ -140,7 +140,7 @@ namespace System.Test
         }
 
         // Multiple writers, multiple readers, in parallel
-        [TestCaseSource(typeof(TestConfigurations.Cluster))]
+        [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
         {
             const int Records = 100;
@@ -206,6 +206,12 @@ namespace System.Test
         private void Configure(MemstateSettings settings)
         {
             settings.StreamName = _randomStreamName;
+            Console.WriteLine("C: " + settings);
+        }
+
+        public static IEnumerable<MemstateSettings> Configurations()
+        {
+            return new TestConfigurations.Cluster().GetConfigurations();
         }
     }
 }

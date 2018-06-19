@@ -33,6 +33,19 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Model\**" />
     <EmbeddedResource Remove="Model\**" />
     <None Remove="Model\**" />
+    <Compile Remove="Logging\ILog.cs.pp" />
+    <Compile Remove="Logging\LogLevel.cs.pp" />
+    <Compile Remove="Logging\LogProvider.cs.pp" />
+    <Compile Remove="Logging\LogProviders\DisposableAction.cs.pp" />
+    <Compile Remove="Logging\LogProviders\LibLogException.cs.pp" />
+    <Compile Remove="Logging\LogProviders\Log4NetLogProvider.cs.pp" />
+    <Compile Remove="Logging\LogProviders\LogMessageFormatter.cs.pp" />
+    <Compile Remove="Logging\LogProviders\LogProviderBase.cs.pp" />
+    <Compile Remove="Logging\LogProviders\LoupeLogProvidercs.cs.pp" />
+    <Compile Remove="Logging\LogProviders\NLogLogProvider.cs.pp" />
+    <Compile Remove="Logging\LogProviders\SerilogLogProvider.cs.pp" />
+    <Compile Remove="Logging\LogProviders\TraceEventTypeValues.cs.pp" />
+    <Compile Remove="Logging\LogProviders\TypeExtensions.cs.pp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="CommandChunk.cs" />
@@ -41,6 +54,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
   <ItemGroup>
     <PackageReference Include="App.Metrics" Version="2.0.0" />
     <PackageReference Include="App.Metrics.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="LibLog" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
@@ -50,6 +64,5 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
     <PackageReference Include="Wire" Version="0.8.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
   </ItemGroup>
 </Project>

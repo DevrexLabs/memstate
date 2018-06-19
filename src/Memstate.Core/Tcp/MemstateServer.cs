@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate.Tcp
 {
@@ -20,7 +20,7 @@ namespace Memstate.Tcp
 
         private readonly TcpListener _tcpListener;
 
-        private readonly ILogger _log;
+        private readonly ILog _log;
 
         private readonly CancellationTokenSource _cancellationSource;
 
@@ -39,16 +39,16 @@ namespace Memstate.Tcp
             var ip = IPAddress.Any;
             var endPoint = new IPEndPoint(ip, 3001);
             _tcpListener = new TcpListener(endPoint);
-            _log = config.LoggerFactory.CreateLogger(typeof(MemstateServer<>));
+            _log = LogProvider.GetCurrentClassLogger();
             _cancellationSource = new CancellationTokenSource();
         }
 
         public void Start()
         {
-            _log.LogInformation("Starting");
+            _log.Info("Starting");
             _tcpListener.Start();
             _listenerTask = Task.Run(() => AcceptConnections(_cancellationSource.Token));
-            _log.LogDebug("Started");
+            _log.Debug("Started");
         }
 
         private async Task AcceptConnections(CancellationToken cancellationToken)
@@ -56,10 +56,8 @@ namespace Memstate.Tcp
             while (!cancellationToken.IsCancellationRequested)
             {
                 var tcpClient = await _tcpListener.AcceptTcpClientAsync();
-
                 _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
-
-                _log.LogInformation("Connection from {0}", tcpClient.Client.RemoteEndPoint);
+                _log.Info("Connection from {0}", tcpClient.Client.RemoteEndPoint);
             }
         }
 
@@ -71,22 +69,17 @@ namespace Memstate.Tcp
             var outgoingMessages = new BlockingCollection<Message>();
             var writerTask = Task.Run(() => SendMessages(outgoingMessages, stream));
             var session = new Session<T>(_config, _engine);
-
             session.OnMessage += outgoingMessages.Add;
 
             while (!_cancellationSource.Token.IsCancellationRequested)
             {
-                _log.LogDebug("Waiting for message");
-
+                _log.Debug("Waiting for message");
                 var message = await Message.Read(stream, serializer, _cancellationSource.Token);
-
-                _log.LogDebug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
-
+                _log.Debug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
                 await session.Handle(message);
             }
 
             outgoingMessages.CompleteAdding();
-
             await writerTask;
         }
 
@@ -101,28 +94,23 @@ namespace Memstate.Tcp
             {
                 var message = messages.TakeOrDefault(cancellationToken);
 
-                if (message == null)
-                {
-                    break;
-                }
+                if (message == null) break;
 
                 var bytes = serializer.Serialize(message);
                 var packet = Packet.Create(bytes, ++messageId);
-
                 await packet.WriteTo(stream);
-
                 await stream.FlushAsync();
             }
         }
 
         public void Stop()
         {
-            _log.LogInformation("Closing");
+            _log.Info("Closing");
             _cancellationSource.Cancel();
             _listenerTask.Wait();
             // TODO: Should we stop before Cancel() and Wait() ?
             _tcpListener.Stop();
-            _log.LogDebug("Closed");
+            _log.Debug("Closed");
         }
     }
 }

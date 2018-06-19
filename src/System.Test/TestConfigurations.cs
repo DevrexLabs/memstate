@@ -8,7 +8,7 @@ namespace System.Test
     using Memstate.JsonNet;
     using Memstate.Postgresql;
     using Memstate.Wire;
-    using Microsoft.Extensions.Logging;
+    using Memstate.Logging;
 
     public class TestConfigurations : IEnumerable<object[]>
     {
@@ -32,7 +32,6 @@ namespace System.Test
                 {
                     var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
                     settings.Serializer = serializerName;
-                    settings.LoggerFactory.AddConsole();    
                     settings.FileSystem = new InMemoryFileSystem();
                     settings.StorageProvider = providerType.AssemblyQualifiedName;
                     settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));

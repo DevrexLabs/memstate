@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Memstate.Logging;
 
 namespace Memstate.EventStore
 {
@@ -14,13 +13,13 @@ namespace Memstate.EventStore
 
         private readonly string _streamName;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         public EventStoreWriter(MemstateSettings settings, IEventStoreConnection connection)
             : base(settings)
         {
             _connection = connection;
-            _logger = settings.CreateLogger<EventStoreWriter>();
+            _logger = LogProvider.GetCurrentClassLogger();
 
             var eventStoreSettings = new EventStoreSettings(settings);
 
@@ -31,12 +30,9 @@ namespace Memstate.EventStore
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData).ToArray();
-
-            _logger.LogDebug("Writing {0} events", events.Length);
-
+            _logger.Debug("Writing {0} events", events.Length);
             var writeResult = _connection.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Result;
-
-            _logger.LogDebug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
+            _logger.Debug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
         }
 
         private EventData ToEventData(Command cmd)

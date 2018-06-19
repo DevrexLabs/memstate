@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Memstate.Logging;
 using System.Threading.Tasks;
 using Npgsql;
 
@@ -6,7 +6,7 @@ namespace Memstate.Postgresql
 {
     public class PostgresqlProvider : StorageProvider
     {
-        private readonly ILogger<PostgresqlProvider> _log;
+        private readonly ILog _log;
         
         private readonly MemstateSettings _settings;
 
@@ -14,9 +14,8 @@ namespace Memstate.Postgresql
 
         public PostgresqlProvider(MemstateSettings settings)
         {
-            _log = settings.CreateLogger<PostgresqlProvider>();
+            _log = LogProvider.GetCurrentClassLogger();
             _settings = settings;
-            
             Settings = new PostgresqlSettings(settings);
         }
 
@@ -39,7 +38,7 @@ namespace Memstate.Postgresql
                 
                 command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
                 
-                _log.LogTrace($"Executing SQL '{command.CommandText}'");
+                _log.Trace($"Executing SQL '{command.CommandText}'");
                 
                 command.ExecuteNonQuery();
             }

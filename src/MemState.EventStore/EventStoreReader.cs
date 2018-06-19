@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Memstate.Logging;
+
 
 namespace Memstate.EventStore
 {
@@ -17,11 +17,11 @@ namespace Memstate.EventStore
 
         private readonly int _eventsPerSlice;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         public EventStoreReader(MemstateSettings config, EventStoreSettings eventStoreSettings, IEventStoreConnection connection)
         {
-            _logger = config.CreateLogger<EventStoreReader>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;
             _serializer = config.Serializers.Create(eventStoreSettings.Serializer, config);
             _streamName = eventStoreSettings.StreamName;
@@ -37,13 +37,13 @@ namespace Memstate.EventStore
         {
             var nextRecord = fromRecord;
 
-            _logger.LogInformation("GetRecords from {0}", nextRecord);
+            _logger.Info("GetRecords from {0}", nextRecord);
 
             while (true)
             {
                 var slice = _connection.ReadStreamEventsForwardAsync(_streamName, nextRecord, _eventsPerSlice, false).Result;
 
-                _logger.LogDebug("{0} events in slice from {0}", slice.Events.Length, slice.FromEventNumber);
+                _logger.Debug("{0} events in slice from {0}", slice.Events.Length, slice.FromEventNumber);
 
                 foreach (var @event in slice.Events.Select(e => e.Event))
                 {
@@ -58,7 +58,7 @@ namespace Memstate.EventStore
                 nextRecord = slice.NextEventNumber;
             }
 
-            _logger.LogInformation("GetRecords completed");
+            _logger.Info("GetRecords completed");
         }
     }
 }

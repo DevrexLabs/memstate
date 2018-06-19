@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Memstate.Logging;
 
 namespace Memstate
 {
@@ -10,19 +11,12 @@ namespace Memstate
         protected BatchingJournalWriter(MemstateSettings config)
         {
             Ensure.NotNull(config, nameof(config));
-
             _batcher = new Batcher<Command>(config, OnCommandBatch);
         }
 
-        public void Send(Command command)
-        {
-            _batcher.Add(command);
-        }
+        public void Send(Command command) => _batcher.Add(command);
 
-        public virtual async Task DisposeAsync()
-        {
-            await _batcher.DisposeAsync().ConfigureAwait(false);
-        }
+        public virtual Task DisposeAsync() => _batcher.DisposeAsync();
 
         protected abstract void OnCommandBatch(IEnumerable<Command> commands);
     }

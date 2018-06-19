@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate.Host.Commands
 {
@@ -15,26 +15,21 @@ namespace Memstate.Host.Commands
 
         private Host _host;
 
-        public async Task Start(string[] arguments)
+        public Task Start(string[] arguments)
         {
             StartServer(arguments);
-
-            await StartWebInterface();
+            return StartWebInterface();
         }
 
         public async Task Stop()
         {
             await _webHost.StopAsync();
-
             _host.Stop();
         }
 
         private void StartServer(string[] arguments)
         {
             _host = new Host(arguments);
-            
-            _host.Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
-
             _host.Start();
         }
 

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate
 {
@@ -16,11 +16,11 @@ namespace Memstate
 
         private readonly Action<IEnumerable<T>> _batchHandler;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         public Batcher(MemstateSettings config, Action<IEnumerable<T>> batchHandler)
         {
-            _logger = config.CreateLogger<Batcher<T>>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _batchHandler = batchHandler;
             _maxBatchSize = config.MaxBatchSize;
             _items = new BlockingCollection<T>(config.MaxBatchQueueLength);
@@ -35,13 +35,10 @@ namespace Memstate
 
         public async Task DisposeAsync()
         {
-            _logger.LogDebug("Begin Dispose");
-
+            _logger.Debug("Begin Dispose");
             _items.CompleteAdding();
-
             await _batchTask.ConfigureAwait(false);
-
-            _logger.LogDebug("End Dispose");
+            _logger.Debug("End Dispose");
         }
 
         private void ProcessItems()
@@ -63,7 +60,6 @@ namespace Memstate
                 }
 
                 _batchHandler.Invoke(buffer);
-
                 buffer.Clear();
             }
         }

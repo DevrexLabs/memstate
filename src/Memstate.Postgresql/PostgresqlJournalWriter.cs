@@ -5,13 +5,13 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    using Microsoft.Extensions.Logging;
+    using Memstate.Logging;
 
     public class PostgresqlJournalWriter : BatchingJournalWriter
     {
         private const string InsertSql = @"INSERT INTO {0} (""command"") VALUES {1};";
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         private readonly ISerializer _serializer;
 
@@ -24,7 +24,7 @@ namespace Memstate.Postgresql
 
             _serializer = settings.CreateSerializer();
             _settings = new PostgresqlSettings(settings);
-            _logger = settings.CreateLogger<PostgresqlJournalWriter>();
+            _logger = LogProvider.GetCurrentClassLogger();
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
@@ -37,7 +37,7 @@ namespace Memstate.Postgresql
 
                 var count = commands.Count();
 
-                _logger.LogDebug($"OnCommandBatch received {count} commands");
+                _logger.Debug($"OnCommandBatch received {count} commands");
 
                 var values = string.Join(",", Enumerable.Range(0, count).Select(i => $"(@{i})"));
 

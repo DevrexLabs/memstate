@@ -3,7 +3,8 @@ using System.Reflection;
 using App.Metrics;
 using App.Metrics.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
+
 
 namespace Memstate
 {
@@ -32,8 +33,6 @@ namespace Memstate
 
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
-        public ILoggerFactory LoggerFactory { get; } //= new LoggerFactory();
-
         public StorageProviders StorageProviders { get; set; } = new StorageProviders();
 
         public Serializers Serializers { get; set; } = new Serializers();
@@ -57,11 +56,6 @@ namespace Memstate
             provider.Initialize();
 
             return provider;
-        }
-
-        public ILogger<T> CreateLogger<T>()
-        {
-            return LoggerFactory.CreateLogger<T>();
         }
 
         public IModelCreator CreateModelCreator()

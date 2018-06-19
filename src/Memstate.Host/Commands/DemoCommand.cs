@@ -33,7 +33,7 @@ namespace Memstate.Host.Commands
             _settings = new MemstateSettings(arguments);
 
             _settings.WithInmemoryStorage();
-            _settings.LoggerFactory.AddConsole((category, level) => true);
+            //_settings.LoggerFactory.AddConsole((category, level) => true);
 
             _engine = await new EngineBuilder(_settings).Build<KeyValueStore<int>>();
 

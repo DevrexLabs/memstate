@@ -3,13 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate
 {
     public class Engine<TModel> where TModel : class
     {
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         private readonly Kernel _kernel;
 
@@ -47,7 +47,7 @@ namespace Memstate
             long nextRecord)
         {
             _lastRecordNumber = nextRecord - 1;
-            _logger = settings.CreateLogger<Engine<TModel>>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _kernel = new Kernel(settings, model);
             _settings = settings;
             _journalWriter = journalWriter;
@@ -78,7 +78,7 @@ namespace Memstate
 
         public async Task DisposeAsync()
         {
-            _logger.LogDebug("Begin Dispose");
+            _logger.Debug("Begin Dispose");
 
             await _journalWriter.DisposeAsync().ConfigureAwait(false);
 
@@ -89,7 +89,7 @@ namespace Memstate
 
             _commandSubscription.Dispose();
 
-            _logger.LogDebug("End Dispose");
+            _logger.Debug("End Dispose");
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Memstate
                     _pendingCommandsChanged.Set();
                 }
 
-                _logger.LogDebug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
+                _logger.Debug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
 
                 VerifyRecordSequence(record.RecordNumber);
 
@@ -183,7 +183,7 @@ namespace Memstate
             catch (Exception ex)
             {
                 _metrics.CommandFailed();
-                _logger.LogError(default(EventId), ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+                _logger.Error(ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);
             }
         }
@@ -199,7 +199,7 @@ namespace Memstate
                     throw new Exception($"Broken sequence, expected {expected}, got {actualRecordNumber}");
                 }
 
-                _logger.LogWarning(
+                _logger.Warn(
                     "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
                     expected,
                     actualRecordNumber);
@@ -222,7 +222,7 @@ namespace Memstate
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Exception thrown in CommandExecuted handler.");
+                _logger.Error(exception, "Exception thrown in CommandExecuted handler.");
             }
         }
     }

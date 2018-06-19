@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Memstate.Models;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate.Host.Commands
 {
@@ -15,7 +15,7 @@ namespace Memstate.Host.Commands
         
         protected MemstateSettings Settings { get; private set; }
 
-        protected ILogger<Benchmark> Logger { get; private set; }
+        internal ILog Logger { get; private set; }
 
         protected Engine<KeyValueStore<int>> Engine { get; private set; }
 
@@ -25,9 +25,9 @@ namespace Memstate.Host.Commands
         {
             Settings = new MemstateSettings(arguments);
             Settings.WithRandomSuffixAppendedToStreamName();
-            Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
+            //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 
-            Logger = Settings.CreateLogger<Benchmark>();
+            Logger = LogProvider.GetCurrentClassLogger();
 
             Engine = await new EngineBuilder(Settings).Build<KeyValueStore<int>>();
 
@@ -35,7 +35,7 @@ namespace Memstate.Host.Commands
 
             for (var run = 0; run < Runs; run++)
             {
-                Logger.LogInformation($"Run {run + 1}");
+                Logger.Info($"Run {run + 1}");
 
                 var stopwatch = Stopwatch.StartNew();
 

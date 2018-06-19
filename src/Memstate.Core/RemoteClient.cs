@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Memstate.Tcp;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate
 {
@@ -12,7 +12,7 @@ namespace Memstate
     {
         private readonly MemstateSettings _config;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         /// <summary>
         /// The tcp connection to the server
@@ -55,9 +55,8 @@ namespace Memstate
             _config = config;
             _serializer = config.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
-            _logger = _config.LoggerFactory.CreateLogger<RemoteClient<TModel>>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _cancellationSource = new CancellationTokenSource();
-
             _eventHandlers = new Dictionary<Type, Action<Event>>();
         }
 
@@ -67,7 +66,7 @@ namespace Memstate
             _tcpClient = new TcpClient();
             await _tcpClient.ConnectAsync(host, port);
             _stream = _tcpClient.GetStream();
-            _logger.LogInformation($"Connected to {host}:{port}");
+            _logger.Info($"Connected to {host}:{port}");
             _messageDispatcher = new MessageProcessor<Message>(WriteMessage);
             _messageHandler = Task.Run(ReceiveMessages);
         }
@@ -97,7 +96,7 @@ namespace Memstate
                     break;
 
                 default:
-                    _logger.LogError("No handler for message " + message);
+                    _logger.Error("No handler for message " + message);
                     break;
             }
         }
@@ -119,7 +118,7 @@ namespace Memstate
                 }
                 else
                 {
-                    _logger.LogError("No handler for event type {0}", @event);
+                    _logger.Error("No handler for event type {0}", @event);
                 }
             }
         }
@@ -133,31 +132,22 @@ namespace Memstate
             }
             else
             {
-                _logger.LogError($"No completion source for {response}, id {response.ResponseTo}");
+                _logger.Error($"No completion source for {response}, id {response.ResponseTo}");
             }
         }
 
         private async Task ReceiveMessages()
         {
-            _logger.LogTrace("Starting ReceiveMessages task");
-
+            _logger.Trace("Starting ReceiveMessages task");
             var serializer = _config.CreateSerializer();
-
             var cancellationToken = _cancellationSource.Token;
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                _logger.LogTrace("awaiting NetworkMessage");
-
+                _logger.Trace("awaiting NetworkMessage");
                 var message = await Message.Read(_stream, serializer, cancellationToken);
-
-                _logger.LogDebug("message received " + message);
-
-                if (message == null)
-                {
-                    break;
-                }
-
+                _logger.Debug("message received " + message);
+                if (message == null) break;
                 Handle(message);
             }
         }
@@ -169,33 +159,25 @@ namespace Memstate
         /// <returns></returns>
         private async Task WriteMessage(Message message)
         {
-            _logger.LogDebug("WriteMessage: invoked with " + message);
-
+            _logger.Debug("WriteMessage: invoked with " + message);
             var bytes = _serializer.Serialize(message);
-
-            _logger.LogDebug("WriteMessage: serialized message size: " + bytes.Length);
+            _logger.Debug("WriteMessage: serialized message size: " + bytes.Length);
 
             var messageId = _counter.Next();
             var packet = Packet.Create(bytes, messageId);
 
             await packet.WriteTo(_stream);
-
-            _logger.LogTrace("Packet written");
-
+            _logger.Trace("Packet written");
             await _stream.FlushAsync();
         }
 
-        private async Task<Message> SendAndReceive(Request request)
+        private Task<Message> SendAndReceive(Request request)
         {
             var completionSource = new TaskCompletionSource<Message>();
-
             _pendingRequests[request.Id] = completionSource;
-
-            _logger.LogTrace("SendAndReceive: queueing request id {0}, type {1}", request.Id, request.GetType());
-
+            _logger.Trace("SendAndReceive: queueing request id {0}, type {1}", request.Id, request.GetType());
             _messageDispatcher.Enqueue(request);
-
-            return await completionSource.Task;
+            return completionSource.Task;
         }
 
         internal async override Task<object> ExecuteUntyped(Query query)
@@ -206,10 +188,10 @@ namespace Memstate
         }
 
 
-        public override async Task Execute(Command<TModel> command)
+        public override Task Execute(Command<TModel> command)
         {
             var request = new CommandRequest(command);
-            await SendAndReceive(request);
+            return SendAndReceive(request);
         }
 
         public override async Task<TResult> Execute<TResult>(Command<TModel, TResult> command)
@@ -226,14 +208,14 @@ namespace Memstate
             return (TResult) response.Result;
         }
 
-        public override async Task Unsubscribe<T>()
+        public override Task Unsubscribe<T>()
         {
-            await SendAndReceive(new UnsubscribeRequest(typeof(T)));
+            return SendAndReceive(new UnsubscribeRequest(typeof(T)));
         }
 
-        public override async Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
+        public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
         {
-            await SendAndReceive(new SubscribeRequest(typeof(T), filter));
+            return SendAndReceive(new SubscribeRequest(typeof(T), filter));
         }
 
         public void Dispose()

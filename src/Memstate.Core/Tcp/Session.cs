@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate.Tcp
 {
@@ -15,14 +15,14 @@ namespace Memstate.Tcp
     {
         private readonly Engine<T> _engine;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         private readonly ConcurrentDictionary<Type, EventMatcher> _subscriptions; 
 
         public Session(MemstateSettings config, Engine<T> engine)
         {
             _engine = engine;
-            _logger = config.LoggerFactory.CreateLogger<Session<T>>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _engine.CommandExecuted += SendMatchingEvents;
             _subscriptions = new ConcurrentDictionary<Type, EventMatcher>();
         }
@@ -35,7 +35,7 @@ namespace Memstate.Tcp
 
             if (matchingEvents.Length > 0)
             {
-                _logger.LogTrace("Sending {0} events", matchingEvents.Length);
+                _logger.Trace("Sending {0} events", matchingEvents.Length);
                 OnMessage.Invoke(new EventsRaised(matchingEvents));
             }
         }
@@ -73,12 +73,12 @@ namespace Memstate.Tcp
                         HandleImpl(request);
                         break;
                     default:
-                        throw new Exception("unrecognized exception");
+                        throw new Exception("unrecognized message");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error handling message: " + message);
+                _logger.Error(ex, "Error handling message: " + message);
                 OnMessage.Invoke(new ExceptionResponse(message, ex));
             }
         }
@@ -87,7 +87,6 @@ namespace Memstate.Tcp
         {
             var result = _engine.ExecuteUntyped(request.Query);
             var response = new QueryResponse(result, request.Id);
-
             OnMessage.Invoke(response);
         }
 
@@ -95,7 +94,6 @@ namespace Memstate.Tcp
         {
             var result = await _engine.ExecuteUntyped(request.Command);
             var response = new CommandResponse(result, request.Id);
-
             OnMessage.Invoke(response);
         }
 

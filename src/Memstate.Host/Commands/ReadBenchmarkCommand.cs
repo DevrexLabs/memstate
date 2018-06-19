@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate.Models.KeyValue;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate.Host.Commands
 {
@@ -25,7 +25,7 @@ namespace Memstate.Host.Commands
 
         protected override Task Total(TimeSpan total)
         {
-            Logger.LogInformation($"Read {Reads} queries in {total.TotalSeconds}s. {Reads / total.TotalSeconds:0.00} queries/second.");
+            Logger.Info($"Read {Reads} queries in {total.TotalSeconds}s. {Reads / total.TotalSeconds:0.00} queries/second.");
 
             return Task.CompletedTask;
         }
@@ -34,10 +34,10 @@ namespace Memstate.Host.Commands
         {
             var queriesPerSeconds = totals.Select(total => Reads / total.TotalSeconds).ToArray();
 
-            Logger.LogInformation($"Min: {queriesPerSeconds.Min():0.00}");
-            Logger.LogInformation($"Max: {queriesPerSeconds.Max():0.00}");
-            Logger.LogInformation($"Average: {queriesPerSeconds.Average():0.00}");
-            Logger.LogInformation(await Metrics());
+            Logger.Info($"Min: {queriesPerSeconds.Min():0.00}");
+            Logger.Info($"Max: {queriesPerSeconds.Max():0.00}");
+            Logger.Info($"Average: {queriesPerSeconds.Average():0.00}");
+            Logger.Info(await Metrics());
         }
     }
 }

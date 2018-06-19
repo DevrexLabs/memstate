@@ -1,7 +1,7 @@
 ﻿using System;
 using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Memstate.Logging;
+
 
 namespace Memstate.EventStore
 {
@@ -11,11 +11,11 @@ namespace Memstate.EventStore
 
         private readonly Func<bool> _ready;
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger;
 
         public EventStoreSubscriptionAdapter(MemstateSettings config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
         {
-            _logger = config.CreateLogger<EventStoreSubscriptionAdapter>();
+            _logger = LogProvider.GetCurrentClassLogger();
             _subscription = subscription;
             _ready = ready;
         }
@@ -24,8 +24,7 @@ namespace Memstate.EventStore
 
         public void Dispose()
         {
-            _logger.LogInformation("Disposing");
-
+            _logger.Info("Disposing");
             _subscription.Stop();
         }
     }

@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+using Memstate.Logging;
 
 namespace Memstate
 {
@@ -19,10 +19,10 @@ namespace Memstate
         public Kernel(MemstateSettings config, object model)
         {
             _metrics = new KernelMetrics(config);
-            var logger = config.CreateLogger<Kernel>();
+            var logger = LogProvider.GetCurrentClassLogger();
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-            logger.LogInformation("Created Kernel");
+            logger.Info("Created Kernel");
         }
 
         public object Execute(Command command)

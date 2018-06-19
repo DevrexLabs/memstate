@@ -127,7 +127,7 @@ namespace System.Test
         {
             settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
-            var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             await engine.Execute(new Reverse()).ConfigureAwait(false);
             await engine.DisposeAsync().ConfigureAwait(false);
         }
@@ -140,7 +140,7 @@ namespace System.Test
             settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
-            var engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
@@ -151,7 +151,7 @@ namespace System.Test
 
             await engine.DisposeAsync().ConfigureAwait(false);
 
-            engine = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
             Assert.AreEqual(NumRecords, strings.Count);
             await engine.DisposeAsync().ConfigureAwait(false);

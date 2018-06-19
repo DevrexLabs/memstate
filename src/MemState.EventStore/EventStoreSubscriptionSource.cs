@@ -54,7 +54,6 @@ namespace Memstate.EventStore
                     ready = true;
                     _logger.LogInformation("liveProcessingStarted");
                 });
-
             return new EventStoreSubscriptionAdapter(_memstateSettings, sub, () => ready);
         }
     }

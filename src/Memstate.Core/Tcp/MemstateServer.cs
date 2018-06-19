@@ -78,7 +78,7 @@ namespace Memstate.Tcp
             {
                 _log.LogDebug("Waiting for message");
 
-                var message = await Message.ReadAsync(stream, serializer, _cancellationSource.Token);
+                var message = await Message.Read(stream, serializer, _cancellationSource.Token);
 
                 _log.LogDebug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
 
@@ -109,7 +109,7 @@ namespace Memstate.Tcp
                 var bytes = serializer.Serialize(message);
                 var packet = Packet.Create(bytes, ++messageId);
 
-                await packet.WriteToAsync(stream);
+                await packet.WriteTo(stream);
 
                 await stream.FlushAsync();
             }

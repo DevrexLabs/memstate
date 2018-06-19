@@ -50,11 +50,11 @@ namespace Memstate.Tcp
         /// <param name="stream"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        public static async Task<Packet> ReadAsync(Stream stream, CancellationToken cancellation)
+        public static async Task<Packet> Read(Stream stream, CancellationToken cancellation)
         {
             var buf = new byte[HeaderSize];
 
-            await FillBufferAsync(stream, buf, cancellation);
+            await FillBuffer(stream, buf, cancellation);
 
             var reader = new BinaryReader(new MemoryStream(buf, writable: false));
 
@@ -69,7 +69,7 @@ namespace Memstate.Tcp
 
             packet.Payload = new byte[payloadSize];
 
-            await FillBufferAsync(stream, packet.Payload, cancellation);
+            await FillBuffer(stream, packet.Payload, cancellation);
 
             return packet;
         }
@@ -81,7 +81,7 @@ namespace Memstate.Tcp
         /// <param name="buffer"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        internal static async Task FillBufferAsync(Stream stream, byte[] buffer, CancellationToken cancellation)
+        internal static async Task FillBuffer(Stream stream, byte[] buffer, CancellationToken cancellation)
         {
             var totalBytesRead = 0;
 
@@ -100,7 +100,7 @@ namespace Memstate.Tcp
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public async Task WriteToAsync(Stream stream)
+        public Task WriteTo(Stream stream)
         {
             var ms = new MemoryStream();
 
@@ -114,7 +114,7 @@ namespace Memstate.Tcp
 
             ms.Position = 0;
 
-            await ms.CopyToAsync(stream);
+            return ms.CopyToAsync(stream);
         }
 
         public static Packet Create(byte[] payload, long messageId)

@@ -36,7 +36,7 @@ namespace Memstate.Test
             Packet packet = Packet.Create(new byte[payloadSize], 1);
 
             var memoryStream = new MemoryStream();
-            await packet.WriteToAsync(memoryStream);
+            await packet.WriteTo(memoryStream);
             Assert.AreEqual(memoryStream.Length, packet.Size);
         }
 
@@ -46,12 +46,12 @@ namespace Memstate.Test
             //Arrange
             Packet packet = Packet.Create(new byte[payloadSize], 1);
             var stream = new MemoryStream();
-            await packet.WriteToAsync(stream);
+            await packet.WriteTo(stream);
             stream.Position = 0;
             var token = new CancellationToken();
 
             //Act
-            Packet copy = await Packet.ReadAsync(stream, token);
+            Packet copy = await Packet.Read(stream, token);
 
             //Assert
             Assert.AreEqual(packet.Size, copy.Size);
@@ -68,13 +68,13 @@ namespace Memstate.Test
             Packet packet = Packet.Create(new byte[payloadSize], 1);
             using (var stream = new MemoryStream())
             {
-                await packet.WriteToAsync(stream);
+                await packet.WriteTo(stream);
                 stream.SetLength(stream.Length - 3);
                 var cancellationSource = new CancellationTokenSource();
                 stream.Position = 0;
 
                 //Act
-                var task = Packet.ReadAsync(stream, cancellationSource.Token);
+                var task = Packet.Read(stream, cancellationSource.Token);
                 // await Task.Delay(TimeSpan.FromMilliseconds(5));
 
                 //Assert

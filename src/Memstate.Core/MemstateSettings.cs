@@ -32,7 +32,7 @@ namespace Memstate
 
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
-        public ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
+        public ILoggerFactory LoggerFactory { get; } //= new LoggerFactory();
 
         public StorageProviders StorageProviders { get; set; } = new StorageProviders();
 

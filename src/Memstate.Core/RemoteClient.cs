@@ -62,7 +62,7 @@ namespace Memstate
         }
 
 
-        public async Task ConnectAsync(string host = "localhost", int port = 3001)
+        public async Task Connect(string host = "localhost", int port = 3001)
         {
             _tcpClient = new TcpClient();
             await _tcpClient.ConnectAsync(host, port);
@@ -149,7 +149,7 @@ namespace Memstate
             {
                 _logger.LogTrace("awaiting NetworkMessage");
 
-                var message = await Message.ReadAsync(_stream, serializer, cancellationToken);
+                var message = await Message.Read(_stream, serializer, cancellationToken);
 
                 _logger.LogDebug("message received " + message);
 
@@ -178,7 +178,7 @@ namespace Memstate
             var messageId = _counter.Next();
             var packet = Packet.Create(bytes, messageId);
 
-            await packet.WriteToAsync(_stream);
+            await packet.WriteTo(_stream);
 
             _logger.LogTrace("Packet written");
 

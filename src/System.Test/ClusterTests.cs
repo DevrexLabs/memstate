@@ -26,13 +26,13 @@ namespace System.Test
 
             Configure(settings);
 
-            var writer = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            var writer = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             foreach (var number in Enumerable.Range(1, records))
             {
@@ -64,13 +64,13 @@ namespace System.Test
             Configure(settings);
 
 
-            var reader = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            var reader = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             var totalCount = 0;
 
@@ -104,15 +104,15 @@ namespace System.Test
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
 
             var totalCount = 0;
 
@@ -150,17 +150,17 @@ namespace System.Test
             Console.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             Console.WriteLine("Readers created");
 
             Console.WriteLine("Creating writers");
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.StartAsync<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             Console.WriteLine("Writers created");
 
             Console.WriteLine("Creating write tasks");

@@ -17,7 +17,7 @@ namespace Memstate.Tcp
 
         public Guid Id { get; set; }
 
-        public static async Task<Message> ReadAsync(
+        public static async Task<Message> Read(
             Stream stream,
             ISerializer serializer,
             CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ namespace Memstate.Tcp
 
             while (true)
             {
-                var packet = await Packet.ReadAsync(stream, cancellationToken);
+                var packet = await Packet.Read(stream, cancellationToken);
 
                 buffer.Write(packet.Payload, 0, packet.Payload.Length);
 

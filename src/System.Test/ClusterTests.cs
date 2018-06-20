@@ -128,8 +128,11 @@ namespace System.Test
                 await writer.DisposeAsync().ConfigureAwait(false);
             }
 
-            foreach (var reader in readers)
+            for(var i = 0; i < readers.Length; i++)
             {
+                var reader = readers[i];
+                Console.WriteLine("Reader index: " + i);
+
                 //await reader.EnsureVersion(totalCount);
                 var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
 

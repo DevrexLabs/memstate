@@ -7,7 +7,7 @@ namespace Memstate.Postgresql
 {
     using System.Threading.Tasks;
 
-    public class PostgresqlJournalReader : IJournalReader
+    public class PostgresJournalReader : IJournalReader
     {
         private const string SelectSql = @"SELECT id, written, command FROM {0}
                                            WHERE id >= @id
@@ -15,14 +15,14 @@ namespace Memstate.Postgresql
 
         private readonly ISerializer _serializer;
         
-        private readonly PostgresqlSettings _settings;
+        private readonly PostgresSettings _settings;
 
-        public PostgresqlJournalReader(MemstateSettings memstateSettings)
-            : this(new PostgresqlSettings(memstateSettings))
+        public PostgresJournalReader(MemstateSettings memstateSettings)
+            : this(new PostgresSettings(memstateSettings))
         {
         }
 
-        public PostgresqlJournalReader(PostgresqlSettings settings)
+        public PostgresJournalReader(PostgresSettings settings)
         {
             Ensure.NotNull(settings, nameof(settings));
 

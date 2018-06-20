@@ -23,7 +23,7 @@ namespace Memstate.Benchmarks
 
         [Params(
             //typeof(InMemoryStorageProvider),
-            typeof(PostgresqlProvider),
+            typeof(PostgresProvider),
             typeof(EventStoreProvider))]
         public Type StorageProviderTypes { get; set; }
 

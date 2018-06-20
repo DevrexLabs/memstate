@@ -10,5 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
     <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+    <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
   </ItemGroup>
 </Project>

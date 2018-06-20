@@ -7,7 +7,7 @@ namespace Memstate.Postgresql
 {
     using Memstate.Logging;
 
-    public class PostgresqlJournalWriter : BatchingJournalWriter
+    public class PostgresJournalWriter : BatchingJournalWriter
     {
         private const string InsertSql = @"INSERT INTO {0} (""command"") VALUES {1};";
 
@@ -15,15 +15,15 @@ namespace Memstate.Postgresql
 
         private readonly ISerializer _serializer;
 
-        private readonly PostgresqlSettings _settings;
+        private readonly PostgresSettings _settings;
 
-        public PostgresqlJournalWriter(MemstateSettings settings)
+        public PostgresJournalWriter(MemstateSettings settings)
             : base(settings)
         {
             Ensure.NotNull(settings, nameof(settings));
 
             _serializer = settings.CreateSerializer();
-            _settings = new PostgresqlSettings(settings);
+            _settings = new PostgresSettings(settings);
             _logger = LogProvider.GetCurrentClassLogger();
         }
 

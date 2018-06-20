@@ -19,10 +19,9 @@ namespace Memstate
             RegisteredProviders[name] = constructor;
         }
 
-        private static T InstanceFromTypeName(string typeName, MemstateSettings settings)
+        protected static T InstanceFromTypeName(string typeName, MemstateSettings settings)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
-
             return (T) Activator.CreateInstance(type, settings);
         }
 

@@ -3,7 +3,6 @@ using System.Reflection;
 using App.Metrics;
 using App.Metrics.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
-using Memstate.Logging;
 
 
 namespace Memstate

@@ -7,7 +7,7 @@ namespace Memstate.Postgresql.Tests
 {
     public class PostgresqlSettingsTests
     {
-        private readonly PostgresqlSettings _settings;
+        private readonly PostgresSettings _settings;
         private readonly MemstateSettings _memstateSettings;
         private readonly ITestOutputHelper _log;
 
@@ -15,7 +15,7 @@ namespace Memstate.Postgresql.Tests
         {
             _log = log;
             _memstateSettings = new MemstateSettings();
-            _settings = new PostgresqlSettings(_memstateSettings);
+            _settings = new PostgresSettings(_memstateSettings);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Memstate.Postgresql.Tests
         public void DefaultConnectionStringIsUsed()
         {
             var key = "Memstate:StorageProviders:Postgres:Password";
-            var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresqlSettings.DefaultConnectionString);
+            var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresSettings.DefaultConnectionString);
 
             //Appveyor workaround
             //test failed on Appveyor because the pgsql password env variable is set
@@ -102,7 +102,7 @@ namespace Memstate.Postgresql.Tests
         {
             var expected = Guid.NewGuid().ToString();
             var settings = new MemstateSettings("--Memstate:StorageProviders:Postgres:Password", expected);
-            var pgSettings = new PostgresqlSettings(settings);
+            var pgSettings = new PostgresSettings(settings);
             Assert.Equal(expected, pgSettings.Password);
         }
 
@@ -113,7 +113,7 @@ namespace Memstate.Postgresql.Tests
             var expected = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(key, expected);
             var settings = new MemstateSettings();
-            var pgSettings = new PostgresqlSettings(settings);
+            var pgSettings = new PostgresSettings(settings);
             Assert.Equal(expected, pgSettings.Password);
             Environment.SetEnvironmentVariable(key, null);
         }

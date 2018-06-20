@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    public class PostgresqlProvider : StorageProvider
+    public class PostgresProvider : StorageProvider
     {
         private readonly ILog _log;
         
@@ -12,14 +12,14 @@ namespace Memstate.Postgresql
 
         private bool _initialized;
 
-        public PostgresqlProvider(MemstateSettings settings)
+        public PostgresProvider(MemstateSettings settings)
         {
             _log = LogProvider.GetCurrentClassLogger();
             _settings = settings;
-            Settings = new PostgresqlSettings(settings);
+            Settings = new PostgresSettings(settings);
         }
 
-        public PostgresqlSettings Settings { get; }
+        public PostgresSettings Settings { get; }
 
         public override void Initialize()
         {
@@ -48,19 +48,19 @@ namespace Memstate.Postgresql
 
         public override IJournalReader CreateJournalReader()
         {
-            return new PostgresqlJournalReader(_settings);
+            return new PostgresJournalReader(_settings);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             // todo: nextRecordNumber unused
 
-            return new PostgresqlJournalWriter(_settings);
+            return new PostgresJournalWriter(_settings);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new PostgresqlSubscriptionSource(_settings);
+            return new PostgresSubscriptionSource(_settings);
         }
 
         public Task DisposeAsync() => Task.CompletedTask;

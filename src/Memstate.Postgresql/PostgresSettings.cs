@@ -3,7 +3,7 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    public class PostgresqlSettings : Settings
+    public class PostgresSettings : Settings
     {
         public const string ConfigurationKey = "StorageProviders:Postgres";
 
@@ -15,7 +15,7 @@ namespace Memstate.Postgresql
 
         private string _connectionStringTemplate = DefaultConnectionString;
 
-        public PostgresqlSettings(MemstateSettings settings)
+        public PostgresSettings(MemstateSettings settings)
             : base(settings, ConfigurationKey)
         {
             Ensure.NotNull(settings, nameof(settings));

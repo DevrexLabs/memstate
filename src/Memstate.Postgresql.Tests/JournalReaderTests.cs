@@ -9,7 +9,7 @@ namespace Memstate.Postgresql.Tests
 {
     public class JournalReaderTests
     {
-        private readonly PostgresqlProvider _provider;
+        private readonly PostgresProvider _provider;
 
         private readonly IJournalReader _journalReader;
 
@@ -20,7 +20,7 @@ namespace Memstate.Postgresql.Tests
         public JournalReaderTests()
         {
             var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
-            _provider = new PostgresqlProvider(settings);
+            _provider = new PostgresProvider(settings);
             _provider.Initialize();
 
             _journalReader = _provider.CreateJournalReader();

@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Memstate.Postgresql
 {
-    public class PostgresqlJournalSubscription : IJournalSubscription
+    public class PostgresJournalSubscription : IJournalSubscription
     {
         private readonly AutoResetEvent _readWaiter = new AutoResetEvent(false);
         
@@ -12,11 +12,11 @@ namespace Memstate.Postgresql
         
         private readonly Thread _readerThread;
         
-        private readonly PostgresqlSettings _settings;
+        private readonly PostgresSettings _settings;
         
         private readonly Action<JournalRecord> _handler;
         
-        private readonly PostgresqlJournalReader _journalReader;
+        private readonly PostgresJournalReader _journalReader;
         
         private bool _ready;
         
@@ -27,7 +27,7 @@ namespace Memstate.Postgresql
         /// </summary>
         private long _nextRecordId;
 
-        public PostgresqlJournalSubscription(PostgresqlSettings settings, Action<JournalRecord> handler, long nextRecordId)
+        public PostgresJournalSubscription(PostgresSettings settings, Action<JournalRecord> handler, long nextRecordId)
         {
             Ensure.NotNull(settings, nameof(settings));
 
@@ -35,7 +35,7 @@ namespace Memstate.Postgresql
             _handler = handler;
             _nextRecordId = nextRecordId;
 
-            _journalReader = new PostgresqlJournalReader(settings);
+            _journalReader = new PostgresJournalReader(settings);
 
             _listenerThread = new Thread(Listen)
             {
@@ -44,12 +44,12 @@ namespace Memstate.Postgresql
 
             _readerThread = new Thread(Reader)
             {
-                Name = "Memstate:Postgresql:Reader"
+                Name = "Memstate:Postgres:Reader"
             };
         }
 
-        public PostgresqlJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long nextRecordId)
-            : this(new PostgresqlSettings(settings), handler, nextRecordId)
+        public PostgresJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long nextRecordId)
+            : this(new PostgresSettings(settings), handler, nextRecordId)
         {
         }
 

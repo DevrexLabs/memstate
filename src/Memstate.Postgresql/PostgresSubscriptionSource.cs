@@ -2,18 +2,18 @@
 
 namespace Memstate.Postgresql
 {
-    public class PostgresqlSubscriptionSource : IJournalSubscriptionSource
+    public class PostgresSubscriptionSource : IJournalSubscriptionSource
     {
         private readonly MemstateSettings _settings;
 
-        public PostgresqlSubscriptionSource(MemstateSettings settings)
+        public PostgresSubscriptionSource(MemstateSettings settings)
         {
             _settings = settings;
         }
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
         {
-            var subscription = new PostgresqlJournalSubscription(_settings, handler, from);
+            var subscription = new PostgresJournalSubscription(_settings, handler, from);
             
             subscription.Start();
 

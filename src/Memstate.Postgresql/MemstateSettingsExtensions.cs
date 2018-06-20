@@ -4,7 +4,7 @@
     {
         public static MemstateSettings UsePostgresqlProvider(this MemstateSettings settings)
         {
-            settings.StorageProvider = typeof(PostgresqlProvider).AssemblyQualifiedName;
+            settings.StorageProvider = typeof(PostgresProvider).AssemblyQualifiedName;
             
             return settings;
         }

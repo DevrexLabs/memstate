@@ -38,7 +38,7 @@ namespace Memstate.Postgresql.Tests
 
             var journalRecords = _journalReader.GetRecords();
 
-            Assert.AreEqual(0, journalRecords.Count());
+            Assert.AreEqual(1, journalRecords.Count());
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace Memstate.Postgresql.Tests
 
             var journalRecords = GetJournalRecords();
 
-            Assert.AreEqual(0, journalRecords.Count());
+            Assert.AreEqual(1, journalRecords.Count());
         }
 
         private void InsertCommand(byte[] data)

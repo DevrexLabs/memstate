@@ -1,37 +1,36 @@
 ﻿using System;
-using Xunit;
-using Xunit.Abstractions;
 using Npgsql;
+using NUnit.Framework;
 
 namespace Memstate.Postgresql.Tests
 {
+    [TestFixture]
     public class PostgresqlSettingsTests
     {
-        private readonly PostgresSettings _settings;
-        private readonly MemstateSettings _memstateSettings;
-        private readonly ITestOutputHelper _log;
+        private  PostgresSettings _settings;
+        private  MemstateSettings _memstateSettings;
 
-        public PostgresqlSettingsTests(ITestOutputHelper log)
+        [SetUp]
+        public void Setup()
         {
-            _log = log;
             _memstateSettings = new MemstateSettings();
             _settings = new PostgresSettings(_memstateSettings);
         }
 
-        [Fact]
+        [Test]
         public void CanExtractInitSqlResource()
         {
             foreach (var resourceName in _settings.GetEmbeddedResourceNames())
             {
-                _log.WriteLine(resourceName);
+                Console.WriteLine(resourceName);
             }
 
             var initSql = _settings.InitSql.Value;
 
-            Assert.StartsWith("CREATE", initSql);
+            Assert.AreEqual("CREATE", initSql.Substring(0,6));
         }
 
-        [Fact]
+        [Test]
         public void DefaultConnectionStringIsUsed()
         {
             var key = "Memstate:StorageProviders:Postgres:Password";
@@ -45,68 +44,68 @@ namespace Memstate.Postgresql.Tests
             Assert.True(defaultBuilder.EquivalentTo(actualBuilder));
         }
 
-        [Fact]
+        [Test]
         public void TableNameEndsWithSuffix()
         {
-            Assert.EndsWith(_settings.TableSuffix, _settings.Table);
+            Assert.True(_settings.Table.EndsWith(_settings.TableSuffix));
         }
 
-        [Fact]
+        [Test]
         public void TableNameStartsWithStreamName()
         {
-            Assert.StartsWith(_memstateSettings.StreamName, _settings.Table);
+            Assert.True(_settings.Table.StartsWith(_memstateSettings.StreamName));
         }
 
-        [Fact]
+        [Test]
         public void HostOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
             _settings.Host = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
-            Assert.Equal(expected, connectionStringBuilder.Host);
-            Assert.Contains(expected, connectionStringBuilder.ToString());
+            Assert.AreEqual(expected, connectionStringBuilder.Host);
+            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
-        [Fact]
+        [Test]
         public void PasswordOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
             _settings.Password = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
-            Assert.Equal(expected, connectionStringBuilder.Password);
-            Assert.Contains(expected, connectionStringBuilder.ToString());
+            Assert.AreEqual(expected, connectionStringBuilder.Password);
+            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
-        [Fact]
+        [Test]
         public void UsernameOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
             _settings.Username = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
-            Assert.Equal(expected, connectionStringBuilder.Username);
-            Assert.Contains(expected, connectionStringBuilder.ToString());
+            Assert.AreEqual(expected, connectionStringBuilder.Username);
+            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
-        [Fact]
+        [Test]
         public void DatabaseOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
             _settings.Database = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
-            Assert.Equal(expected, connectionStringBuilder.Database);
-            Assert.Contains(expected, connectionStringBuilder.ToString());
+            Assert.AreEqual(expected, connectionStringBuilder.Database);
+            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
-        [Fact]
+        [Test]
         public void PasswordFromArgumentsOverridesConnectionString()
         {
             var expected = Guid.NewGuid().ToString();
             var settings = new MemstateSettings("--Memstate:StorageProviders:Postgres:Password", expected);
             var pgSettings = new PostgresSettings(settings);
-            Assert.Equal(expected, pgSettings.Password);
+            Assert.AreEqual(expected, pgSettings.Password);
         }
 
-        [Fact(Skip="Interferes with same ENV var on appveyor!")]
+        [Test, Ignore("Interferes with same ENV var on appveyor!")]
         public void PasswordFromEnvironmentVariableOverridesConnectionString()
         {
             string key = "Memstate:StorageProviders:Postgres:Password";
@@ -114,7 +113,7 @@ namespace Memstate.Postgresql.Tests
             Environment.SetEnvironmentVariable(key, expected);
             var settings = new MemstateSettings();
             var pgSettings = new PostgresSettings(settings);
-            Assert.Equal(expected, pgSettings.Password);
+            Assert.AreEqual(expected, pgSettings.Password);
             Environment.SetEnvironmentVariable(key, null);
         }
     }

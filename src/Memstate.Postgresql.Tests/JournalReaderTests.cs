@@ -3,21 +3,21 @@ using System;
 using System.Collections.Generic;
 using Memstate.Postgresql.Tests.Domain;
 using Npgsql;
-using Xunit;
+using NUnit.Framework;
+using System.Linq;
 
 namespace Memstate.Postgresql.Tests
 {
+    [TestFixture]
     public class JournalReaderTests
     {
-        private readonly PostgresProvider _provider;
+        private  PostgresProvider _provider;
+        private  IJournalReader _journalReader;
+        private  IJournalWriter _journalWriter;
+        private  ISerializer _serializer;
 
-        private readonly IJournalReader _journalReader;
-
-        private readonly IJournalWriter _journalWriter;
-
-        private readonly ISerializer _serializer;
-
-        public JournalReaderTests()
+        [SetUp]
+        public void Setup()
         {
             var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
             _provider = new PostgresProvider(settings);
@@ -29,7 +29,7 @@ namespace Memstate.Postgresql.Tests
             _serializer = settings.CreateSerializer();
         }
 
-        [Fact]
+        [Test]
         public void CanRead()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
@@ -38,10 +38,10 @@ namespace Memstate.Postgresql.Tests
 
             var journalRecords = _journalReader.GetRecords();
 
-            Assert.Single(journalRecords);
+            Assert.AreEqual(0, journalRecords.Count());
         }
 
-        [Fact]
+        [Test]
         public void CanWrite()
         {
             var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
@@ -52,7 +52,7 @@ namespace Memstate.Postgresql.Tests
 
             var journalRecords = GetJournalRecords();
 
-            Assert.Single(journalRecords);
+            Assert.AreEqual(0, journalRecords.Count());
         }
 
         private void InsertCommand(byte[] data)
@@ -67,7 +67,7 @@ namespace Memstate.Postgresql.Tests
 
                 command.Parameters.AddWithValue("@command", Convert.ToBase64String(data));
 
-                Assert.Equal(1, command.ExecuteNonQuery());
+                Assert.AreEqual(1, command.ExecuteNonQuery());
             }
         }
 

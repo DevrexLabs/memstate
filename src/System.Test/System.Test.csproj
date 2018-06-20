@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
     <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+    <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="TestOutputLogger.cs" />

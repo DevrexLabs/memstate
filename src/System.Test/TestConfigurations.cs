@@ -34,7 +34,6 @@ namespace System.Test
                     settings.Serializer = serializerName;
                     settings.FileSystem = new InMemoryFileSystem();
                     settings.StorageProvider = providerType.AssemblyQualifiedName;
-                    settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
                     yield return settings;
                 }
             }
@@ -43,7 +42,7 @@ namespace System.Test
         private IEnumerable<string> Serializers()
         {
             yield return typeof(JsonSerializerAdapter).AssemblyQualifiedName;
-            yield return typeof(WireSerializerAdapter).FullName;
+            yield return typeof(WireSerializerAdapter).AssemblyQualifiedName;
         }
 
         protected virtual IEnumerable<Type> ProviderTypes()

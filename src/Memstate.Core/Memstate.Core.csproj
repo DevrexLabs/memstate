@@ -64,4 +64,8 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Metrics\" />
+    <Folder Include="Storage\" />
+  </ItemGroup>
 </Project>

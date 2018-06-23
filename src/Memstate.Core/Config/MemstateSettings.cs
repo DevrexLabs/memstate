@@ -1,25 +1,30 @@
 using System;
 using System.Reflection;
 using App.Metrics;
-using App.Metrics.Extensions.Configuration;
-using Microsoft.Extensions.Configuration;
-
 
 namespace Memstate
 {
     public class MemstateSettings : Settings
     {
-        public MemstateSettings(params string[] args)
-            : base(Build(args))
+        public MemstateSettings()
         {
-            Memstate = this;
-
+            //var msConfig = ((MsConfigSettingsBuilder) SettingsBuilder.Current).Configuration;
+            //var msConfig = new ConfigurationBuilder().Build();
+            //TODO: abstact away and move
             Metrics = new MetricsBuilder()
-                .Configuration.ReadFrom(Configuration)
+                //.Configuration.ReadFrom(msConfig)
                 .OutputMetrics.AsJson()
                 .Build();
         }
 
+        public override string Key { get; } = "Memstate";
+
+        public static readonly MemstateSettings Default = new MemstateSettings();
+
+        public static MemstateSettings Current { get; set; } = new MemstateSettings();
+
+
+        //todo: abstract away and move
         public IMetricsRoot Metrics { get; }
 
         public int MaxBatchSize { get; set; } = 1024;
@@ -51,34 +56,20 @@ namespace Memstate
         public StorageProvider CreateStorageProvider()
         {
             var provider = StorageProviders.Create(StorageProvider, this);
-
             provider.Initialize();
-
             return provider;
         }
 
         public IModelCreator CreateModelCreator()
         {
             var type = Type.GetType(ModelCreator);
-
             var modelCreator = (IModelCreator) Activator.CreateInstance(type, Array.Empty<object>());
-
             return modelCreator;
         }
 
         public override string ToString()
         {
             return $"Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}";
-        }
-
-        private static IConfiguration Build(params string[] commandLineArguments)
-        {
-            return new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables()
-                .AddCommandLine(commandLineArguments ?? Array.Empty<string>())
-                .Build()
-                .GetSection("Memstate");
         }
     }
 }

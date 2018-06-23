@@ -55,13 +55,6 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReference Include="App.Metrics" Version="2.0.0" />
     <PackageReference Include="App.Metrics.Extensions.Configuration" Version="2.0.0" />
     <PackageReference Include="LibLog" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
   </ItemGroup>
 </Project>

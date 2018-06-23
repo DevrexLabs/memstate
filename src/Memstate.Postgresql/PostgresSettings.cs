@@ -5,7 +5,7 @@ namespace Memstate.Postgresql
 {
     public class PostgresSettings : Settings
     {
-        public const string ConfigurationKey = "StorageProviders:Postgres";
+        public override string Key { get; } = "Memstate:StorageProviders:Postgres";
 
         public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
@@ -15,11 +15,9 @@ namespace Memstate.Postgresql
 
         private string _connectionStringTemplate = DefaultConnectionString;
 
-        public PostgresSettings(MemstateSettings settings)
-            : base(settings, ConfigurationKey)
+        public PostgresSettings()
         {
-            Ensure.NotNull(settings, nameof(settings));
-            _memstateSettings = settings;
+            _memstateSettings = MemstateSettings.Current;
         }
 
         /// <summary>
@@ -53,19 +51,16 @@ namespace Memstate.Postgresql
                 if (Password != null) builder.Password = Password;
                 return builder.ToString();
             }
-            set
-            {
-                _connectionStringTemplate = value;
-            }
+            set => _connectionStringTemplate = value;
         }
 
         public string TableSuffix { get; set; } = "_commands";
 
         public string SubscriptionStreamSuffix { get; set; } = "_notifications";
 
-        public string Table => _memstateSettings?.StreamName + TableSuffix;
+        public string Table => _memstateSettings.StreamName + TableSuffix;
 
-        public string SubscriptionStream => _memstateSettings?.StreamName + SubscriptionStreamSuffix;
+        public string SubscriptionStream => _memstateSettings.StreamName + SubscriptionStreamSuffix;
 
         public int ReadBatchSize { get; set; } = 1024;
 

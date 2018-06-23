@@ -23,7 +23,8 @@ namespace Memstate.Host.Commands
 
         public async Task Start(string[] arguments)
         {
-            Settings = new MemstateSettings(arguments);
+            var builder = new MsConfigSettingsBuilder(arguments);
+            Settings = builder.Build<MemstateSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
             //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 

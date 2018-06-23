@@ -18,7 +18,6 @@ namespace Memstate
         private long _nextRecord;
 
         public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord)
-            : base(settings)
         {
             _nextRecord = nextRecord;
             _journalStream = settings.FileSystem.OpenAppend(fileName);

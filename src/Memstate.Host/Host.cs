@@ -20,7 +20,8 @@ namespace Memstate.Host
 
         public Host(params string[] arguments)
         {
-            Settings = new MemstateSettings(arguments);
+            var builder = new MsConfigSettingsBuilder(arguments);
+            Settings = builder.Build<MemstateSettings>();
 
             var modelType = Type.GetType(Settings.Model);
 

@@ -2,18 +2,15 @@
 {
     public class EventStoreSettings : Settings
     {
-        public const string ConfigurationKey = "StorageProviders:EventStore";
+        public override string Key { get; } = "Memstate:StorageProviders:EventStore";
 
         public const string DefaultSerializer = "newtonsoft.json";
 
         private readonly MemstateSettings _memstateSettings;
 
-        public EventStoreSettings(MemstateSettings settings)
-            : base(settings, ConfigurationKey)
+        public EventStoreSettings()
         {
-            Ensure.NotNull(settings, nameof(settings));
-            
-            _memstateSettings = settings;
+            _memstateSettings = MemstateSettings.Current;
         }
 
         public string ConnectionString { get; set; } = "ConnectTo=tcp://admin:changeit@localhost:1113";

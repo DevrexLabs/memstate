@@ -2,15 +2,18 @@
 {
     public class FileStorageSettings : Settings
     {
-        public const string ConfigurationKey = "StorageProviders:FileStorage";
+        public override string Key { get;  } = "Memstate:StorageProviders:FileStorage";
+
+        private readonly MemstateSettings _memstateSettings;
 
         public FileStorageSettings(MemstateSettings settings)
-            : base(settings, ConfigurationKey)
         {
+            Ensure.NotNull(settings, nameof(settings));
+            _memstateSettings = settings;
         }
 
         public string FileNameSuffix { get; set; } = ".journal";
 
-        public string FileName => Memstate?.StreamName + FileNameSuffix;
+        public string FileName => _memstateSettings.StreamName + FileNameSuffix;
     }
 }

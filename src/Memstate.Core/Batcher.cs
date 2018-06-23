@@ -18,12 +18,13 @@ namespace Memstate
 
         private readonly ILog _logger;
 
-        public Batcher(MemstateSettings config, Action<IEnumerable<T>> batchHandler)
+        public Batcher(Action<IEnumerable<T>> batchHandler)
         {
+            var settings = MemstateSettings.Current;
             _logger = LogProvider.GetCurrentClassLogger();
             _batchHandler = batchHandler;
-            _maxBatchSize = config.MaxBatchSize;
-            _items = new BlockingCollection<T>(config.MaxBatchQueueLength);
+            _maxBatchSize = settings.MaxBatchSize;
+            _items = new BlockingCollection<T>(settings.MaxBatchQueueLength);
             _batchTask = new Task(ProcessItems, TaskCreationOptions.LongRunning);
             _batchTask.Start();
         }

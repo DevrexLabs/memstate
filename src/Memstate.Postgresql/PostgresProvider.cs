@@ -7,16 +7,12 @@ namespace Memstate.Postgresql
     public class PostgresProvider : StorageProvider
     {
         private readonly ILog _log;
-        
-        private readonly MemstateSettings _settings;
-
         private bool _initialized;
 
-        public PostgresProvider(MemstateSettings settings)
+        public PostgresProvider()
         {
             _log = LogProvider.GetCurrentClassLogger();
-            _settings = settings;
-            Settings = new PostgresSettings(settings);
+            Settings = Memstate.Settings.Read<PostgresSettings>();
         }
 
         public PostgresSettings Settings { get; }
@@ -48,19 +44,19 @@ namespace Memstate.Postgresql
 
         public override IJournalReader CreateJournalReader()
         {
-            return new PostgresJournalReader(_settings);
+            return new PostgresJournalReader(Settings);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             // todo: nextRecordNumber unused
-
-            return new PostgresJournalWriter(_settings);
+            var serializer = MemstateSettings.Current.CreateSerializer();
+            return new PostgresJournalWriter(serializer, Settings);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new PostgresSubscriptionSource(_settings);
+            return new PostgresSubscriptionSource(Settings);
         }
 
         public Task DisposeAsync() => Task.CompletedTask;

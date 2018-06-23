@@ -6,7 +6,6 @@ using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host.Commands
 {
@@ -29,8 +28,8 @@ namespace Memstate.Host.Commands
         public async Task Start(string[] arguments)
         {
             _running = true;
-
-            _settings = new MemstateSettings(arguments);
+            SettingsBuilder.Current = new MsConfigSettingsBuilder(arguments);
+            _settings = Settings.Read<MemstateSettings>();
 
             _settings.WithInmemoryStorage();
             //_settings.LoggerFactory.AddConsole((category, level) => true);

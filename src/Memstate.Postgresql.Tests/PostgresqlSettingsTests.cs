@@ -14,7 +14,7 @@ namespace Memstate.Postgresql.Tests
         public void Setup()
         {
             _memstateSettings = new MemstateSettings();
-            _settings = new PostgresSettings(_memstateSettings);
+            _settings = new PostgresSettings();
         }
 
         [Test]
@@ -94,27 +94,6 @@ namespace Memstate.Postgresql.Tests
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.AreEqual(expected, connectionStringBuilder.Database);
             Assert.True(connectionStringBuilder.ToString().Contains(expected));
-        }
-
-        [Test]
-        public void PasswordFromArgumentsOverridesConnectionString()
-        {
-            var expected = Guid.NewGuid().ToString();
-            var settings = new MemstateSettings("--Memstate:StorageProviders:Postgres:Password", expected);
-            var pgSettings = new PostgresSettings(settings);
-            Assert.AreEqual(expected, pgSettings.Password);
-        }
-
-        [Test, Ignore("Interferes with same ENV var on appveyor!")]
-        public void PasswordFromEnvironmentVariableOverridesConnectionString()
-        {
-            string key = "Memstate:StorageProviders:Postgres:Password";
-            var expected = Guid.NewGuid().ToString();
-            Environment.SetEnvironmentVariable(key, expected);
-            var settings = new MemstateSettings();
-            var pgSettings = new PostgresSettings(settings);
-            Assert.AreEqual(expected, pgSettings.Password);
-            Environment.SetEnvironmentVariable(key, null);
         }
     }
 }

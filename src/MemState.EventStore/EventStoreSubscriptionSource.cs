@@ -6,26 +6,19 @@ namespace Memstate.EventStore
 {
     public class EventStoreSubscriptionSource : IJournalSubscriptionSource
     {
-        private readonly MemstateSettings _memstateSettings;
-
         private readonly IEventStoreConnection _connection;
-
         private readonly ISerializer _serializer;
-
         private readonly string _streamName;
-
         private readonly ILog _logger;
+        private readonly EventStoreSettings _settings;
 
-        public EventStoreSubscriptionSource(MemstateSettings settings, IEventStoreConnection connection)
+        public EventStoreSubscriptionSource(EventStoreSettings settings, IEventStoreConnection connection)
         {
             _logger = LogProvider.GetCurrentClassLogger();
-            _memstateSettings = settings;
             _connection = connection;
-
-            var eventStoreSettings = new EventStoreSettings(settings);
-
-            _serializer = eventStoreSettings.CreateSerializer();
-            _streamName = eventStoreSettings.StreamName;
+            _settings = settings;
+            _serializer = settings.CreateSerializer();
+            _streamName = settings.StreamName;
         }
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
@@ -53,7 +46,7 @@ namespace Memstate.EventStore
                     ready = true;
                     _logger.Info("liveProcessingStarted");
                 });
-            return new EventStoreSubscriptionAdapter(_memstateSettings, sub, () => ready);
+            return new EventStoreSubscriptionAdapter(_settings, sub, () => ready);
         }
     }
 }

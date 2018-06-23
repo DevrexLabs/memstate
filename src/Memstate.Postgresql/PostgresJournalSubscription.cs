@@ -39,7 +39,7 @@ namespace Memstate.Postgresql
 
             _listenerThread = new Thread(Listen)
             {
-                Name = "Memstate:Postgresql:NotificationsListener"
+                Name = "Memstate:Postgres:NotificationsListener"
             };
 
             _readerThread = new Thread(Reader)
@@ -48,10 +48,6 @@ namespace Memstate.Postgresql
             };
         }
 
-        public PostgresJournalSubscription(MemstateSettings settings, Action<JournalRecord> handler, long nextRecordId)
-            : this(new PostgresSettings(settings), handler, nextRecordId)
-        {
-        }
 
         public void Start()
         {

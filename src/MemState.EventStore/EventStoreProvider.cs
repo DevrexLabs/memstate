@@ -16,7 +16,7 @@ namespace Memstate.EventStore
         public EventStoreProvider(MemstateSettings memstateSettings)
         {
             _memstateSettings = memstateSettings;
-            _eventStoreSettings = new EventStoreSettings(memstateSettings);
+            _eventStoreSettings = Settings.Read<EventStoreSettings>();
             _connection = EventStoreConnection.Create(_eventStoreSettings.ConnectionString);
             _connection.ConnectAsync().Wait();
         }
@@ -28,12 +28,12 @@ namespace Memstate.EventStore
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
-            return new EventStoreWriter(_memstateSettings, _connection);
+            return new EventStoreWriter(_eventStoreSettings, _connection);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new EventStoreSubscriptionSource(_memstateSettings, _connection);
+            return new EventStoreSubscriptionSource(_eventStoreSettings, _connection);
         }
 
         public Task DisposeAsync()

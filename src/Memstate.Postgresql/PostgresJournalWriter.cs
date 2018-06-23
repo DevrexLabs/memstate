@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Npgsql;
+using Memstate.Logging;
 
 namespace Memstate.Postgresql
 {
-    using Memstate.Logging;
 
     public class PostgresJournalWriter : BatchingJournalWriter
     {
@@ -17,13 +17,12 @@ namespace Memstate.Postgresql
 
         private readonly PostgresSettings _settings;
 
-        public PostgresJournalWriter(MemstateSettings settings)
-            : base(settings)
+        public PostgresJournalWriter(ISerializer serializer, PostgresSettings settings)
         {
+            Ensure.NotNull(serializer, nameof(serializer));
             Ensure.NotNull(settings, nameof(settings));
-
-            _serializer = settings.CreateSerializer();
-            _settings = new PostgresSettings(settings);
+            _settings = settings;
+            _serializer = serializer;
             _logger = LogProvider.GetCurrentClassLogger();
         }
 

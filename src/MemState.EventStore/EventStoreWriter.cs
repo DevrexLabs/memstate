@@ -8,23 +8,16 @@ namespace Memstate.EventStore
     public class EventStoreWriter : BatchingJournalWriter
     {
         private readonly IEventStoreConnection _connection;
-
         private readonly ISerializer _serializer;
-
         private readonly string _streamName;
-
         private readonly ILog _logger;
 
-        public EventStoreWriter(MemstateSettings settings, IEventStoreConnection connection)
-            : base(settings)
+        public EventStoreWriter(EventStoreSettings settings, IEventStoreConnection connection)
         {
             _connection = connection;
             _logger = LogProvider.GetCurrentClassLogger();
-
-            var eventStoreSettings = new EventStoreSettings(settings);
-
-            _serializer = eventStoreSettings.CreateSerializer();
-            _streamName = eventStoreSettings.StreamName;
+            _serializer = settings.CreateSerializer();
+            _streamName = settings.StreamName;
         }
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
@@ -38,7 +31,6 @@ namespace Memstate.EventStore
         private EventData ToEventData(Command cmd)
         {
             var typeName = cmd.GetType().ToString();
-
             var bytes = _serializer.Serialize(cmd);
 
             return new EventData(

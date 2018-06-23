@@ -8,12 +8,10 @@ namespace Memstate.EventStore
     public class EventStoreSubscriptionAdapter : IJournalSubscription
     {
         private readonly EventStoreCatchUpSubscription _subscription;
-
         private readonly Func<bool> _ready;
-
         private readonly ILog _logger;
 
-        public EventStoreSubscriptionAdapter(MemstateSettings config, EventStoreCatchUpSubscription subscription, Func<bool> ready)
+        public EventStoreSubscriptionAdapter(EventStoreSettings settings, EventStoreCatchUpSubscription subscription, Func<bool> ready)
         {
             _logger = LogProvider.GetCurrentClassLogger();
             _subscription = subscription;

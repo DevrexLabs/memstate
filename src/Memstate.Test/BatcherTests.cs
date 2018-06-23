@@ -10,8 +10,7 @@ namespace Memstate.Test
         [Test]
         public async Task Batcher_terminates_when_disposed()
         {
-            var config = new MemstateSettings();
-            var batcher = new Batcher<int>(config, batch => { });
+            var batcher = new Batcher<int>(batch => { });
             await batcher.DisposeAsync().ConfigureAwait(false);
         }
 

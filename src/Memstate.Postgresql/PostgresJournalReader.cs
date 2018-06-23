@@ -17,17 +17,12 @@ namespace Memstate.Postgresql
         
         private readonly PostgresSettings _settings;
 
-        public PostgresJournalReader(MemstateSettings memstateSettings)
-            : this(new PostgresSettings(memstateSettings))
-        {
-        }
-
         public PostgresJournalReader(PostgresSettings settings)
         {
             Ensure.NotNull(settings, nameof(settings));
 
             _settings = settings;
-            _serializer = settings.Memstate.CreateSerializer();
+            _serializer = MemstateSettings.Current.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

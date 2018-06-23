@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Memstate.Logging;
 
 namespace Memstate
 {
@@ -8,10 +7,9 @@ namespace Memstate
     {
         private readonly Batcher<Command> _batcher;
 
-        protected BatchingJournalWriter(MemstateSettings config)
+        protected BatchingJournalWriter()
         {
-            Ensure.NotNull(config, nameof(config));
-            _batcher = new Batcher<Command>(config, OnCommandBatch);
+            _batcher = new Batcher<Command>(OnCommandBatch);
         }
 
         public void Send(Command command) => _batcher.Add(command);

@@ -25,7 +25,7 @@ namespace Memstate.Host.Commands
 
         protected override Task Total(TimeSpan total)
         {
-            Logger.Info($"Read {Reads} queries in {total.TotalSeconds}s. {Reads / total.TotalSeconds:0.00} queries/second.");
+            Logger.Info($"Get {Reads} queries in {total.TotalSeconds}s. {Reads / total.TotalSeconds:0.00} queries/second.");
 
             return Task.CompletedTask;
         }
@@ -37,7 +37,7 @@ namespace Memstate.Host.Commands
             Logger.Info($"Min: {queriesPerSeconds.Min():0.00}");
             Logger.Info($"Max: {queriesPerSeconds.Max():0.00}");
             Logger.Info($"Average: {queriesPerSeconds.Average():0.00}");
-            Logger.Info(await Metrics());
+            Logger.Info(await GetMetrics());
         }
     }
 }

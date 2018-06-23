@@ -21,7 +21,7 @@ namespace Memstate.Postgresql.Tests
         {
             var settings = MemstateSettings.Current.WithRandomSuffixAppendedToStreamName();
 
-            _provider = new PostgresProvider();
+            _provider = new PostgresProvider(settings);
             _provider.Initialize();
 
             _journalReader = _provider.CreateJournalReader();

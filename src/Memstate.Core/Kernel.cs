@@ -14,11 +14,11 @@ namespace Memstate
 
         private readonly ReaderWriterLockSlim _lock;
 
-        private readonly KernelMetrics _metrics;
+        private readonly IKernelMetrics _metrics;
 
         public Kernel(MemstateSettings config, object model)
         {
-            _metrics = new KernelMetrics(config);
+            _metrics = Metrics.Provider.GetKernelMetrics();
             var logger = LogProvider.GetCurrentClassLogger();
             _model = model;
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
@@ -48,7 +48,6 @@ namespace Memstate
                 try
                 {
                     _lock.EnterReadLock();
-
                     return query.ExecuteImpl(_model);
                 }
                 finally

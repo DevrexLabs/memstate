@@ -53,13 +53,11 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Logging.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="App.Metrics" Version="2.0.0" />
-    <PackageReference Include="App.Metrics.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="App.Metrics.Abstractions" Version="2.1.0" />
     <PackageReference Include="LibLog" Version="5.0.0" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Metrics\" />
     <Folder Include="Storage\" />
   </ItemGroup>
 </Project>

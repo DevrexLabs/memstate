@@ -61,19 +61,9 @@ namespace Memstate.Host.Commands
             return Task.CompletedTask;
         }
 
-        protected async Task<string> Metrics()
+        protected Task<string> GetMetrics()
         {
-            var snapshot = Settings.Metrics.Snapshot.Get();
-            var formatter = Settings.Metrics.DefaultOutputMetricsFormatter;
-
-            using (var stream = new MemoryStream())
-            {
-                await formatter.WriteAsync(stream, snapshot);
-
-                var result = Encoding.UTF8.GetString(stream.ToArray());
-
-                return result;
-            }
+            return Metrics.Report();
         }
 
         protected abstract Task Run();

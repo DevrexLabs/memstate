@@ -7,7 +7,7 @@ namespace Memstate
     {
         public abstract string Key { get; }
 
-        public static T Read<T>() where T : Settings, new()
+        public static T Get<T>() where T : Settings, new()
         {
             var builder = SettingsBuilder.Current;
             Ensure.NotNull(builder, "SettingsBuilder.Current");

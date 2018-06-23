@@ -4,15 +4,15 @@ using App.Metrics.Counter;
 using App.Metrics.Gauge;
 using App.Metrics.Timer;
 
-namespace Memstate
+namespace Memstate.AppMetrics
 {
-    internal class EngineMetrics
+    public class AppMetricsEngineMetrics : IEngineMetrics
     {
-        private readonly MemstateSettings _settings;
+        private readonly IMetricsRoot _mtx;
 
-        public EngineMetrics(MemstateSettings settings)
+        public AppMetricsEngineMetrics(IMetricsRoot metricsRoot)
         {
-            _settings = settings;
+            _mtx = metricsRoot;
         }
 
         public void QueryExecuted()
@@ -23,7 +23,7 @@ namespace Memstate
                 MeasurementUnit = Unit.Calls
             };
 
-            _settings.Metrics.Measure.Counter.Increment(options);
+            _mtx.Measure.Counter.Increment(options);
         }
 
         public void QueryFailed()
@@ -34,7 +34,7 @@ namespace Memstate
                 MeasurementUnit = Unit.Calls
             };
 
-            _settings.Metrics.Measure.Counter.Increment(options);
+            _mtx.Measure.Counter.Increment(options);
         }
 
         public void CommandExecuted()
@@ -45,7 +45,7 @@ namespace Memstate
                 MeasurementUnit = Unit.Calls
             };
 
-            _settings.Metrics.Measure.Counter.Increment(options);
+            _mtx.Measure.Counter.Increment(options);
         }
 
         public void CommandFailed()
@@ -56,7 +56,7 @@ namespace Memstate
                 MeasurementUnit = Unit.Calls
             };
 
-            _settings.Metrics.Measure.Counter.Increment(options);
+            _mtx.Measure.Counter.Increment(options);
         }
 
         public void PendingLocalCommands(int value)
@@ -67,7 +67,7 @@ namespace Memstate
                 MeasurementUnit = Unit.Items
             };
 
-            _settings.Metrics.Measure.Gauge.SetValue(options, value);
+            _mtx.Measure.Gauge.SetValue(options, value);
         }
 
         public IDisposable MeasureCommandExecution()
@@ -80,7 +80,7 @@ namespace Memstate
                 RateUnit = TimeUnit.Seconds
             };
 
-            return _settings.Metrics.Measure.Timer.Time(options);
+            return _mtx.Measure.Timer.Time(options);
         }
 
         public IDisposable MeasureQueryExecution()
@@ -93,7 +93,7 @@ namespace Memstate
                 RateUnit = TimeUnit.Seconds
             };
 
-            return _settings.Metrics.Measure.Timer.Time(options);
+            return _mtx.Measure.Timer.Time(options);
         }
     }
 }

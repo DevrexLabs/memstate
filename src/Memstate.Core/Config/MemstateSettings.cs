@@ -6,26 +6,11 @@ namespace Memstate
 {
     public class MemstateSettings : Settings
     {
-        public MemstateSettings()
-        {
-            //var msConfig = ((MsConfigSettingsBuilder) SettingsBuilder.Current).Configuration;
-            //var msConfig = new ConfigurationBuilder().Build();
-            //TODO: abstact away and move
-            Metrics = new MetricsBuilder()
-                //.Configuration.ReadFrom(msConfig)
-                .OutputMetrics.AsJson()
-                .Build();
-        }
-
         public override string Key { get; } = "Memstate";
 
         public static readonly MemstateSettings Default = new MemstateSettings();
 
         public static MemstateSettings Current { get; set; } = new MemstateSettings();
-
-
-        //todo: abstract away and move
-        public IMetricsRoot Metrics { get; }
 
         public int MaxBatchSize { get; set; } = 1024;
 

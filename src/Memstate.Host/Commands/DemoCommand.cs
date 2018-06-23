@@ -29,7 +29,7 @@ namespace Memstate.Host.Commands
         {
             _running = true;
             SettingsBuilder.Current = new MsConfigSettingsBuilder(arguments);
-            _settings = Settings.Read<MemstateSettings>();
+            _settings = Settings.Get<MemstateSettings>();
 
             _settings.WithInmemoryStorage();
             //_settings.LoggerFactory.AddConsole((category, level) => true);

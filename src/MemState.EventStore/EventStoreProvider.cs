@@ -16,7 +16,7 @@ namespace Memstate.EventStore
         public EventStoreProvider(MemstateSettings memstateSettings)
         {
             _memstateSettings = memstateSettings;
-            _eventStoreSettings = Settings.Read<EventStoreSettings>();
+            _eventStoreSettings = Settings.Get<EventStoreSettings>();
             _connection = EventStoreConnection.Create(_eventStoreSettings.ConnectionString);
             _connection.ConnectAsync().Wait();
         }

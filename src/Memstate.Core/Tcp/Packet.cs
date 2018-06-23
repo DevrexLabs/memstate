@@ -45,7 +45,7 @@ namespace Memstate.Tcp
         public const int HeaderSize = sizeof(PacketInfo) + sizeof(int) + sizeof(long);
 
         /// <summary>
-        /// Read a single packet from a given stream
+        /// Get a single packet from a given stream
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="cancellation"></param>
@@ -75,7 +75,7 @@ namespace Memstate.Tcp
         }
 
         /// <summary>
-        /// Read bytes from a stream into a buffer until the buffer is full
+        /// Get bytes from a stream into a buffer until the buffer is full
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="buffer"></param>

@@ -41,7 +41,7 @@ namespace Memstate.Host.Commands
             Logger.Info($"Min: {commandsPerSeconds.Min():0.00}");
             Logger.Info($"Max: {commandsPerSeconds.Max():0.00}");
             Logger.Info($"Average: {commandsPerSeconds.Average():0.00}");
-            Logger.Info(await Metrics());
+            Logger.Info(await GetMetrics());
         }
     }
 }

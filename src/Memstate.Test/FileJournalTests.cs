@@ -37,7 +37,7 @@ namespace Memstate.Test
             //wait for the writes to complete
             await writer.DisposeAsync().ConfigureAwait(false);
 
-            //Read back all the entries, should be NumRecords
+            //Get back all the entries, should be NumRecords
             var reader = provider.CreateJournalReader();
             Assert.AreEqual(NumRecords, reader.GetRecords().Count());
             await reader.DisposeAsync().ConfigureAwait(false);

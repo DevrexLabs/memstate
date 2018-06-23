@@ -1,5 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
 
 namespace Memstate
 {
@@ -10,6 +9,6 @@ namespace Memstate
             Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; private set; }
+        public Guid Id { get; }
     }
 }

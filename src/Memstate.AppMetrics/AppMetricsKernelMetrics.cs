@@ -2,15 +2,15 @@
 using App.Metrics;
 using App.Metrics.Timer;
 
-namespace Memstate
+namespace Memstate.AppMetrics
 {
-    internal class KernelMetrics
+    public class AppMetricsKernelMetrics : IKernelMetrics
     {
-        private readonly MemstateSettings _settings;
+        private readonly IMetricsRoot _mtx;
 
-        public KernelMetrics(MemstateSettings settings)
+        public AppMetricsKernelMetrics(IMetricsRoot metricsRoot)
         {
-            _settings = settings;
+            _mtx = metricsRoot;
         }
 
         public IDisposable MeasureQueryExecution()
@@ -23,7 +23,7 @@ namespace Memstate
                 RateUnit = TimeUnit.Seconds
             };
 
-            return _settings.Metrics.Measure.Timer.Time(options);
+            return _mtx.Measure.Timer.Time(options);
         }
 
         public IDisposable MeasureCommandExecution()
@@ -36,7 +36,7 @@ namespace Memstate
                 RateUnit = TimeUnit.Seconds
             };
 
-            return _settings.Metrics.Measure.Timer.Time(options);
+            return _mtx.Measure.Timer.Time(options);
         }
     }
 }

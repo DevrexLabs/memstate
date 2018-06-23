@@ -9,10 +9,10 @@ namespace Memstate.Postgresql
         private readonly ILog _log;
         private bool _initialized;
 
-        public PostgresProvider()
+        public PostgresProvider(MemstateSettings settings)
         {
             _log = LogProvider.GetCurrentClassLogger();
-            Settings = Memstate.Settings.Read<PostgresSettings>();
+            Settings = Memstate.Settings.Get<PostgresSettings>();
         }
 
         public PostgresSettings Settings { get; }

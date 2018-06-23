@@ -27,7 +27,7 @@ namespace Memstate
 
         private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
 
-        private readonly EngineMetrics _metrics;
+        private readonly IEngineMetrics _metrics;
 
         private volatile bool _stopped;
 
@@ -53,7 +53,7 @@ namespace Memstate
             _journalWriter = journalWriter;
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _commandSubscription = subscriptionSource.Subscribe(nextRecord, OnRecordReceived);
-            _metrics = new EngineMetrics(settings);
+            _metrics = Metrics.Provider.GetEngineMetrics();
             ExecutionContext.Current = new ExecutionContext(nextRecord);
         }
 

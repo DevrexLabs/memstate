@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Devrex Labs</Authors>
+    <Company>Devrex Labs</Company>
+    <Product>Memstate</Product>
+    <Description>Metrics module for memstate based on the App.Metrics library</Description>
+    <Copyright>Devrex Labs</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="App.Metrics" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,20 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using App.Metrics;
-using App.Metrics.Formatters;
 using Memstate.Host.Commands;
-using Memstate.Models;
-using Memstate.Models.KeyValue;
-using Memstate.Tcp;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Memstate.Host
 {

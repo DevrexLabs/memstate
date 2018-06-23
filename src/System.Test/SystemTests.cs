@@ -6,18 +6,9 @@ using NUnit.Framework;
 
 namespace System.Test
 {
-
     [TestFixture]
     public class SystemTests
     {
-        private string _randomStreamName;
-
-        [SetUp]
-        public void Setup()
-        {
-            _randomStreamName = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
-        }
-
         public static IEnumerable<MemstateSettings> Configurations()
         {
             return new TestConfigurations().GetConfigurations();
@@ -26,7 +17,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteOne(MemstateSettings settings)
         {
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
@@ -45,7 +35,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task WriteAndReadCommands(MemstateSettings settings)
         {
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
@@ -68,7 +57,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversPreExistingCommands(MemstateSettings settings)
         {
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
@@ -100,7 +88,6 @@ namespace System.Test
         public async Task SubscriptionDeliversFutureCommands(MemstateSettings settings)
         {
             const int NumRecords = 5;
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
             var provider = settings.CreateStorageProvider();
@@ -125,7 +112,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task Can_execute_void_commands(MemstateSettings settings)
         {
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
             var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             await engine.Execute(new Reverse()).ConfigureAwait(false);
@@ -137,7 +123,6 @@ namespace System.Test
         {
             const int NumRecords = 100;
 
-            settings.StreamName = _randomStreamName;
             Console.WriteLine(settings);
 
             var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);

@@ -15,7 +15,7 @@
 
         public string ConnectionString { get; set; } = "ConnectTo=tcp://admin:changeit@localhost:1113";
 
-        public string StreamName => _memstateSettings?.StreamName;
+        public string StreamName => _memstateSettings.StreamName;
 
         public string Serializer => DefaultSerializer;
 

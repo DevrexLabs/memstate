@@ -7,7 +7,13 @@ namespace Memstate
     {
         public override string Key { get; } = "Memstate";
 
-        public static MemstateSettings Current { get; set; } = new MemstateSettings();
+        public static MemstateSettings Current { get; set; }
+
+        public static void Initialize()
+        {
+            if (Current != null) return;
+            Current = Settings.Get<MemstateSettings>();
+        }
 
         /// <summary>
         /// Maximum number of commands per batch sent to journal writer

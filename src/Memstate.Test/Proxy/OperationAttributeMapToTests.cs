@@ -40,11 +40,17 @@ namespace Memstate.Test.DispatchProxy
             }
         }
 
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Settings.Initialize();
+        }
+
         [Test]
         public async Task MapsToCommand()
         {
             //Arrange
-            var settings  = new MemstateSettings();
+            var settings  = MemstateSettings.Current;
             settings.FileSystem = new InMemoryFileSystem();
             var storageProvider = settings.GetStorageProvider();
             var builder = new EngineBuilder(settings, storageProvider);

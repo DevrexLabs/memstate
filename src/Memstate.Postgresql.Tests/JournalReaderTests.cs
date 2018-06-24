@@ -19,7 +19,7 @@ namespace Memstate.Postgresql.Tests
         [SetUp]
         public void Setup()
         {
-            var settings = MemstateSettings.Current.WithRandomSuffixAppendedToStreamName();
+            var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
 
             _provider = new PostgresProvider(settings);
             _provider.Initialize();

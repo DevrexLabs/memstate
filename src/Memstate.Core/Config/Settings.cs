@@ -12,11 +12,12 @@ namespace Memstate
 
         public static T Get<T>() where T : Settings, new()
         {
-            Ensure.NotNull(Provider, "Settings.Provider");
+            Initialize();
             return Provider.Get<T>();
         }
 
         public static SettingsProvider Provider { get; set; }
+
 
         public static void Initialize()
         {
@@ -24,6 +25,7 @@ namespace Memstate
             var providerType = Type.GetType(MsConfigSettingsProviderType, throwOnError: false);
             providerType = providerType ?? typeof(NullSettingsProvider);
             Provider = (SettingsProvider)Activator.CreateInstance(providerType);
+            MemstateSettings.Current = Get<MemstateSettings>();
         }
 
         public virtual void Validate()

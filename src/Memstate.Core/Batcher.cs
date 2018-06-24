@@ -20,7 +20,7 @@ namespace Memstate
 
         public Batcher(Action<IEnumerable<T>> batchHandler)
         {
-            var settings = MemstateSettings.Current;
+             var settings = MemstateSettings.Current;
             _logger = LogProvider.GetCurrentClassLogger();
             _batchHandler = batchHandler;
             _maxBatchSize = settings.MaxBatchSize;

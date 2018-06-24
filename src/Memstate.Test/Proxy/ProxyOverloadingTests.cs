@@ -8,10 +8,12 @@ namespace Memstate.Test.DispatchProxy
     {
         private IModelWithOverloads _db;
 
+
         [SetUp]
         public void Setup()
         {
-            var settings = new MemstateSettings().WithInmemoryStorage();
+            var settings =  new MemstateSettings().WithInmemoryStorage();
+            MemstateSettings.Current = settings;
             var storageProvider = settings.GetStorageProvider();
             var model = new ModelWithOverloads();
             var engine = new EngineBuilder(settings, storageProvider)

@@ -7,7 +7,6 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 
 using Memstate.EventStore;
-using Memstate.JsonNet;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Memstate.Postgresql;
@@ -36,8 +35,8 @@ namespace Memstate.Benchmarks
             var logProvider = new ConsoleLoggerProvider(filter: (cat, level) => true, includeScopes: false);
             settings.LoggerFactory.AddProvider(logProvider);
             */
-            settings.StorageProvider = StorageProviderTypes.AssemblyQualifiedName;
-            settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
+            settings.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
+            settings.SerializerName = "newtonsoft.json";
             var engineBuilder = new EngineBuilder(settings);
             _engine = engineBuilder.Build(new KeyValueStore<int>()).Result;
         }

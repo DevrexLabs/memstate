@@ -12,7 +12,7 @@ namespace Memstate.Test.DispatchProxy
         public void Setup()
         {
             var settings = new MemstateSettings().WithInmemoryStorage();
-            var storageProvider = settings.CreateStorageProvider();
+            var storageProvider = settings.GetStorageProvider();
             var model = new ModelWithOverloads();
             var engine = new EngineBuilder(settings, storageProvider)
                 .Build<IModelWithOverloads>(model).Result;

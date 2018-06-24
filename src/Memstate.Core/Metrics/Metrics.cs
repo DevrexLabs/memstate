@@ -1,17 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Memstate
 {
     public class Metrics
     {
-        public static MetricsProvider Provider { get; set; } = new NullMetricsProvider();
+        private const string AppMetricsProviderType = "Memstate.AppMetricsProvider, Memstate.AppMetrics";
 
-        public static bool AutoConfigure()
+        public static MetricsProvider Provider { get; set; } 
+            
+        public static void Initialize()
         {
-            //assign Provider by searching for known providers
-            //todo look for implementations using reflection
-            //return true if successful
-            return false;
+            if (Provider != null) return;
+            var appMetricsType = Type.GetType(AppMetricsProviderType, throwOnError: false);
+            appMetricsType = appMetricsType ?? typeof(NullMetricsProvider);
+            Provider = (MetricsProvider) Activator.CreateInstance(appMetricsType);
         }
 
         public static Task<string> Report()

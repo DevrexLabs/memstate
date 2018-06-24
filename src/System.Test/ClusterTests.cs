@@ -9,13 +9,11 @@ namespace System.Test
     [TestFixture]
     public class ClusterTests
     {
-        private string _randomStreamName;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
-            _randomStreamName 
-                = "memstate" + Guid.NewGuid().ToString("N").Substring(0, 10);
+            Settings.Initialize(); //Triggers MsConfigSettingsProvider
         }
 
         // One writer, multiple readers
@@ -208,7 +206,7 @@ namespace System.Test
 
         private void Configure(MemstateSettings settings)
         {
-            settings.StreamName = _randomStreamName;
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine("C: " + settings);
         }
 

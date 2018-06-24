@@ -21,11 +21,10 @@ namespace Memstate.Test
             const string FileName = Stream + ".journal";
 
             var settings = new MemstateSettings().WithInmemoryStorage();
-            settings.Serializers.Register("newtonsoft.json", _ => new JsonSerializerAdapter(settings));
-            settings.Serializer = "newtonsoft.json";
+            settings.SerializerName = "newtonsoft.json";
 
             settings.StreamName = Stream;
-            var provider = settings.CreateStorageProvider();
+            var provider = settings.GetStorageProvider();
             
             //Write NumRecords entries 
             var writer = provider.CreateJournalWriter(0);

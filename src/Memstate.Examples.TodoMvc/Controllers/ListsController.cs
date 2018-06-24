@@ -24,7 +24,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
             return Json(lists);
         }
         
-        [Route("", Name = "Lists.Create")]
+        [Route("", Name = "Lists.Resolve")]
         [HttpPost]
         public IActionResult Create(string name)
         {

@@ -33,7 +33,7 @@ namespace Memstate.Postgresql.Tests
         [Test]
         public void CanRead()
         {
-            var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
+            var create = new Create(Guid.NewGuid(), "Resolve a Postgresql driver for Memstate");
 
             InsertCommand(_serializer.Serialize(create));
 
@@ -45,7 +45,7 @@ namespace Memstate.Postgresql.Tests
         [Test]
         public void CanWrite()
         {
-            var create = new Create(Guid.NewGuid(), "Create a Postgresql driver for Memstate");
+            var create = new Create(Guid.NewGuid(), "Resolve a Postgresql driver for Memstate");
 
             _journalWriter.Send(create);
 

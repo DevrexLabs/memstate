@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace Memstate
 {
-    public class MsConfigSettingsBuilder : SettingsBuilder
+    public class MsConfigSettingsProvider : SettingsProvider
     {
         private readonly string[] _args;
 
         public IConfiguration Configuration { get; set; }
 
-        public MsConfigSettingsBuilder(params string[] args)
+        public MsConfigSettingsProvider(params string[] args)
         {
             _args = args;
             Configuration = new ConfigurationBuilder()
@@ -18,12 +19,12 @@ namespace Memstate
                 .Build();
         }
 
-        public MsConfigSettingsBuilder(IConfiguration configuration)
+        public MsConfigSettingsProvider(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public override T Build<T>(string key = null)
+        public override T Get<T>(string key = null)
         {
             var settings = new T();
             Bind(settings, key);

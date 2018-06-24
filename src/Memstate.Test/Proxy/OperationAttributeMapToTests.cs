@@ -46,7 +46,7 @@ namespace Memstate.Test.DispatchProxy
             //Arrange
             var settings  = new MemstateSettings();
             settings.FileSystem = new InMemoryFileSystem();
-            var storageProvider = settings.CreateStorageProvider();
+            var storageProvider = settings.GetStorageProvider();
             var builder = new EngineBuilder(settings, storageProvider);
             var engine = builder.Build<ITestModel>(new TestModel()).Result;
             var client = new LocalClient<ITestModel>(engine);

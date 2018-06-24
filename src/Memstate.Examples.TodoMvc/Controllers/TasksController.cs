@@ -15,7 +15,7 @@ namespace Memstate.Examples.TodoMvc.Controllers
             _model = model;
         }
         
-        [Route("", Name = "Tasks.Create")]
+        [Route("", Name = "Tasks.Resolve")]
         [HttpPost]
         public IActionResult Create(Guid listId, string title, string description, DateTime? dueBy)
         {

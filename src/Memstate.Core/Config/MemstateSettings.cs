@@ -7,23 +7,44 @@ namespace Memstate
     {
         public override string Key { get; } = "Memstate";
 
-        public static readonly MemstateSettings Default = new MemstateSettings();
-
         public static MemstateSettings Current { get; set; } = new MemstateSettings();
 
+        /// <summary>
+        /// Maximum number of commands per batch sent to journal writer
+        /// </summary>
         public int MaxBatchSize { get; set; } = 1024;
 
         public string StreamName { get; set; } = "memstate";
 
-        public string StorageProvider { get; set; } = "file";
-
-        public string Serializer { get; set; } = "Wire";
+        /// <summary>
+        /// Name of a well known storage provider OR resolvable type name
+        /// OR the literal "Auto" (which is default) for automatic resolution.
+        /// Automatic resolution will take the first available of eventstore,
+        /// postgres or filestorage.
+        /// </summary>
+        public string StorageProviderName { get; set; } = "Auto";
+        
+        public string SerializerName { get; set; } = "Auto";
 
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
-        public StorageProviders StorageProviders { get; set; } = new StorageProviders();
+        private StorageProvider _storageProvider;
 
-        public Serializers Serializers { get; set; } = new Serializers();
+        /// <summary>
+        /// Assign a storage provider or leave null and it will
+        /// be assigned automatically based on the value of StorageProviderName
+        /// </summary>
+        public void SetStorageProvider(StorageProvider storageProvider)
+        {
+             _storageProvider = storageProvider;
+        }
+    
+
+        internal StorageProviders StorageProviders { get; set; }
+            = new StorageProviders();
+
+        internal Serializers Serializers { get; set; }
+            = new Serializers();
 
         public int MaxBatchQueueLength { get; set; } = int.MaxValue;
 
@@ -31,17 +52,20 @@ namespace Memstate
 
         public bool AllowBrokenSequence { get; set; } = false;
 
-        public ISerializer CreateSerializer(string serializer = null) => Serializers.Create(serializer ?? Serializer, this);
+        public ISerializer CreateSerializer(string serializer = null) => Serializers.Resolve(serializer ?? SerializerName, this);
 
         public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
 
         public string ModelCreator { get; set; } = typeof(DefaultModelCreator).AssemblyQualifiedName;
 
-        public StorageProvider CreateStorageProvider()
+        public StorageProvider GetStorageProvider()
         {
-            var provider = StorageProviders.Create(StorageProvider, this);
-            provider.Initialize();
-            return provider;
+            if (_storageProvider == null)
+            {
+                _storageProvider = StorageProviders.Resolve(StorageProviderName, this);
+                _storageProvider.Initialize();
+            }
+            return _storageProvider;
         }
 
         public IModelCreator CreateModelCreator()
@@ -53,7 +77,7 @@ namespace Memstate
 
         public override string ToString()
         {
-            return $"Provider:{StorageProvider}, Serializer: {Serializer}, Name:{StreamName}";
+            return $"Provider:{StorageProviderName}, SerializerName: {SerializerName}, Name:{StreamName}";
         }
     }
 }

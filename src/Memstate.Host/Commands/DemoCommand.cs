@@ -28,7 +28,7 @@ namespace Memstate.Host.Commands
         public async Task Start(string[] arguments)
         {
             _running = true;
-            SettingsBuilder.Current = new MsConfigSettingsBuilder(arguments);
+            Settings.Provider = new MsConfigSettingsProvider(arguments);
             _settings = Settings.Get<MemstateSettings>();
 
             _settings.WithInmemoryStorage();

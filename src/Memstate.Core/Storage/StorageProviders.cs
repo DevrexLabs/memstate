@@ -1,18 +1,27 @@
+using System;
+using System.Collections.Generic;
+
 namespace Memstate
 {
-    public class StorageProviders : Providers<StorageProvider>
+    internal class StorageProviders : Providers<StorageProvider>
     {
-        public const string EventStore 
-            = "Memstate.EventStore.EventStoreProvider, Memstate.EventStore";
+        private const string EventStoreProviderType = "Memstate.EventStoreProviderType.EventStoreProvider, Memstate.EventStoreProviderType";
 
-        public const string Postgres =
-                    "Memstate.Postgres.PostgresProvider, Memstate.Postgres";
+        private const string PostgresProviderType = "Memstate.PostgresProviderType.PostgresProvider, Memstate.PostgresProviderType";
 
         public StorageProviders()
         {
+            Register("auto", AutoResolve);
             Register("file", s => new FileStorageProvider(s));
-            Register("EventStore", s => InstanceFromTypeName(EventStore, s));
-            Register("Postgres", s => InstanceFromTypeName(Postgres, s));
+            Register("EventStore", s => InstanceFromTypeName(EventStoreProviderType, s));
+            Register("Postgres", s => InstanceFromTypeName(PostgresProviderType, s));
+        }
+
+        protected override IEnumerable<string> AutoResolutionCandidates()
+        {
+            yield return "eventstore";
+            yield return "postgres";
+            yield return "file";
         }
     }
 }

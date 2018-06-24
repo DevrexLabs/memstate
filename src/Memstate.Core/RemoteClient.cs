@@ -20,7 +20,7 @@ namespace Memstate
         private TcpClient _tcpClient;
 
         /// <summary>
-        /// Serializer used to serialize and deserialize messages
+        /// SerializerName used to serialize and deserialize messages
         /// </summary>
         private readonly ISerializer _serializer;
 

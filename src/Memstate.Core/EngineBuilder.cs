@@ -11,7 +11,7 @@ namespace Memstate
         public EngineBuilder(MemstateSettings settings, StorageProvider storageProvider = null)
         {
             _settings = settings;
-            _storageProvider = storageProvider ?? settings.CreateStorageProvider();
+            _storageProvider = storageProvider ?? settings.GetStorageProvider();
             _storageProvider.Initialize();
         }
 

@@ -1,15 +1,14 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Memstate;
+using Memstate.EventStore;
+using Memstate.JsonNet;
+using Memstate.Postgresql;
+using Memstate.Wire;
+
 namespace System.Test
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Memstate;
-    using Memstate.EventStore;
-    using Memstate.JsonNet;
-    using Memstate.Postgresql;
-    using Memstate.Wire;
-    using Memstate.Logging;
-
     public class TestConfigurations : IEnumerable<object[]>
     {
         IEnumerator IEnumerable.GetEnumerator()
@@ -30,10 +29,10 @@ namespace System.Test
             {
                 foreach (var providerType in ProviderTypes())
                 {
-                    var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
-                    settings.Serializer = serializerName;
+                    var settings = new MemstateSettings();
+                    settings.SerializerName = serializerName;
                     settings.FileSystem = new InMemoryFileSystem();
-                    settings.StorageProvider = providerType.AssemblyQualifiedName;
+                    settings.StorageProviderName = providerType.AssemblyQualifiedName;
                     yield return settings;
                 }
             }

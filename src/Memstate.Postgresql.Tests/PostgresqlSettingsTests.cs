@@ -33,7 +33,7 @@ namespace Memstate.Postgresql.Tests
         [Test]
         public void DefaultConnectionStringIsUsed()
         {
-            var key = "Memstate:StorageProviders:Postgres:Password";
+            var key = "Memstate:StorageProviders:PostgresProviderType:Password";
             var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresSettings.DefaultConnectionString);
 
             //Appveyor workaround

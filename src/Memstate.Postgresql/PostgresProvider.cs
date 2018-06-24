@@ -34,7 +34,7 @@ namespace Memstate.Postgresql
                 
                 command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
                 
-                _log.Trace($"Executing SQL '{command.CommandText}'");
+                _log.Debug($"Executing SQL '{command.CommandText}'");
                 
                 command.ExecuteNonQuery();
             }

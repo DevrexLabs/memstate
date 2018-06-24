@@ -2,7 +2,7 @@
 {
     public class EventStoreSettings : Settings
     {
-        public override string Key { get; } = "Memstate:StorageProviders:EventStore";
+        public override string Key { get; } = "Memstate:StorageProviders:EventStoreProviderType";
 
         public const string DefaultSerializer = "newtonsoft.json";
 

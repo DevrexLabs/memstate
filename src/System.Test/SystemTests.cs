@@ -9,6 +9,12 @@ namespace System.Test
     [TestFixture]
     public class SystemTests
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Settings.Initialize();
+        }
+
         public static IEnumerable<MemstateSettings> Configurations()
         {
             return new TestConfigurations().GetConfigurations();
@@ -17,9 +23,10 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteOne(MemstateSettings settings)
         {
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
-
-            var provider = settings.CreateStorageProvider();
+            
+            var provider = settings.GetStorageProvider();
             provider.Initialize();
             var writer = provider.CreateJournalWriter(0);
 
@@ -35,9 +42,10 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task WriteAndReadCommands(MemstateSettings settings)
         {
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
 
-            var provider = settings.CreateStorageProvider();
+            var provider = settings.GetStorageProvider();
             provider.Initialize();
 
             var journalWriter = provider.CreateJournalWriter(0);
@@ -57,9 +65,10 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversPreExistingCommands(MemstateSettings settings)
         {
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
 
-            var provider = settings.CreateStorageProvider();
+            var provider = settings.GetStorageProvider();
             const int NumRecords = 50;
             var journalWriter = provider.CreateJournalWriter(0);
             for (var i = 0; i < NumRecords; i++)
@@ -88,9 +97,10 @@ namespace System.Test
         public async Task SubscriptionDeliversFutureCommands(MemstateSettings settings)
         {
             const int NumRecords = 5;
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
 
-            var provider = settings.CreateStorageProvider();
+            var provider = settings.GetStorageProvider();
             var records = new List<JournalRecord>();
             var writer = provider.CreateJournalWriter(0);
 
@@ -112,6 +122,7 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task Can_execute_void_commands(MemstateSettings settings)
         {
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
             var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
             await engine.Execute(new Reverse()).ConfigureAwait(false);
@@ -123,6 +134,7 @@ namespace System.Test
         {
             const int NumRecords = 100;
 
+            settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine(settings);
 
             var engine = await Engine.Start<List<string>>(settings).ConfigureAwait(false);

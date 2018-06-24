@@ -39,12 +39,12 @@ namespace Memstate.Postgresql
 
             _listenerThread = new Thread(Listen)
             {
-                Name = "Memstate:Postgres:NotificationsListener"
+                Name = "Memstate:PostgresProviderType:NotificationsListener"
             };
 
             _readerThread = new Thread(Reader)
             {
-                Name = "Memstate:Postgres:Reader"
+                Name = "Memstate:PostgresProviderType:Reader"
             };
         }
 

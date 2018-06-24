@@ -14,6 +14,16 @@ namespace Memstate.AppMetrics
             _mtx = mtx;
         }
 
+        public AppMetricsProvider(): this(DefaultConfig())
+        {
+
+        }
+
+        private static IMetricsRoot DefaultConfig()
+        {
+            return new MetricsBuilder().Build();
+        }
+
         public override IEngineMetrics GetEngineMetrics()
         {
             return new AppMetricsEngineMetrics(_mtx);

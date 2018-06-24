@@ -5,11 +5,11 @@ namespace Memstate.Postgresql
 {
     public class PostgresSettings : Settings
     {
-        public override string Key { get; } = "Memstate:StorageProviders:PostgresProviderType";
+        public override string Key { get; } = "Memstate:StorageProviders:Postgres";
 
         public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
-        public const string InitSqlResourceName = "Memstate.PostgresProviderType.init_sql";
+        public const string InitSqlResourceName = "Memstate.Postgres.init_sql";
 
         private readonly MemstateSettings _memstateSettings;
 

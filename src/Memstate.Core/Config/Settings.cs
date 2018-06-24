@@ -18,7 +18,6 @@ namespace Memstate
 
         public static SettingsProvider Provider { get; set; }
 
-
         public static void Initialize()
         {
             if (Provider != null) return;

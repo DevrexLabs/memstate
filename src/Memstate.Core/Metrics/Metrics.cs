@@ -7,8 +7,13 @@ namespace Memstate
     {
         private const string AppMetricsProviderType = "Memstate.AppMetricsProvider, Memstate.AppMetrics";
 
-        public static MetricsProvider Provider { get; set; } 
-            
+        public static MetricsProvider Provider { get; set; }
+
+        static Metrics()
+        {
+            Initialize();
+        }
+
         public static void Initialize()
         {
             if (Provider != null) return;

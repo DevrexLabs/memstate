@@ -14,7 +14,7 @@ namespace Memstate.Host.Commands
     {
         public event EventHandler Done = (sender, args) => { };
         
-        protected MemstateSettings Settings { get; private set; }
+        protected EngineSettings Settings { get; private set; }
 
         internal ILog Logger { get; private set; }
 
@@ -24,7 +24,7 @@ namespace Memstate.Host.Commands
 
         public async Task Start(string[] arguments)
         {
-            Settings = Config.Current.Resolve<MemstateSettings>();
+            Settings = Config.Current.Resolve<EngineSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
             //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 

@@ -6,13 +6,13 @@ namespace Memstate
 {
     public class EngineBuilder
     {
-        private readonly MemstateSettings _settings;
+        private readonly EngineSettings _settings;
         private readonly StorageProvider _storageProvider;
 
         public EngineBuilder()
         {
             var config = Config.Current;
-            _settings = config.Resolve<MemstateSettings>();
+            _settings = config.Resolve<EngineSettings>();
             _storageProvider = config.GetStorageProvider();
             _storageProvider.Initialize();
         }

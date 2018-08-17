@@ -9,7 +9,7 @@ namespace Memstate.Test
     [TestFixture]
     public partial class LocalClientEventTests
     {
-        private MemstateSettings _settings;
+        private EngineSettings _settings;
         private LocalClient<UsersModel> _client;
 
         [SetUp]
@@ -17,7 +17,7 @@ namespace Memstate.Test
         {
             var cfg = Config.Reset();
             cfg.FileSystem = new InMemoryFileSystem();
-            _settings = cfg.Resolve<MemstateSettings>();
+            _settings = cfg.Resolve<EngineSettings>();
             var engine = await Engine.Start<UsersModel>();
             _client = new LocalClient<UsersModel>(engine);
         }

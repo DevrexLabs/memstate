@@ -21,7 +21,7 @@ namespace Memstate.Host
 
         public Host(params string[] arguments)
         {
-            Settings = Config.Current.Resolve<MemstateSettings>();
+            Settings = Config.Current.Resolve<EngineSettings>();
 
             var modelType = Type.GetType(Settings.Model);
 
@@ -44,7 +44,7 @@ namespace Memstate.Host
             _server = CreateServer(Settings, model);
         }
 
-        public MemstateSettings Settings { get; }
+        public EngineSettings Settings { get; }
 
         public void Start()
         {
@@ -86,7 +86,7 @@ namespace Memstate.Host
             return model;
         }
 
-        private static object CreateServer(MemstateSettings settings, object model)
+        private static object CreateServer(EngineSettings settings, object model)
         {
             var method = typeof(Host).GetMethods(BindingFlags)
                 .Where(m => m.Name == "CreateServer" && m.IsGenericMethod && m.GetGenericArguments().Length == 1)
@@ -98,7 +98,7 @@ namespace Memstate.Host
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
-        private static MemstateServer<T> CreateServer<T>(MemstateSettings settings, T model) where T : class
+        private static MemstateServer<T> CreateServer<T>(EngineSettings settings, T model) where T : class
         {
             var engine = new EngineBuilder().Build(model).Result;
             return new MemstateServer<T>(settings, engine);

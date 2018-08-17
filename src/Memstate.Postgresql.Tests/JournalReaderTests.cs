@@ -21,7 +21,7 @@ namespace Memstate.Postgres.Tests
         public void Setup()
         {
             var cfg = Config.Reset();
-            cfg.Resolve<MemstateSettings>()
+            cfg.Resolve<EngineSettings>()
                .WithRandomSuffixAppendedToStreamName();
 
             _provider = new PostgresProvider();

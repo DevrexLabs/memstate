@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using Memstate.Configuration;
 using Npgsql;
 
@@ -6,7 +8,7 @@ namespace Memstate.Postgres
 {
     public class PostgresSettings : Settings
     {
-        public override string Key { get; } = "Memstate:StorageProviders:Postgres";
+        public override string Key { get; } = "Memstate:Postgres";
 
         public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
@@ -15,11 +17,11 @@ namespace Memstate.Postgres
 
         private string _connectionStringTemplate = DefaultConnectionString;
 
-        private readonly MemstateSettings _memstateSettings;
+        private readonly EngineSettings _memstateSettings;
 
         public PostgresSettings()
         {
-            _memstateSettings = Config.Current.Resolve<MemstateSettings>();
+            _memstateSettings = Config.Current.Resolve<EngineSettings>();
         }
 
         /// <summary>
@@ -64,6 +66,10 @@ namespace Memstate.Postgres
 
         public string SubscriptionStream => _memstateSettings.StreamName + SubscriptionStreamSuffix;
 
+        /// <summary>
+        /// Number of records to read per SELECT statement
+        /// </summary>
+        /// <value>The size of the read batch.</value>
         public int ReadBatchSize { get; set; } = 1024;
 
         public Lazy<string> InitSql => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
@@ -73,6 +79,17 @@ namespace Memstate.Postgres
             Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
             Ensure.NotNullOrEmpty(Table, nameof(Table));
             Ensure.NotNullOrEmpty(SubscriptionStream, nameof(SubscriptionStream));
+        }
+
+        private string GetEmbeddedResource(string resourceName)
+        {
+            var asm = Assembly.GetExecutingAssembly();
+
+            using (var stream = asm.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
     }
 }

@@ -36,9 +36,6 @@ namespace Memstate.Configuration
 
         public ConfigBuilder AddEnvironmentVariables(string prefix = "Memstate")
         {
-            
-            prefix += "_";
-
             var vars = Environment.GetEnvironmentVariables();
             foreach (String key in vars.Keys)
             {

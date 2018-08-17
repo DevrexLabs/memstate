@@ -7,7 +7,7 @@ namespace Memstate
     public class FileStorageProvider : StorageProvider
     {
         private readonly FileStorageSettings _fileStorageSettings;
-        private readonly MemstateSettings _settings;
+        private readonly EngineSettings _settings;
         private FileJournalWriter _currentWriter;
         private readonly IFileSystem _fileSystem;
 
@@ -15,7 +15,7 @@ namespace Memstate
         public FileStorageProvider()
         {
             var cfg = Config.Current;
-            _settings = cfg.Resolve<MemstateSettings>();
+            _settings = cfg.Resolve<EngineSettings>();
             _fileStorageSettings = cfg.Resolve<FileStorageSettings>();
             _fileSystem = cfg.FileSystem;
         }

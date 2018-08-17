@@ -21,7 +21,7 @@ namespace Memstate
         }
 
 
-        public static MemstateSettings WithRandomSuffixAppendedToStreamName(this MemstateSettings settings)
+        public static EngineSettings WithRandomSuffixAppendedToStreamName(this EngineSettings settings)
         {
             var randomPart = Guid.NewGuid().ToString("N").Substring(0, 10);
 

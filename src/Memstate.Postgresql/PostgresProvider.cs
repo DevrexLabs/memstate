@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Npgsql;
 using Memstate.Configuration;
 using Npgsql.Logging;
+using System.Diagnostics;
 
 namespace Memstate.Postgres
 {
@@ -17,11 +18,17 @@ namespace Memstate.Postgres
             Settings = Config.Current.Resolve<PostgresSettings>();
         }
 
-        //static PostgresProvider()
-        //{
-        //    NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Debug, true, true);
-        //    NpgsqlLogManager.IsParameterLoggingEnabled = true;
-        //}
+        static PostgresProvider()
+        {
+            EnableNpgsqlDebugLogging();
+        }
+
+        [Conditional("DEBUG")]
+        private static void EnableNpgsqlDebugLogging()
+        {
+            NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Debug, true, true);
+            NpgsqlLogManager.IsParameterLoggingEnabled = true;
+        }
 
         public PostgresSettings Settings { get; }
 

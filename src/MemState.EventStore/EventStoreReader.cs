@@ -23,7 +23,7 @@ namespace Memstate.EventStore
         public EventStoreReader(IEventStoreConnection connection)
         {
             var config = Config.Current;
-            var settings = config.Resolve<MemstateSettings>();
+            var settings = config.Resolve<EngineSettings>();
             var eventStoreSettings = config.Resolve<EventStoreSettings>();
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;

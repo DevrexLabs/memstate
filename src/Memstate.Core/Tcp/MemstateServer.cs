@@ -27,11 +27,11 @@ namespace Memstate.Tcp
 
         private readonly ISet<Task> _connections = new HashSet<Task>();
 
-        private readonly MemstateSettings _settings;
+        private readonly EngineSettings _settings;
 
         private Task _listenerTask;
 
-        public MemstateServer(MemstateSettings config, Engine<T> engine)
+        public MemstateServer(EngineSettings config, Engine<T> engine)
         {
             _engine = engine;
             _settings = config;

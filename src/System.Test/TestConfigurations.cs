@@ -33,7 +33,7 @@ namespace System.Test
                     var cfg = new Config();
                     cfg.SerializerName = serializerName;
                     cfg.UseInMemoryFileSystem();
-                    var settings = cfg.Resolve<MemstateSettings>();
+                    var settings = cfg.Resolve<EngineSettings>();
                     settings.WithRandomSuffixAppendedToStreamName();
                     cfg.StorageProviderName = providerType.AssemblyQualifiedName;
                     yield return cfg;
@@ -63,15 +63,15 @@ namespace System.Test
         {
             protected override IEnumerable<Type> ProviderTypes()
             {
-                yield return typeof(EventStoreProvider);
-                //yield return typeof(PostgresProvider);
+                //yield return typeof(EventStoreProvider);
+                yield return typeof(PostgresProvider);
             }
         }
 
         internal static void Configure(Config config)
         {
             Config.Current = config;
-            var settings = config.Resolve<MemstateSettings>();
+            var settings = config.Resolve<EngineSettings>();
             settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine("C: " + config);
         }

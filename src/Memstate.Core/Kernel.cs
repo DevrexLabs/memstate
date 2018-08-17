@@ -16,7 +16,7 @@ namespace Memstate
 
         private readonly IKernelMetrics _metrics;
 
-        public Kernel(MemstateSettings config, object model)
+        public Kernel(EngineSettings config, object model)
         {
             _metrics = Metrics.Provider.GetKernelMetrics();
             var logger = LogProvider.GetCurrentClassLogger();

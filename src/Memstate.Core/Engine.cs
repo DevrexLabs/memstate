@@ -13,7 +13,7 @@ namespace Memstate
 
         private readonly Kernel _kernel;
 
-        private readonly MemstateSettings _settings;
+        private readonly EngineSettings _settings;
 
         private readonly IJournalWriter _journalWriter;
 
@@ -40,7 +40,7 @@ namespace Memstate
         public event CommandExecuted CommandExecuted = delegate { };
 
         public Engine(
-            MemstateSettings settings,
+            EngineSettings settings,
             TModel model,
             IJournalSubscriptionSource subscriptionSource,
             IJournalWriter journalWriter,

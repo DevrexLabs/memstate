@@ -3,16 +3,16 @@ using Memstate.Configuration;
 
 namespace Memstate
 {
-    public class MemstateSettings : Settings
+    public class EngineSettings : Settings
     {
-        public override string Key { get; } = "Memstate";
+        public override string Key { get; } = "Memstate:Engine";
 
-        public MemstateSettings()
+        public EngineSettings()
             : this(Config.Current)
         {
         }
 
-        public MemstateSettings(Config config)
+        public EngineSettings(Config config)
         {
             config.Bind(this, Key);
         }
@@ -22,10 +22,17 @@ namespace Memstate
         /// </summary>
         public int MaxBatchSize { get; set; } = 1024;
 
+        /// <summary>
+        /// Used by storage providers to set the name of the storage entity.
+        /// Will be used as filename, stream name, table name, etc
+        /// </summary>
         public string StreamName { get; set; } = "memstate";
         
         public int MaxBatchQueueLength { get; set; } = int.MaxValue;
 
+        /// <summary>
+        /// If set to true, Engine will halt if there is a gap in the stream of commands.
+        /// </summary>
         public bool AllowBrokenSequence { get; set; } = false;
 
         public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;

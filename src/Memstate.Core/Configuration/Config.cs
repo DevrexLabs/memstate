@@ -75,7 +75,7 @@ namespace Memstate.Configuration
         private static Config BuildDefault()
         {
             //todo: add support for a config file. INI perhaps ???
-            var args = System.Environment.GetCommandLineArgs();
+            var args = Environment.GetCommandLineArgs();
 
             var config = new ConfigBuilder()
                 .AddEnvironmentVariables()
@@ -93,12 +93,12 @@ namespace Memstate.Configuration
             Container.Register(this);
         }
 
-        public void Register<T>(T instance) where T : class
-        {
-            Container.Register(instance).AsSingleton();
-        }
+        //public void Register<T>(T instance) where T : class
+        //{
+        //    Container.Register(instance).AsSingleton();
+        //}
 
-        public T Resolve<T>() where T : class
+        public T Resolve<T>() where T : Settings
         {
             if (_singletonCache.TryGetValue(typeof(T), out object result))
             {
@@ -108,6 +108,7 @@ namespace Memstate.Configuration
             {
                 var newInstance = Container.Resolve<T>();
                 _singletonCache[typeof(T)] = newInstance;
+                Bind(newInstance, newInstance.Key);
                 return newInstance;
             }
         }

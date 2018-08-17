@@ -5,7 +5,7 @@ namespace Memstate.EventStore
 {
     public class EventStoreConnectionMonitor
     {
-        public EventStoreConnectionMonitor(MemstateSettings config, IEventStoreConnection connection)
+        public EventStoreConnectionMonitor(EngineSettings config, IEventStoreConnection connection)
         {
             ILog logger = LogProvider.GetCurrentClassLogger();
             

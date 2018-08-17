@@ -30,7 +30,7 @@ namespace Memstate.Benchmarks
         public void Setup()
         {
             var config = Config.Current;
-            var settings = config.Resolve<MemstateSettings>().WithRandomSuffixAppendedToStreamName();
+            var settings = config.Resolve<EngineSettings>().WithRandomSuffixAppendedToStreamName();
 
             /* 
             var logProvider = new ConsoleLoggerProvider(filter: (cat, level) => true, includeScopes: false);

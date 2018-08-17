@@ -1,4 +1,5 @@
 ﻿using System;
+using Memstate.Configuration;
 using Npgsql;
 using NUnit.Framework;
 
@@ -7,41 +8,46 @@ namespace Memstate.Postgres.Tests
     [TestFixture]
     public class PostgresSettingsTests
     {
-        private  PostgresSettings _settings;
-        private  MemstateSettings _memstateSettings;
+        private PostgresSettings _settings;
+        private EngineSettings _memstateSettings;
 
         [SetUp]
         public void Setup()
         {
-            _memstateSettings = new MemstateSettings();
+            _memstateSettings = new EngineSettings();
             _settings = new PostgresSettings();
         }
 
         [Test]
         public void CanExtractInitSqlResource()
         {
-            foreach (var resourceName in ((Settings)_settings).GetEmbeddedResourceNames())
-            {
-                Console.WriteLine(resourceName);
-            }
-
             var initSql = _settings.InitSql.Value;
-
-            Assert.AreEqual("CREATE", initSql.Substring(0,6));
+            Assert.True(!String.IsNullOrEmpty(initSql));
         }
 
         [Test]
         public void DefaultConnectionStringIsUsed()
         {
-            var key = "Memstate:StorageProviders:PostgresProviderType:Password";
+            var key = "Memstate:Postgres:Password";
             var defaultBuilder = new NpgsqlConnectionStringBuilder(PostgresSettings.DefaultConnectionString);
 
             //Appveyor workaround
-            //test failed on Appveyor because the pgsql password env variable is set
+            //test failed on Appveyor because the pgsql password env variable is set!
             defaultBuilder.Password = Environment.GetEnvironmentVariable(key) ?? defaultBuilder.Password;
 
             var actualBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.True(defaultBuilder.EquivalentTo(actualBuilder));
+        }
+
+        [Test]
+        public void PasswordCanBeSetUsingEnvironmentVariable()
+        {
+            string key = "MEMSTATE_POSTGRES_PASSWORD";
+            string value = "Password12!";
+            Environment.SetEnvironmentVariable(key, value);
+            var config = Config.Reset();
+            var settings = config.Resolve<PostgresSettings>();
+            Assert.AreEqual(value, settings.Password);
         }
 
         [Test]
@@ -63,7 +69,6 @@ namespace Memstate.Postgres.Tests
             _settings.Host = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.AreEqual(expected, connectionStringBuilder.Host);
-            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
         [Test]
@@ -73,7 +78,6 @@ namespace Memstate.Postgres.Tests
             _settings.Password = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.AreEqual(expected, connectionStringBuilder.Password);
-            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
         [Test]
@@ -83,7 +87,6 @@ namespace Memstate.Postgres.Tests
             _settings.Username = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.AreEqual(expected, connectionStringBuilder.Username);
-            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
 
         [Test]
@@ -93,7 +96,6 @@ namespace Memstate.Postgres.Tests
             _settings.Database = expected;
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             Assert.AreEqual(expected, connectionStringBuilder.Database);
-            Assert.True(connectionStringBuilder.ToString().Contains(expected));
         }
     }
 }

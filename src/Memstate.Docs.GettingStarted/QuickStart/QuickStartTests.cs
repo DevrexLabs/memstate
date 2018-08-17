@@ -30,7 +30,7 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print("   (using Wire format  & local filesystem storage)");
-            var settings = Config.Current.Resolve<MemstateSettings>();
+            var settings = Config.Current.Resolve<EngineSettings>();
             settings.StreamName = Filename;
             var engine = await Engine.Start<LoyaltyDB>();
             Print("AND I initialise the database with 20 customers, each with 10 loyalty points");

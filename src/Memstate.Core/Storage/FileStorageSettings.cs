@@ -6,11 +6,11 @@ namespace Memstate
     {
         public override string Key { get;  } = "Memstate:StorageProviders:FileStorage";
 
-        private readonly MemstateSettings _memstateSettings;
+        private readonly EngineSettings _memstateSettings;
 
         public FileStorageSettings()
         {
-            _memstateSettings = Config.Current.Resolve<MemstateSettings>();
+            _memstateSettings = Config.Current.Resolve<EngineSettings>();
         }
 
         public string FileNameSuffix { get; set; } = ".journal";

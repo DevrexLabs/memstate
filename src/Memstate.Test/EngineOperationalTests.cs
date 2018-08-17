@@ -11,7 +11,7 @@ namespace Memstate.Test
     [TestFixture]
     public class EngineOperationalTests
     {
-        private MemstateSettings _settings;
+        private EngineSettings _settings;
         private FakeSubscriptionSource _fakeSource;
         private DateTime _now;
         private Engine<KeyValueStore<int>> _engine;
@@ -20,7 +20,7 @@ namespace Memstate.Test
         public void Setup()
         {
             var cfg = Config.Current;
-            _settings = cfg.Resolve<MemstateSettings>();
+            _settings = cfg.Resolve<EngineSettings>();
             cfg.FileSystem = new InMemoryFileSystem();
         }
 

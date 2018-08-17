@@ -46,7 +46,7 @@ namespace Memstate.Test
         [SetUp]
         public void Setup()
         {
-            var config = new MemstateSettings();
+            var config = new EngineSettings();
             _bank = new AccountModel();
             _kernel = new Kernel(config, _bank);
         }

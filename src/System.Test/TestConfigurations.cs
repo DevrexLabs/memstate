@@ -33,7 +33,7 @@ namespace System.Test
                     var cfg = new Config();
                     cfg.SerializerName = serializerName;
                     cfg.UseInMemoryFileSystem();
-                    var settings = cfg.Resolve<EngineSettings>();
+                    var settings = cfg.GetSettings<EngineSettings>();
                     settings.WithRandomSuffixAppendedToStreamName();
                     cfg.StorageProviderName = providerType.AssemblyQualifiedName;
                     yield return cfg;
@@ -71,7 +71,7 @@ namespace System.Test
         internal static void Configure(Config config)
         {
             Config.Current = config;
-            var settings = config.Resolve<EngineSettings>();
+            var settings = config.GetSettings<EngineSettings>();
             settings.WithRandomSuffixAppendedToStreamName();
             Console.WriteLine("C: " + config);
         }

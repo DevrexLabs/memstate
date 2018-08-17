@@ -77,7 +77,7 @@ namespace Memstate.Test.Models.Redis
         {
             var cfg = Config.Current;
             cfg.FileSystem = new InMemoryFileSystem();
-            var settings = cfg.Resolve<EngineSettings>();
+            var settings = cfg.GetSettings<EngineSettings>();
 
 
             var engine = new EngineBuilder().Build<IRedisModel>(new RedisModel()).Result;

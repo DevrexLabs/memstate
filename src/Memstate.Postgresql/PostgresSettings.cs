@@ -21,7 +21,7 @@ namespace Memstate.Postgres
 
         public PostgresSettings()
         {
-            _memstateSettings = Config.Current.Resolve<EngineSettings>();
+            _memstateSettings = Config.Current.GetSettings<EngineSettings>();
         }
 
         /// <summary>

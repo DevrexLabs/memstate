@@ -46,7 +46,7 @@ namespace Memstate.Postgres.Tests
             string value = "Password12!";
             Environment.SetEnvironmentVariable(key, value);
             var config = Config.Reset();
-            var settings = config.Resolve<PostgresSettings>();
+            var settings = config.GetSettings<PostgresSettings>();
             Assert.AreEqual(value, settings.Password);
         }
 

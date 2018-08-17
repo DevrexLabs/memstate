@@ -15,8 +15,8 @@ namespace Memstate
         public FileStorageProvider()
         {
             var cfg = Config.Current;
-            _settings = cfg.Resolve<EngineSettings>();
-            _fileStorageSettings = cfg.Resolve<FileStorageSettings>();
+            _settings = cfg.GetSettings<EngineSettings>();
+            _fileStorageSettings = cfg.GetSettings<FileStorageSettings>();
             _fileSystem = cfg.FileSystem;
         }
 

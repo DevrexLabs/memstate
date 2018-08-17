@@ -28,7 +28,7 @@ namespace Memstate.Host.Commands
         {
             _running = true;
             var cfg = Config.Current;
-            var settings = cfg.Resolve<EngineSettings>();
+            var settings = cfg.GetSettings<EngineSettings>();
             cfg.FileSystem = new InMemoryFileSystem();
             //_settings.LoggerFactory.AddConsole((category, level) => true);
 

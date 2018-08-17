@@ -17,7 +17,7 @@ namespace Memstate.Test
         {
             var cfg = Config.Reset();
             cfg.FileSystem = new InMemoryFileSystem();
-            _settings = cfg.Resolve<EngineSettings>();
+            _settings = cfg.GetSettings<EngineSettings>();
             var engine = await Engine.Start<UsersModel>();
             _client = new LocalClient<UsersModel>(engine);
         }

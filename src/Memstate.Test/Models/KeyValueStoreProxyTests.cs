@@ -15,7 +15,7 @@ namespace Memstate.Test.Models
         public async Task Setup()
         {
             var config = Config.Reset();
-            var settings = config.Resolve<EngineSettings>();
+            var settings = config.GetSettings<EngineSettings>();
             config.UseInMemoryFileSystem();
             IKeyValueStore<int> model = new KeyValueStore<int>();
             var engine = await new EngineBuilder().Build(model);

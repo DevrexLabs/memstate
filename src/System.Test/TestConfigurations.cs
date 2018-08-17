@@ -63,8 +63,8 @@ namespace System.Test
         {
             protected override IEnumerable<Type> ProviderTypes()
             {
-                //yield return typeof(EventStoreProvider);
-                yield return typeof(PostgresProvider);
+                yield return typeof(EventStoreProvider);
+                //yield return typeof(PostgresProvider);
             }
         }
 

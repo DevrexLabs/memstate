@@ -21,7 +21,7 @@ namespace Memstate.Host
 
         public Host(params string[] arguments)
         {
-            Settings = Config.Current.Resolve<EngineSettings>();
+            Settings = Config.Current.GetSettings<EngineSettings>();
 
             var modelType = Type.GetType(Settings.Model);
 

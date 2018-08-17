@@ -10,7 +10,7 @@ namespace Memstate
 
         public FileStorageSettings()
         {
-            _memstateSettings = Config.Current.Resolve<EngineSettings>();
+            _memstateSettings = Config.Current.GetSettings<EngineSettings>();
         }
 
         public string FileNameSuffix { get; set; } = ".journal";

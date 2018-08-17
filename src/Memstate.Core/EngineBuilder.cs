@@ -12,7 +12,7 @@ namespace Memstate
         public EngineBuilder()
         {
             var config = Config.Current;
-            _settings = config.Resolve<EngineSettings>();
+            _settings = config.GetSettings<EngineSettings>();
             _storageProvider = config.GetStorageProvider();
             _storageProvider.Initialize();
         }

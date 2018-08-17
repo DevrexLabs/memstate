@@ -24,7 +24,7 @@ namespace Memstate.Host.Commands
 
         public async Task Start(string[] arguments)
         {
-            Settings = Config.Current.Resolve<EngineSettings>();
+            Settings = Config.Current.GetSettings<EngineSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
             //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 

@@ -18,7 +18,7 @@ namespace Memstate.EventStore
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;
             var config = Config.Current;
-            _settings = config.Resolve<EventStoreSettings>();
+            _settings = config.GetSettings<EventStoreSettings>();
             _serializer = config.CreateSerializer(_settings.SerializerName);
             _streamName = _settings.StreamName;
         }

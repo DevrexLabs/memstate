@@ -1,21 +1,10 @@
 using System;
-using Memstate.Configuration;
 
 namespace Memstate
 {
     public class EngineSettings : Settings
     {
         public override string Key { get; } = "Memstate:Engine";
-
-        public EngineSettings()
-            : this(Config.Current)
-        {
-        }
-
-        public EngineSettings(Config config)
-        {
-            config.Bind(this, Key);
-        }
 
         /// <summary>
         /// Maximum number of commands per batch sent to journal writer

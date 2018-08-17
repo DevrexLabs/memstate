@@ -47,7 +47,7 @@ namespace Memstate.Test.DispatchProxy
             //Arrange
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
-            var settings = Config.Current.Resolve<EngineSettings>();
+            var settings = Config.Current.GetSettings<EngineSettings>();
             var storageProvider = cfg.GetStorageProvider();
             var builder = new EngineBuilder();
             var engine = builder.Build<ITestModel>().Result;

@@ -15,7 +15,7 @@ namespace Memstate.Postgres
         public PostgresProvider()
         {
             _log = LogProvider.GetCurrentClassLogger();
-            Settings = Config.Current.Resolve<PostgresSettings>();
+            Settings = Config.Current.GetSettings<PostgresSettings>();
         }
 
         static PostgresProvider()
@@ -26,7 +26,7 @@ namespace Memstate.Postgres
         [Conditional("DEBUG")]
         private static void EnableNpgsqlDebugLogging()
         {
-            NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Debug, true, true);
+            NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Trace, true, true);
             NpgsqlLogManager.IsParameterLoggingEnabled = true;
         }
 

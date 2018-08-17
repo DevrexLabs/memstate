@@ -20,7 +20,7 @@ namespace Memstate.Test
 
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
-            var settings = cfg.Resolve<EngineSettings>();
+            var settings = cfg.GetSettings<EngineSettings>();
             cfg.SerializerName = "newtonsoft.json";
 
             settings.StreamName = Stream;

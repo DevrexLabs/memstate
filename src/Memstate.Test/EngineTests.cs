@@ -26,7 +26,7 @@ namespace Memstate.Test
             A.CallTo(() => _fakeSubscriptionSource.Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
                 .Returns(_fakeSubscription);
 
-            var settings = Config.Current.Resolve<EngineSettings>();
+            var settings = Config.Current.GetSettings<EngineSettings>();
             _engine = new Engine<Object>(settings, new Object(), _fakeSubscriptionSource, _fakeJournalWriter, _nextRecordNumber);
         }
 

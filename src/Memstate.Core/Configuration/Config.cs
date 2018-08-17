@@ -93,12 +93,7 @@ namespace Memstate.Configuration
             Container.Register(this);
         }
 
-        //public void Register<T>(T instance) where T : class
-        //{
-        //    Container.Register(instance).AsSingleton();
-        //}
-
-        public T Resolve<T>() where T : Settings
+        public T GetSettings<T>() where T : Settings
         {
             if (_singletonCache.TryGetValue(typeof(T), out object result))
             {

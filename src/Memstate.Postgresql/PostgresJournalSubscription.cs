@@ -2,7 +2,7 @@
 using System.Threading;
 using Npgsql;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
     public class PostgresJournalSubscription : IJournalSubscription
     {

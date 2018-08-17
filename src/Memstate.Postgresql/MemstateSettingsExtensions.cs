@@ -1,11 +1,13 @@
-﻿namespace Memstate.Postgresql
+﻿using Memstate.Configuration;
+
+namespace Memstate.Postgres
 {
     public static class MemstateSettingsExtensions
     {
-        public static MemstateSettings UsePostgresqlProvider(this MemstateSettings settings)
+        public static Config UsePostgresqlProvider(this Config config)
         {
-            settings.StorageProviderName = typeof(PostgresProvider).AssemblyQualifiedName;
-            return settings;
+            config.StorageProviderName = typeof(PostgresProvider).AssemblyQualifiedName;
+            return config;
         }
     }
 }

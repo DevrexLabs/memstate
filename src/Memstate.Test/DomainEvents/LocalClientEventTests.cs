@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Test.EventfulTestDomain;
 using NUnit.Framework;
 
@@ -12,11 +13,13 @@ namespace Memstate.Test
         private LocalClient<UsersModel> _client;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            _settings = new MemstateSettings();
-            _settings.WithInmemoryStorage();
-            _client = new LocalClient<UsersModel>(() => new UsersModel(), _settings);
+            var cfg = Config.Reset();
+            cfg.FileSystem = new InMemoryFileSystem();
+            _settings = cfg.Resolve<MemstateSettings>();
+            var engine = await Engine.Start<UsersModel>();
+            _client = new LocalClient<UsersModel>(engine);
         }
         
         [Test]

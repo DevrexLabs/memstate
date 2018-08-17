@@ -12,9 +12,9 @@ namespace Memstate
         public StorageProviders()
         {
             Register("auto", AutoResolve);
-            Register("file", s => new FileStorageProvider(s));
-            Register("EventStore", s => InstanceFromTypeName(EventStoreProviderType, s));
-            Register("Postgres", s => InstanceFromTypeName(PostgresProviderType, s));
+            Register("file", () => new FileStorageProvider());
+            Register("EventStore", () => InstanceFromTypeName(EventStoreProviderType));
+            Register("Postgres", () => InstanceFromTypeName(PostgresProviderType));
         }
 
         protected override IEnumerable<string> AutoResolutionCandidates()

@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Memstate
 {
-    internal class HostFileSystem : IVirtualFileSystem
+    internal class HostFileSystem : IFileSystem
     {
         public Stream OpenAppend(string path)
         {

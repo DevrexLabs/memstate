@@ -1,3 +1,4 @@
+using Memstate.Configuration;
 using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,21 +41,16 @@ namespace Memstate.Test.DispatchProxy
             }
         }
 
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            Settings.Initialize();
-        }
-
         [Test]
         public async Task MapsToCommand()
         {
             //Arrange
-            var settings  = MemstateSettings.Current;
-            settings.FileSystem = new InMemoryFileSystem();
-            var storageProvider = settings.GetStorageProvider();
-            var builder = new EngineBuilder(settings, storageProvider);
-            var engine = builder.Build<ITestModel>(new TestModel()).Result;
+            var cfg = Config.Reset();
+            cfg.UseInMemoryFileSystem();
+            var settings = Config.Current.Resolve<MemstateSettings>();
+            var storageProvider = cfg.GetStorageProvider();
+            var builder = new EngineBuilder();
+            var engine = builder.Build<ITestModel>().Result;
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();
 

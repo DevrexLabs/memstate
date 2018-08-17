@@ -1,23 +1,24 @@
-using System.Collections.Generic;
 using Memstate.Models.KeyValue;
 using NUnit.Framework;
+using System;
+using System.Threading.Tasks;
+using Memstate.Configuration;
+using Memstate.Models;
 
 namespace Memstate.Test.Models
 {
-    using System;
-    using Memstate.Models;
-
     public class KeyValueStoreProxyTests
     {
         private IKeyValueStore<int> _keyValueStore;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
-            MemstateSettings config = new MemstateSettings();
-            config.FileSystem = new InMemoryFileSystem();
+            var config = Config.Reset();
+            var settings = config.Resolve<MemstateSettings>();
+            config.UseInMemoryFileSystem();
             IKeyValueStore<int> model = new KeyValueStore<int>();
-            var engine = new EngineBuilder(config).Build(model).Result;
+            var engine = await new EngineBuilder().Build(model);
             var client = new LocalClient<IKeyValueStore<int>>(engine);
             _keyValueStore = client.GetDispatchProxy();
         }

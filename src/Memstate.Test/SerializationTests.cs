@@ -13,9 +13,8 @@ namespace Memstate.Test
     {
         private static IEnumerable<ISerializer> Serializers()
         {
-            var settings = new MemstateSettings();
-            yield return new WireSerializerAdapter(settings);
-            yield return new JsonSerializerAdapter(settings);
+            yield return new WireSerializerAdapter();
+            yield return new JsonSerializerAdapter();
         }
 
         [Test, TestCaseSource(nameof(Serializers))]

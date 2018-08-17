@@ -2,6 +2,7 @@ using System;
 using FakeItEasy;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Memstate.Configuration;
 
 namespace Memstate.Test
 {
@@ -24,11 +25,8 @@ namespace Memstate.Test
 
             A.CallTo(() => _fakeSubscriptionSource.Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
                 .Returns(_fakeSubscription);
-            
 
-            Settings.Initialize();
-
-            var settings = MemstateSettings.Current;
+            var settings = Config.Current.Resolve<MemstateSettings>();
             _engine = new Engine<Object>(settings, new Object(), _fakeSubscriptionSource, _fakeJournalWriter, _nextRecordNumber);
         }
 

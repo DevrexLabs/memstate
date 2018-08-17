@@ -10,31 +10,13 @@ namespace Memstate
 
         public abstract string Key { get; }
 
-        public static T Get<T>() where T : Settings, new()
-        {
-            Initialize();
-            return Provider.Get<T>();
-        }
-
-        public static SettingsProvider Provider { get; set; }
-
-
-        public static void Initialize()
-        {
-            if (Provider != null) return;
-            var providerType = Type.GetType(MsConfigSettingsProviderType, throwOnError: false);
-            providerType = providerType ?? typeof(NullSettingsProvider);
-            Provider = (SettingsProvider)Activator.CreateInstance(providerType);
-            MemstateSettings.Current = Get<MemstateSettings>();
-        }
-
         public virtual void Validate()
         {
         }
 
         public string GetEmbeddedResource(string resourceName)
         {
-            var assembly = GetType().GetTypeInfo().Assembly;
+            var assembly = GetAssemblyOfExecutingType();
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream))
@@ -45,9 +27,17 @@ namespace Memstate
 
         public string[] GetEmbeddedResourceNames()
         {
-            var assembly = GetType().GetTypeInfo().Assembly;
-
+            var assembly = GetAssemblyOfExecutingType();
             return assembly.GetManifestResourceNames();
+        }
+
+        /// <summary>
+        /// Get the assembly of the concrete subclass
+        /// </summary>
+        /// <returns>The assembly of executing type.</returns>
+        private Assembly GetAssemblyOfExecutingType()
+        {
+            return GetType().GetTypeInfo().Assembly;
         }
     }
 }

@@ -16,11 +16,6 @@ namespace Memstate
             _eventHandlers = new EventHandlers<TModel>(_engine);
         }
 
-        public LocalClient(Func<TModel> creator, MemstateSettings settings)
-            : this(new EngineBuilder(settings).Build(creator()).Result)
-        {
-        }
-
         internal override Task<object> ExecuteUntyped(Query query) 
             => Task.FromResult(_engine.ExecuteUntyped(query));
 
@@ -47,7 +42,7 @@ namespace Memstate
 
         public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
         {
-            _eventHandlers.SetHandler<T>(handler, filter);
+            _eventHandlers.SetHandler(handler, filter);
             return Task.CompletedTask;
         }
     }

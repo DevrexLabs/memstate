@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate
 {
@@ -17,11 +18,12 @@ namespace Memstate
         /// </summary>
         private long _nextRecord;
 
-        public FileJournalWriter(MemstateSettings settings, string fileName, long nextRecord)
+        public FileJournalWriter(string fileName, long nextRecord)
         {
+            var cfg = Config.Current;
             _nextRecord = nextRecord;
-            _journalStream = settings.FileSystem.OpenAppend(fileName);
-            _serializer = settings.CreateSerializer();
+            _journalStream = cfg.FileSystem.OpenAppend(fileName);
+            _serializer = cfg.CreateSerializer();
         }
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };

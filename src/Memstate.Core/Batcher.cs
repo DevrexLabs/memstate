@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate
@@ -18,13 +19,12 @@ namespace Memstate
 
         private readonly ILog _logger;
 
-        public Batcher(Action<IEnumerable<T>> batchHandler)
+        public Batcher(Action<IEnumerable<T>> batchHandler, int maxBatchSize, int maxQueueLength)
         {
-             var settings = MemstateSettings.Current;
             _logger = LogProvider.GetCurrentClassLogger();
             _batchHandler = batchHandler;
-            _maxBatchSize = settings.MaxBatchSize;
-            _items = new BlockingCollection<T>(settings.MaxBatchQueueLength);
+            _maxBatchSize = maxBatchSize;
+            _items = new BlockingCollection<T>(maxQueueLength);
             _batchTask = new Task(ProcessItems, TaskCreationOptions.LongRunning);
             _batchTask.Start();
         }

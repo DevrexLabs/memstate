@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate.Tcp
@@ -26,14 +27,14 @@ namespace Memstate.Tcp
 
         private readonly ISet<Task> _connections = new HashSet<Task>();
 
-        private readonly MemstateSettings _config;
+        private readonly MemstateSettings _settings;
 
         private Task _listenerTask;
 
         public MemstateServer(MemstateSettings config, Engine<T> engine)
         {
             _engine = engine;
-            _config = config;
+            _settings = config;
 
             // TODO: Endpoint should be configurable.
             var ip = IPAddress.Any;
@@ -63,12 +64,12 @@ namespace Memstate.Tcp
 
         private async Task HandleConnection(TcpClient tcpClient)
         {
-            var serializer = _config.CreateSerializer();
+            var serializer = Config.Current.CreateSerializer();
             var stream = tcpClient.GetStream();
 
             var outgoingMessages = new BlockingCollection<Message>();
             var writerTask = Task.Run(() => SendMessages(outgoingMessages, stream));
-            var session = new Session<T>(_config, _engine);
+            var session = new Session<T>(_engine);
             session.OnMessage += outgoingMessages.Add;
 
             while (!_cancellationSource.Token.IsCancellationRequested)
@@ -86,7 +87,7 @@ namespace Memstate.Tcp
         private async Task SendMessages(BlockingCollection<Message> messages, Stream stream)
         {
             // TODO: Consider using MessageProcessor.
-            var serializer = _config.CreateSerializer();
+            var serializer = Config.Current.CreateSerializer();
             var cancellationToken = _cancellationSource.Token;
             var messageId = 0;
 

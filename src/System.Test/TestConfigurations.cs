@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Memstate;
+using Memstate.Configuration;
 using Memstate.EventStore;
 using Memstate.JsonNet;
-using Memstate.Postgresql;
+using Memstate.Postgres;
 using Memstate.Wire;
 
 namespace System.Test
@@ -23,17 +24,19 @@ namespace System.Test
                 .GetEnumerator();
         }
 
-        public IEnumerable<MemstateSettings> GetConfigurations()
+        public IEnumerable<Config> GetConfigurations()
         {
             foreach (var serializerName in Serializers())
             {
                 foreach (var providerType in ProviderTypes())
                 {
-                    var settings = new MemstateSettings();
-                    settings.SerializerName = serializerName;
-                    settings.FileSystem = new InMemoryFileSystem();
-                    settings.StorageProviderName = providerType.AssemblyQualifiedName;
-                    yield return settings;
+                    var cfg = new Config();
+                    cfg.SerializerName = serializerName;
+                    cfg.UseInMemoryFileSystem();
+                    var settings = cfg.Resolve<MemstateSettings>();
+                    settings.WithRandomSuffixAppendedToStreamName();
+                    cfg.StorageProviderName = providerType.AssemblyQualifiedName;
+                    yield return cfg;
                 }
             }
         }
@@ -61,8 +64,16 @@ namespace System.Test
             protected override IEnumerable<Type> ProviderTypes()
             {
                 yield return typeof(EventStoreProvider);
-                //yield return typeof(PostgresqlProvider);
+                //yield return typeof(PostgresProvider);
             }
+        }
+
+        internal static void Configure(Config config)
+        {
+            Config.Current = config;
+            var settings = config.Resolve<MemstateSettings>();
+            settings.WithRandomSuffixAppendedToStreamName();
+            Console.WriteLine("C: " + config);
         }
     }
 }

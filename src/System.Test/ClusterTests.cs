@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate;
+using Memstate.Configuration;
 using NUnit.Framework;
 
 namespace System.Test
@@ -9,28 +10,21 @@ namespace System.Test
     [TestFixture]
     public class ClusterTests
     {
-
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            Settings.Initialize(); //Triggers MsConfigSettingsProvider
-        }
-
         // One writer, multiple readers
         [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteOneAndReadFromMany(MemstateSettings settings)
+        public async Task CanWriteOneAndReadFromMany(Config config)
         {
             const int records = 100;
 
-            Configure(settings);
+            Config.Current = config;
 
-            var writer = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            var writer = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             foreach (var number in Enumerable.Range(1, records))
             {
@@ -55,20 +49,19 @@ namespace System.Test
 
         // Multiple writers, one reader
         [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromOne(MemstateSettings settings)
+        public async Task CanWriteManyAndReadFromOne(Config config)
         {
             const int records = 100;
 
-            Configure(settings);
+            Config.Current = config;
 
-
-            var reader = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            var reader = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             var totalCount = 0;
 
@@ -93,24 +86,24 @@ namespace System.Test
 
         // Multiple writers, multiple readers
         [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromMany(MemstateSettings settings)
+        public async Task CanWriteManyAndReadFromMany(Config config)
         {
             const int records = 100;
 
-            Configure(settings);
+            Config.Current = config;
 
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
 
             var totalCount = 0;
 
@@ -142,26 +135,27 @@ namespace System.Test
 
         // Multiple writers, multiple readers, in parallel
         [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromManyInParallel(MemstateSettings settings)
+        public async Task CanWriteManyAndReadFromManyInParallel(Config config)
         {
+            Config.Current = config;
+
             const int Records = 100;
 
-            Configure(settings);
 
             Console.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
             Console.WriteLine("Readers created");
 
             Console.WriteLine("Creating writers");
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[1] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
-            writers[2] = await Engine.Start<List<string>>(settings).ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
             Console.WriteLine("Writers created");
 
             Console.WriteLine("Creating write tasks");
@@ -204,13 +198,7 @@ namespace System.Test
             Console.WriteLine("Done reading from all engines");
         }
 
-        private void Configure(MemstateSettings settings)
-        {
-            settings.WithRandomSuffixAppendedToStreamName();
-            Console.WriteLine("C: " + settings);
-        }
-
-        public static IEnumerable<MemstateSettings> Configurations()
+        public static IEnumerable<Config> Configurations()
         {
             return new TestConfigurations.Cluster().GetConfigurations();
         }

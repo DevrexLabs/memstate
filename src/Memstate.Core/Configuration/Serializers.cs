@@ -11,8 +11,8 @@ namespace Memstate
         public Serializers()
         {
             Register("Auto", AutoResolve);
-            Register("Wire", s => InstanceFromTypeName(Wire,s));
-            Register("NewtonSoft.Json", s => InstanceFromTypeName(NewtonSoftJson,s));
+            Register("Wire", () => InstanceFromTypeName(Wire));
+            Register("NewtonSoft.Json", () => InstanceFromTypeName(NewtonSoftJson));
         }
 
         protected override IEnumerable<string> AutoResolutionCandidates()

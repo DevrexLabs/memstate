@@ -19,7 +19,7 @@ namespace Memstate.Tcp
 
         private readonly ConcurrentDictionary<Type, EventMatcher> _subscriptions; 
 
-        public Session(MemstateSettings config, Engine<T> engine)
+        public Session(Engine<T> engine)
         {
             _engine = engine;
             _logger = LogProvider.GetCurrentClassLogger();

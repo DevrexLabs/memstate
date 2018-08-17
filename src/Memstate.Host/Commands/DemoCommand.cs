@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
 using Microsoft.AspNetCore.Hosting;
@@ -15,8 +16,6 @@ namespace Memstate.Host.Commands
         
         private volatile bool _running;
         
-        private MemstateSettings _settings;
-
         private Engine<KeyValueStore<int>> _engine;
 
         private IWebHost _host;
@@ -28,19 +27,18 @@ namespace Memstate.Host.Commands
         public async Task Start(string[] arguments)
         {
             _running = true;
-            Settings.Provider = new MsConfigSettingsProvider(arguments);
-            _settings = Settings.Get<MemstateSettings>();
-
-            _settings.WithInmemoryStorage();
+            var cfg = Config.Current;
+            var settings = cfg.Resolve<MemstateSettings>();
+            cfg.FileSystem = new InMemoryFileSystem();
             //_settings.LoggerFactory.AddConsole((category, level) => true);
 
-            _engine = await new EngineBuilder(_settings).Build<KeyValueStore<int>>();
+            _engine = await new EngineBuilder().Build<KeyValueStore<int>>();
 
             _host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Web.Startup>()
-                .ConfigureServices(services => services.AddSingleton(_settings))
+                .ConfigureServices(services => services.AddSingleton(settings))
                 .Build();
 
             _producerThread = new Thread(Producer);

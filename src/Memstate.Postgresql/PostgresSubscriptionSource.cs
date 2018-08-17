@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
     public class PostgresSubscriptionSource : IJournalSubscriptionSource
     {

@@ -2,7 +2,7 @@
 
 namespace Memstate
 {
-    public interface IVirtualFileSystem
+    public interface IFileSystem
     {
         Stream OpenAppend(string path);
 

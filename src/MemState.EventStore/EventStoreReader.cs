@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 
@@ -19,11 +20,14 @@ namespace Memstate.EventStore
 
         private readonly ILog _logger;
 
-        public EventStoreReader(MemstateSettings config, EventStoreSettings eventStoreSettings, IEventStoreConnection connection)
+        public EventStoreReader(IEventStoreConnection connection)
         {
+            var config = Config.Current;
+            var settings = config.Resolve<MemstateSettings>();
+            var eventStoreSettings = config.Resolve<EventStoreSettings>();
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;
-            _serializer = config.Serializers.Resolve(eventStoreSettings.Serializer, config);
+            _serializer = config.Serializers.Resolve(eventStoreSettings.SerializerName);
             _streamName = eventStoreSettings.StreamName;
             _eventsPerSlice = eventStoreSettings.EventsPerSlice;
         }

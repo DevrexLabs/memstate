@@ -1,5 +1,6 @@
 using System;
 using EventStore.ClientAPI;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate.EventStore
@@ -12,13 +13,14 @@ namespace Memstate.EventStore
         private readonly ILog _logger;
         private readonly EventStoreSettings _settings;
 
-        public EventStoreSubscriptionSource(EventStoreSettings settings, IEventStoreConnection connection)
+        public EventStoreSubscriptionSource(IEventStoreConnection connection)
         {
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;
-            _settings = settings;
-            _serializer = settings.CreateSerializer();
-            _streamName = settings.StreamName;
+            var config = Config.Current;
+            _settings = config.Resolve<EventStoreSettings>();
+            _serializer = config.CreateSerializer(_settings.SerializerName);
+            _streamName = _settings.StreamName;
         }
 
         public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)

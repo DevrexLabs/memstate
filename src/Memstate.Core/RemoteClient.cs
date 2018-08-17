@@ -5,12 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Memstate.Tcp;
 using Memstate.Logging;
+using Memstate.Configuration;
 
 namespace Memstate
 {
     public class RemoteClient<TModel> : Client<TModel> where TModel : class
     {
-        private readonly MemstateSettings _config;
+        private readonly MemstateSettings _settings;
 
         private readonly ILog _logger;
 
@@ -20,9 +21,14 @@ namespace Memstate
         private TcpClient _tcpClient;
 
         /// <summary>
-        /// SerializerName used to serialize and deserialize messages
+        /// SerializerName used to serialize outgoing messages
         /// </summary>
         private readonly ISerializer _serializer;
+
+        /// <summary>
+        /// Serializer used to deserialize incoming messages
+        /// </summary>
+        private readonly ISerializer _deserializer;
 
         /// <summary>
         /// Stream that we read and write messages to/from
@@ -50,10 +56,12 @@ namespace Memstate
 
         private readonly Dictionary<Type, Action<Event>> _eventHandlers;
 
-        public RemoteClient(MemstateSettings config)
+        public RemoteClient()
         {
-            _config = config;
-            _serializer = config.CreateSerializer();
+            var cfg = Config.Current;
+            _settings = cfg.Resolve<MemstateSettings>();
+            _serializer = cfg.CreateSerializer();
+            _deserializer = cfg.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
             _logger = LogProvider.GetCurrentClassLogger();
             _cancellationSource = new CancellationTokenSource();
@@ -139,13 +147,12 @@ namespace Memstate
         private async Task ReceiveMessages()
         {
             _logger.Trace("Starting ReceiveMessages task");
-            var serializer = _config.CreateSerializer();
             var cancellationToken = _cancellationSource.Token;
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 _logger.Trace("awaiting NetworkMessage");
-                var message = await Message.Read(_stream, serializer, cancellationToken);
+                var message = await Message.Read(_stream, _deserializer, cancellationToken);
                 _logger.Debug("message received " + message);
                 if (message == null) break;
                 Handle(message);

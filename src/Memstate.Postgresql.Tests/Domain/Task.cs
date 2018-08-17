@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memstate.Postgresql.Tests.Domain
+namespace Memstate.Postgres.Tests.Domain
 {
     public class Task
     {

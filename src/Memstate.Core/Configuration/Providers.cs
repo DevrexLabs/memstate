@@ -13,18 +13,19 @@ namespace Memstate
         /// </summary>
         protected abstract IEnumerable<string> AutoResolutionCandidates();
 
-        internal T Resolve(string providerName, MemstateSettings settings)
+        internal T Resolve(string providerName)
         {
+            providerName = providerName ?? "Auto";
             return RegisteredProviders.TryGetValue(providerName, out var providerConstructor)
-                ? providerConstructor.Invoke(settings)
-                : InstanceFromTypeName(providerName, settings);
+                ? providerConstructor.Invoke()
+                : InstanceFromTypeName(providerName);
         }
 
-        protected bool TryResolve(string provider, MemstateSettings settings, out T result)
+        protected bool TryResolve(string provider, out T result)
         {
             try
             {
-                result = Resolve(provider, settings);
+                result = Resolve(provider);
                 return true;
             }
             catch (Exception)
@@ -34,22 +35,22 @@ namespace Memstate
             }
         }
 
-        protected void Register(string name, Func<MemstateSettings, T> constructor)
+        protected void Register(string name, Func<T> constructor)
         {
             RegisteredProviders[name] = constructor;
         }
 
-        protected static T InstanceFromTypeName(string typeName, MemstateSettings settings)
+        protected static T InstanceFromTypeName(string typeName)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
-            return (T) Activator.CreateInstance(type, settings);
+            return (T) Activator.CreateInstance(type);
         }
 
-        protected T AutoResolve(MemstateSettings settings)
+        protected T AutoResolve()
         {
             foreach (var candidate in AutoResolutionCandidates())
             {
-                if (TryResolve(candidate, settings, out var provider))
+                if (TryResolve(candidate, out var provider))
                 {
                     LogProvider.GetCurrentClassLogger().Info("Provider resolved: " + provider);
                     return provider;
@@ -58,7 +59,7 @@ namespace Memstate
             throw new Exception("Autoresolve failed for " + typeof(T));
         }
 
-        internal class Registry : Dictionary<string, Func<MemstateSettings, T>>
+        internal class Registry : Dictionary<string, Func<T>>
         {
             public Registry() : base(StringComparer.OrdinalIgnoreCase)
             {

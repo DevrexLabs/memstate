@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate
 {
@@ -11,10 +12,12 @@ namespace Memstate
 
         private readonly ISerializer _serializer;
 
-        public FileJournalReader(string fileName, MemstateSettings settings)
+        public FileJournalReader(string fileName)
         {
-            _journalStream = settings.FileSystem.OpenRead(fileName);
-            _serializer = settings.CreateSerializer();
+            var cfg = Config.Current;
+            var settings = cfg.Resolve<MemstateSettings>();
+            _journalStream = cfg.FileSystem.OpenRead(fileName);
+            _serializer = cfg.CreateSerializer();
         }
 
         public Task DisposeAsync()
@@ -26,10 +29,10 @@ namespace Memstate
         {
             foreach (var record in _serializer.ReadObjects<JournalRecord>(_journalStream))
             {
-                    if (record.RecordNumber >= fromRecord)
-                    {
-                        yield return record;
-                    }
+                if (record.RecordNumber >= fromRecord)
+                {
+                    yield return record;
+                }
             }
         }
     }

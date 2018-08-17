@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate
 {
@@ -8,32 +9,33 @@ namespace Memstate
         private readonly FileStorageSettings _fileStorageSettings;
         private readonly MemstateSettings _settings;
         private FileJournalWriter _currentWriter;
+        private readonly IFileSystem _fileSystem;
 
 
-        public FileStorageProvider(MemstateSettings settings)
+        public FileStorageProvider()
         {
-            _settings = settings;
-            _fileStorageSettings = new FileStorageSettings(settings);
+            var cfg = Config.Current;
+            _settings = cfg.Resolve<MemstateSettings>();
+            _fileStorageSettings = cfg.Resolve<FileStorageSettings>();
+            _fileSystem = cfg.FileSystem;
         }
 
         public override IJournalReader CreateJournalReader()
         {
             var fileName = _fileStorageSettings.FileName;
 
-            if (!_settings.FileSystem.Exists(fileName))
+            if (!_fileSystem.Exists(fileName))
             {
                 return new NullJournalReader();
             }
 
-            return new FileJournalReader(fileName, _settings);
+            return new FileJournalReader(fileName);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             var fileName = _fileStorageSettings.FileName;
-
-            _currentWriter = new FileJournalWriter(_settings, fileName, nextRecordNumber);
-
+            _currentWriter = new FileJournalWriter(fileName, nextRecordNumber);
             return _currentWriter;
         }
 

@@ -1,12 +1,13 @@
 ﻿using System.Threading;
 using System;
 using System.Collections.Generic;
-using Memstate.Postgresql.Tests.Domain;
+using Memstate.Postgres.Tests.Domain;
 using Npgsql;
 using NUnit.Framework;
 using System.Linq;
+using Memstate.Configuration;
 
-namespace Memstate.Postgresql.Tests
+namespace Memstate.Postgres.Tests
 {
     [TestFixture]
     public class JournalReaderTests
@@ -19,15 +20,17 @@ namespace Memstate.Postgresql.Tests
         [SetUp]
         public void Setup()
         {
-            var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
+            var cfg = Config.Reset();
+            cfg.Resolve<MemstateSettings>()
+               .WithRandomSuffixAppendedToStreamName();
 
-            _provider = new PostgresProvider(settings);
+            _provider = new PostgresProvider();
             _provider.Initialize();
 
             _journalReader = _provider.CreateJournalReader();
             _journalWriter = _provider.CreateJournalWriter(0);
 
-            _serializer = settings.CreateSerializer();
+            _serializer = Config.Current.CreateSerializer();
         }
 
         [Test]

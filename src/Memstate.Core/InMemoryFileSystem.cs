@@ -9,14 +9,19 @@ namespace Memstate
     /// Useful as a mock file system for integration testing.
     /// Faster than file i/o and no left over files in the file system
     /// </summary>
-    public class InMemoryFileSystem : IVirtualFileSystem
+    public class InMemoryFileSystem : IFileSystem
     {
         private readonly Dictionary<string, MemoryStream> _files = new Dictionary<string, MemoryStream>();
 
         private readonly HashSet<string> _lockedFiles = new HashSet<string>();
 
-        // NOTE: Should this property use a lock?
-        public bool Exists(string fileName) => _files.ContainsKey(fileName);
+        public bool Exists(string fileName)
+        {
+            lock (_files)
+            { 
+                return _files.ContainsKey(fileName); 
+            }   
+        }
 
         public Stream OpenAppend(string path)
         {
@@ -37,7 +42,7 @@ namespace Memstate
                     throw new FileNotFoundException(path);
                 }
 
-                var result = OpenOrCreateStream(path);
+                 var result = OpenOrCreateStream(path);
                 result.Position = 0;
                 return result;
             }

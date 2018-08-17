@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Docs.GettingStarted.QuickStart.Commands;
 using Memstate.Docs.GettingStarted.QuickStart.Queries;
 using NUnit.Framework;
@@ -16,6 +17,7 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         [TearDown]
         public void Setup()
         {
+            Config.Reset().SerializerName = "Wire";
             if (File.Exists(JournalFile)) File.Delete(JournalFile);
         }
 
@@ -28,8 +30,9 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print("   (using Wire format  & local filesystem storage)");
-            var settings = new MemstateSettings { StreamName = Filename };
-            var engine = await new EngineBuilder(settings).Build<LoyaltyDB>();
+            var settings = Config.Current.Resolve<MemstateSettings>();
+            settings.StreamName = Filename;
+            var engine = await Engine.Start<LoyaltyDB>();
             Print("AND I initialise the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
@@ -55,7 +58,7 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Assert.True(File.Exists(JournalFile));
 
             Print("WHEN I start up another engine");
-            engine = await new EngineBuilder(settings).Build<LoyaltyDB>();
+            engine = await Engine.Start<LoyaltyDB>();
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
             var allCustomers = await engine.Execute(new GetCustomers());

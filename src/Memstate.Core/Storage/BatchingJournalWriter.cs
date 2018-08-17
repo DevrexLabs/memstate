@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate
 {
@@ -9,7 +10,11 @@ namespace Memstate
 
         protected BatchingJournalWriter()
         {
-            _batcher = new Batcher<Command>(OnCommandBatch);
+            var config = Config.Current;
+            var settings = config.Resolve<MemstateSettings>();
+            var maxBatchSize = settings.MaxBatchSize;
+            var maxBatchQueueLength = settings.MaxBatchQueueLength;
+            _batcher = new Batcher<Command>(OnCommandBatch, maxBatchSize, maxBatchQueueLength);
         }
 
         public void Send(Command command) => _batcher.Add(command);

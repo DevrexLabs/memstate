@@ -5,3 +5,4 @@
 [assembly: InternalsVisibleTo("System.Test")]
 [assembly: InternalsVisibleTo("Memstate.Host")]
 [assembly: InternalsVisibleTo("Memstate.EventStore")]
+[assembly: InternalsVisibleTo("Memstate.Postgressql.Tests")]

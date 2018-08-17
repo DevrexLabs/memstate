@@ -20,12 +20,6 @@ namespace Memstate
             }
         }
 
-        public static MemstateSettings WithInmemoryStorage(this MemstateSettings settings)
-        {
-            settings.FileSystem = new InMemoryFileSystem();
-
-            return settings;
-        }
 
         public static MemstateSettings WithRandomSuffixAppendedToStreamName(this MemstateSettings settings)
         {

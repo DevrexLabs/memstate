@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using EventStore.ClientAPI;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate.EventStore
@@ -12,11 +13,13 @@ namespace Memstate.EventStore
         private readonly string _streamName;
         private readonly ILog _logger;
 
-        public EventStoreWriter(EventStoreSettings settings, IEventStoreConnection connection)
+        public EventStoreWriter(IEventStoreConnection connection)
         {
+            var config = Config.Current;
+            var settings = config.Resolve<EventStoreSettings>();
             _connection = connection;
             _logger = LogProvider.GetCurrentClassLogger();
-            _serializer = settings.CreateSerializer();
+            _serializer = config.CreateSerializer(settings.SerializerName);
             _streamName = settings.StreamName;
         }
 

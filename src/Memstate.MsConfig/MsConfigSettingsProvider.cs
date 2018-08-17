@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Memstate
 {
-    public class MsConfigSettingsProvider : SettingsProvider
+    public class MsConfigSettingsProvider
     {
         private readonly string[] _args;
 
@@ -24,14 +24,8 @@ namespace Memstate
             Configuration = configuration;
         }
 
-        public override T Get<T>(string key = null)
-        {
-            var settings = new T();
-            Bind(settings, key);
-            return settings;
-        }
 
-        public override void Bind(Settings settings, string key = null)
+        public void Bind(Settings settings, string key = null)
         {
             key = key ?? settings.Key;
             Configuration.Bind(key, settings);

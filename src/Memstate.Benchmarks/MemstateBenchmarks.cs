@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-
+using Memstate.Configuration;
 using Memstate.EventStore;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
-using Memstate.Postgresql;
+using Memstate.Postgres;
 
 namespace Memstate.Benchmarks
 {
@@ -29,16 +29,17 @@ namespace Memstate.Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            var settings = new MemstateSettings().WithRandomSuffixAppendedToStreamName();
+            var config = Config.Current;
+            var settings = config.Resolve<MemstateSettings>().WithRandomSuffixAppendedToStreamName();
 
             /* 
             var logProvider = new ConsoleLoggerProvider(filter: (cat, level) => true, includeScopes: false);
             settings.LoggerFactory.AddProvider(logProvider);
             */
-            settings.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
-            settings.SerializerName = "newtonsoft.json";
-            var engineBuilder = new EngineBuilder(settings);
-            _engine = engineBuilder.Build(new KeyValueStore<int>()).Result;
+            config.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
+            config.SerializerName = "newtonsoft.json";
+            var engineBuilder = new EngineBuilder();
+            _engine = engineBuilder.Build<KeyValueStore<int>>().Result;
         }
 
         [GlobalCleanup]

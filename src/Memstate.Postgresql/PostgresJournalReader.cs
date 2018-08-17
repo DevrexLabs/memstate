@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using Npgsql;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
     using System.Threading.Tasks;
+    using Memstate.Configuration;
 
     public class PostgresJournalReader : IJournalReader
     {
@@ -22,7 +23,7 @@ namespace Memstate.Postgresql
             Ensure.NotNull(settings, nameof(settings));
 
             _settings = settings;
-            _serializer = MemstateSettings.Current.CreateSerializer();
+            _serializer = Config.Current.CreateSerializer();
         }
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)

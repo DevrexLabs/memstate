@@ -2,10 +2,10 @@
 using Npgsql;
 using NUnit.Framework;
 
-namespace Memstate.Postgresql.Tests
+namespace Memstate.Postgres.Tests
 {
     [TestFixture]
-    public class PostgresqlSettingsTests
+    public class PostgresSettingsTests
     {
         private  PostgresSettings _settings;
         private  MemstateSettings _memstateSettings;
@@ -20,7 +20,7 @@ namespace Memstate.Postgresql.Tests
         [Test]
         public void CanExtractInitSqlResource()
         {
-            foreach (var resourceName in _settings.GetEmbeddedResourceNames())
+            foreach (var resourceName in ((Settings)_settings).GetEmbeddedResourceNames())
             {
                 Console.WriteLine(resourceName);
             }

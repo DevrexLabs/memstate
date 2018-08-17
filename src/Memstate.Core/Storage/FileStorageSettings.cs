@@ -1,4 +1,6 @@
-﻿namespace Memstate
+﻿using Memstate.Configuration;
+
+namespace Memstate
 {
     public class FileStorageSettings : Settings
     {
@@ -6,10 +8,9 @@
 
         private readonly MemstateSettings _memstateSettings;
 
-        public FileStorageSettings(MemstateSettings settings)
+        public FileStorageSettings()
         {
-            Ensure.NotNull(settings, nameof(settings));
-            _memstateSettings = settings;
+            _memstateSettings = Config.Current.Resolve<MemstateSettings>();
         }
 
         public string FileNameSuffix { get; set; } = ".journal";

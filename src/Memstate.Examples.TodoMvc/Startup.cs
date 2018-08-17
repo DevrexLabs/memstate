@@ -28,9 +28,7 @@ namespace Memstate.Examples.TodoMvc
 
             services.AddSingleton(async provider =>
             {
-                var settings = new MemstateSettings();
-
-                return await new EngineBuilder(settings).Build<TodoModel>().ConfigureAwait(false);
+                return await new EngineBuilder().Build<TodoModel>().ConfigureAwait(false);
             });
         }
 

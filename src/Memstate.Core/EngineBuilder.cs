@@ -1,23 +1,42 @@
+using System;
+using System.Threading.Tasks;
+using Memstate.Configuration;
+
 namespace Memstate
 {
-    using System.Threading.Tasks;
-
     public class EngineBuilder
     {
         private readonly MemstateSettings _settings;
-
         private readonly StorageProvider _storageProvider;
 
-        public EngineBuilder(MemstateSettings settings, StorageProvider storageProvider = null)
+        public EngineBuilder()
         {
-            _settings = settings;
-            _storageProvider = storageProvider ?? settings.GetStorageProvider();
+            var config = Config.Current;
+            _settings = config.Resolve<MemstateSettings>();
+            _storageProvider = config.GetStorageProvider();
             _storageProvider.Initialize();
         }
 
-        public Task<Engine<T>> Build<T>() where T : class, new()
+        public Task<Engine<T>> Build<T>() where T : class
         {
-            return Build(new T());
+            var model = typeof(T).IsInterface
+                            ? CreateInstance<T>()
+                            : Activator.CreateInstance<T>();
+            return Build(model);
+        }
+
+        private T CreateInstance<T>()
+        {
+            var interfaceName = typeof(T).AssemblyQualifiedName;
+            var idx = interfaceName.LastIndexOf(".I");
+
+            //Inner interfaces will have a plus sign instead of dot
+            if (idx == -1) idx = interfaceName.LastIndexOf("+I");
+
+            var className = interfaceName.Remove(idx + 1, 1);
+
+            var type = Type.GetType(className);
+            return (T) Activator.CreateInstance(type);
         }
 
         public async Task<Engine<T>> Build<T>(T initialModel) where T : class

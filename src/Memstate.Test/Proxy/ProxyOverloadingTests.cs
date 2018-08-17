@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Memstate.Configuration;
 using NUnit.Framework;
 
 namespace Memstate.Test.DispatchProxy
@@ -12,11 +13,11 @@ namespace Memstate.Test.DispatchProxy
         [SetUp]
         public void Setup()
         {
-            var settings =  new MemstateSettings().WithInmemoryStorage();
-            MemstateSettings.Current = settings;
-            var storageProvider = settings.GetStorageProvider();
+            var cfg = Config.Reset();
+            cfg.UseInMemoryFileSystem();
+
             var model = new ModelWithOverloads();
-            var engine = new EngineBuilder(settings, storageProvider)
+            var engine = new EngineBuilder()
                 .Build<IModelWithOverloads>(model).Result;
             var client = new LocalClient<IModelWithOverloads>(engine);
             _db = client.GetDispatchProxy();

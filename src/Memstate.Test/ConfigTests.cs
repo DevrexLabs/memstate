@@ -1,3 +1,4 @@
+using Memstate.Configuration;
 using NUnit.Framework;
 
 namespace Memstate.Test
@@ -8,7 +9,7 @@ namespace Memstate.Test
         [Test]
         public void CanGetDefaultSerializer()
         {
-            MemstateSettings config = new MemstateSettings();
+            var config = new Config();
             var serializer = config.CreateSerializer();
             Assert.NotNull(serializer);
         }

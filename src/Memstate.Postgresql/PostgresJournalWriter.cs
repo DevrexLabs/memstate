@@ -4,7 +4,7 @@ using System.Linq;
 using Npgsql;
 using Memstate.Logging;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
 
     public class PostgresJournalWriter : BatchingJournalWriter

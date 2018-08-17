@@ -30,7 +30,7 @@
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Remove="appsettings.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Web\wwwroot\**\*" />

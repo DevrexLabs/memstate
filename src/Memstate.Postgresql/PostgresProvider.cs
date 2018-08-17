@@ -1,24 +1,27 @@
 ﻿using Memstate.Logging;
 using System.Threading.Tasks;
 using Npgsql;
+using Memstate.Configuration;
+using Npgsql.Logging;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
     public class PostgresProvider : StorageProvider
     {
         private readonly ILog _log;
         private bool _initialized;
 
-        public PostgresProvider(MemstateSettings settings)
+        public PostgresProvider()
         {
             _log = LogProvider.GetCurrentClassLogger();
-            Settings = Memstate.Settings.Get<PostgresSettings>();
+            Settings = Config.Current.Resolve<PostgresSettings>();
         }
 
         public PostgresSettings Settings { get; }
 
         public override void Initialize()
         {
+            NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Trace, true, true);
             if (_initialized)
             {
                 return;
@@ -50,7 +53,7 @@ namespace Memstate.Postgresql
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
             // todo: nextRecordNumber unused
-            var serializer = MemstateSettings.Current.CreateSerializer();
+            var serializer = Config.Current.CreateSerializer();
             return new PostgresJournalWriter(serializer, Settings);
         }
 

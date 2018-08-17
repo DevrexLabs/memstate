@@ -1,7 +1,8 @@
 ﻿using System;
+using Memstate.Configuration;
 using Npgsql;
 
-namespace Memstate.Postgresql
+namespace Memstate.Postgres
 {
     public class PostgresSettings : Settings
     {
@@ -11,13 +12,14 @@ namespace Memstate.Postgresql
 
         public const string InitSqlResourceName = "Memstate.Postgres.init_sql";
 
-        private readonly MemstateSettings _memstateSettings;
 
         private string _connectionStringTemplate = DefaultConnectionString;
 
+        private readonly MemstateSettings _memstateSettings;
+
         public PostgresSettings()
         {
-            _memstateSettings = MemstateSettings.Current;
+            _memstateSettings = Config.Current.Resolve<MemstateSettings>();
         }
 
         /// <summary>

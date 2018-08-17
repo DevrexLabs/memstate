@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using Memstate.Configuration;
 using Memstate.Tcp;
 
 namespace Memstate.Host
@@ -20,8 +21,7 @@ namespace Memstate.Host
 
         public Host(params string[] arguments)
         {
-            var builder = new MsConfigSettingsProvider(arguments);
-            Settings = builder.Get<MemstateSettings>();
+            Settings = Config.Current.Resolve<MemstateSettings>();
 
             var modelType = Type.GetType(Settings.Model);
 
@@ -100,7 +100,7 @@ namespace Memstate.Host
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
         private static MemstateServer<T> CreateServer<T>(MemstateSettings settings, T model) where T : class
         {
-            var engine = new EngineBuilder(settings).Build(model).Result;
+            var engine = new EngineBuilder().Build(model).Result;
             return new MemstateServer<T>(settings, engine);
         }
     }

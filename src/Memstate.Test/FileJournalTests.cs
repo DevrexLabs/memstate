@@ -1,15 +1,13 @@
 using NUnit.Framework;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Memstate.Configuration;
+using Memstate.Models.KeyValue;
 
 namespace Memstate.Test
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using Memstate.JsonNet;
-    using Memstate.Models.KeyValue;
-
     [TestFixture]
     public class FileJournalTests
     {
@@ -20,11 +18,13 @@ namespace Memstate.Test
             const string Stream = "test";
             const string FileName = Stream + ".journal";
 
-            var settings = new MemstateSettings().WithInmemoryStorage();
-            settings.SerializerName = "newtonsoft.json";
+            var cfg = Config.Reset();
+            cfg.UseInMemoryFileSystem();
+            var settings = cfg.Resolve<MemstateSettings>();
+            cfg.SerializerName = "newtonsoft.json";
 
             settings.StreamName = Stream;
-            var provider = settings.GetStorageProvider();
+            var provider = cfg.GetStorageProvider();
             
             //Write NumRecords entries 
             var writer = provider.CreateJournalWriter(0);
@@ -42,8 +42,8 @@ namespace Memstate.Test
             await reader.DisposeAsync().ConfigureAwait(false);
 
             //Count the actual lines in the file
-            Assert.IsTrue(settings.FileSystem.Exists(FileName));
-            var streamReader = new StreamReader(settings.FileSystem.OpenRead(FileName));
+            Assert.IsTrue(cfg.FileSystem.Exists(FileName));
+            var streamReader = new StreamReader(cfg.FileSystem.OpenRead(FileName));
             var lines = 0;
             while (true)
             {

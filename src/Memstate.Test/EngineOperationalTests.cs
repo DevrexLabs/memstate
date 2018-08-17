@@ -4,20 +4,24 @@ using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 using Memstate.Models.KeyValue;
+using Memstate.Configuration;
 
 namespace Memstate.Test
 {
     [TestFixture]
     public class EngineOperationalTests
     {
-        private readonly MemstateSettings _settings;
+        private MemstateSettings _settings;
         private FakeSubscriptionSource _fakeSource;
         private DateTime _now;
         private Engine<KeyValueStore<int>> _engine;
 
-        public EngineOperationalTests()
+        [SetUp]
+        public void Setup()
         {
-            _settings = new MemstateSettings().WithInmemoryStorage();
+            var cfg = Config.Current;
+            _settings = cfg.Resolve<MemstateSettings>();
+            cfg.FileSystem = new InMemoryFileSystem();
         }
 
         [Test]

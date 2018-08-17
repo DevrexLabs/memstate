@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 
 using EventStore.ClientAPI;
+using Memstate.Configuration;
 
 namespace Memstate.EventStore
 {
@@ -9,31 +10,30 @@ namespace Memstate.EventStore
     {
         private readonly IEventStoreConnection _connection;
 
-        private readonly MemstateSettings _memstateSettings;
-        
         private readonly EventStoreSettings _eventStoreSettings;
 
-        public EventStoreProvider(MemstateSettings memstateSettings)
+        public EventStoreProvider()
         {
-            _memstateSettings = memstateSettings;
-            _eventStoreSettings = Settings.Get<EventStoreSettings>();
+            var config = Config.Current;
+            _eventStoreSettings = config.Resolve<EventStoreSettings>();
+            //todo: consider opening the connection from Initialize
             _connection = EventStoreConnection.Create(_eventStoreSettings.ConnectionString);
             _connection.ConnectAsync().Wait();
         }
 
         public override IJournalReader CreateJournalReader()
         {
-            return new EventStoreReader(_memstateSettings, _eventStoreSettings, _connection);
+            return new EventStoreReader(_connection);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
         {
-            return new EventStoreWriter(_eventStoreSettings, _connection);
+            return new EventStoreWriter(_connection);
         }
 
         public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
         {
-            return new EventStoreSubscriptionSource(_eventStoreSettings, _connection);
+            return new EventStoreSubscriptionSource(_connection);
         }
 
         public Task DisposeAsync()

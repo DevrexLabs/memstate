@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Memstate.Models;
 using Memstate.Logging;
+using Memstate.Configuration;
 
 namespace Memstate.Host.Commands
 {
@@ -23,14 +24,13 @@ namespace Memstate.Host.Commands
 
         public async Task Start(string[] arguments)
         {
-            var builder = new MsConfigSettingsProvider(arguments);
-            Settings = builder.Get<MemstateSettings>();
+            Settings = Config.Current.Resolve<MemstateSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
             //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 
             Logger = LogProvider.GetCurrentClassLogger();
 
-            Engine = await new EngineBuilder(Settings).Build<KeyValueStore<int>>();
+            Engine = await new EngineBuilder().Build<KeyValueStore<int>>();
 
             var totals = new List<TimeSpan>(Runs);
 

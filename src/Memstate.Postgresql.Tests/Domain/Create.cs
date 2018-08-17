@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Memstate.Postgresql.Tests.Domain
+namespace Memstate.Postgres.Tests.Domain
 {
     public class Create : Command<Todo, Task>
     {

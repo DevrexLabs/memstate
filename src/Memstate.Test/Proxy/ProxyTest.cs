@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Memstate.Configuration;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Memstate.Test.Proxy
 {
@@ -13,11 +15,12 @@ namespace Memstate.Test.Proxy
         private Engine<ITestModel> _engine;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
-            var config = new MemstateSettings().WithInmemoryStorage();
+            var cfg = Config.Reset();
+            cfg.UseInMemoryFileSystem();
             ITestModel model = new TestModel();
-            _engine = new EngineBuilder(config).Build(model).Result;
+            _engine = await new EngineBuilder().Build<ITestModel>();
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 

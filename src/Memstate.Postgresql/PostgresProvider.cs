@@ -17,11 +17,17 @@ namespace Memstate.Postgres
             Settings = Config.Current.Resolve<PostgresSettings>();
         }
 
+        //static PostgresProvider()
+        //{
+        //    NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Debug, true, true);
+        //    NpgsqlLogManager.IsParameterLoggingEnabled = true;
+        //}
+
         public PostgresSettings Settings { get; }
 
         public override void Initialize()
         {
-            NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Trace, true, true);
+
             if (_initialized)
             {
                 return;

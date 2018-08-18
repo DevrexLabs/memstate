@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using TinyIoC;
-using Memstate.Logging;
 using System.Text;
 
 namespace Memstate.Configuration
@@ -10,7 +9,6 @@ namespace Memstate.Configuration
     public sealed class Config
     {
 
-        private readonly ILog _log;
 
 
         /// <summary>

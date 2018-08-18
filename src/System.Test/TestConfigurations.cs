@@ -28,14 +28,14 @@ namespace System.Test
         {
             foreach (var serializerName in Serializers())
             {
-                foreach (var providerType in ProviderTypes())
+                foreach (var providerName in ProviderNames())
                 {
-                    var cfg = new Config();
+                    var cfg = Config.Reset();
                     cfg.SerializerName = serializerName;
                     cfg.UseInMemoryFileSystem();
                     var settings = cfg.GetSettings<EngineSettings>();
                     settings.WithRandomSuffixAppendedToStreamName();
-                    cfg.StorageProviderName = providerType.AssemblyQualifiedName;
+                    cfg.StorageProviderName = providerName;
                     yield return cfg;
                 }
             }
@@ -43,15 +43,15 @@ namespace System.Test
 
         private IEnumerable<string> Serializers()
         {
-            yield return typeof(JsonSerializerAdapter).AssemblyQualifiedName;
-            yield return typeof(WireSerializerAdapter).AssemblyQualifiedName;
+            yield return "newtonsoft.json";
+            yield return "wire";
         }
 
-        protected virtual IEnumerable<Type> ProviderTypes()
+        protected virtual IEnumerable<string> ProviderNames()
         {
-            yield return typeof(PostgresProvider);
-            yield return typeof(FileStorageProvider);
-            yield return typeof(EventStoreProvider);
+            yield return "file";
+            yield return "postgres";
+            yield return "eventstore";
         }
 
         private object[] ToObjectArray(object o)
@@ -61,10 +61,10 @@ namespace System.Test
 
         public class Cluster : TestConfigurations
         {
-            protected override IEnumerable<Type> ProviderTypes()
+            protected override IEnumerable<string> ProviderNames()
             {
-                yield return typeof(EventStoreProvider);
-                //yield return typeof(PostgresProvider);
+                yield return "eventstore";
+                //yield return "postgres";
             }
         }
 
@@ -73,7 +73,7 @@ namespace System.Test
             Config.Current = config;
             var settings = config.GetSettings<EngineSettings>();
             settings.WithRandomSuffixAppendedToStreamName();
-            Console.WriteLine("C: " + config);
+            Console.WriteLine(config);
         }
     }
 }

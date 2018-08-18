@@ -23,7 +23,7 @@ namespace Memstate.Postgres
             EnableNpgsqlDebugLogging();
         }
 
-        [Conditional("TRACE")]
+        [Conditional("PGTRACE")]
         private static void EnableNpgsqlDebugLogging()
         {
             NpgsqlLogManager.Provider = new ConsoleLoggingProvider(NpgsqlLogLevel.Trace, true, true);

@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Memstate;
 using Memstate.Configuration;
+using Serilog;
 
 namespace System.Test
 {
     public class TestConfigurations : IEnumerable<object[]>
     {
+
+        static TestConfigurations()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}]{Message:lj} {SourceContext}{NewLine}{Exception}")
+                .MinimumLevel.Verbose()
+                .CreateLogger();
+        }
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

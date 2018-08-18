@@ -34,27 +34,18 @@ namespace Memstate.Postgres
 
         public override void Initialize()
         {
+            if (_initialized) return;
+            _log.Debug("Initializing...");
 
-            if (_initialized)
-            {
-                return;
-            }
-            
             var sql = Settings.InitSql.Value;
             
             using (var connection = new NpgsqlConnection(Settings.ConnectionString))
-                
             using (var command = connection.CreateCommand())
             {
                 connection.Open();
-                
                 command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
-                
-                _log.Debug($"Executing SQL '{command.CommandText}'");
-                
                 command.ExecuteNonQuery();
             }
-
             _initialized = true;
         }
 

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Memstate;
 using Memstate.Configuration;
-using Memstate.EventStore;
-using Memstate.JsonNet;
-using Memstate.Postgres;
-using Memstate.Wire;
 
 namespace System.Test
 {
@@ -56,7 +52,7 @@ namespace System.Test
 
         private object[] ToObjectArray(object o)
         {
-            return new[] {o};
+            return new[] { o };
         }
 
         public class Cluster : TestConfigurations
@@ -64,7 +60,9 @@ namespace System.Test
             protected override IEnumerable<string> ProviderNames()
             {
                 yield return "eventstore";
-                //yield return "postgres";
+#if POSTGRES
+                yield return "postgres";
+#endif
             }
         }
 

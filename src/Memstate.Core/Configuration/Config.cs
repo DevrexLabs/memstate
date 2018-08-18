@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using TinyIoC;
+using Memstate.Logging;
 
 namespace Memstate.Configuration
 {
     public sealed class Config
     {
+
+        private readonly ILog _log;
+
+
         /// <summary>
         /// The underlying key value pairs
         /// </summary>
@@ -119,6 +123,7 @@ namespace Memstate.Configuration
                 var candidateKey = prefix + ":" + property.Name;
                 if (Data.TryGetValue(candidateKey, out string value))
                 {
+                    Console.WriteLine("Bind (" + candidateKey + ") = (" + value + ")");
                     property.SetValue(@object, Convert(value, property.PropertyType));
                 }
             }

@@ -24,15 +24,10 @@ namespace Memstate
         /// </summary>
         public bool AllowBrokenSequence { get; set; } = false;
 
+        /// <summary>
+        /// Name of the model type
+        /// </summary>
         public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
 
-        public string ModelCreator { get; set; } = typeof(DefaultModelCreator).AssemblyQualifiedName;
-
-        public IModelCreator CreateModelCreator()
-        {
-            var type = Type.GetType(ModelCreator);
-            var modelCreator = (IModelCreator) Activator.CreateInstance(type, Array.Empty<object>());
-            return modelCreator;
-        }
     }
 }

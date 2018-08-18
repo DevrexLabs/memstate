@@ -20,7 +20,7 @@ namespace Memstate.Host
 
         public static int Main(string[] arguments)
         {
-            return MainAsync(arguments).GetAwaiter().GetResult();
+            return MainAsync(arguments).Result;
         }
 
         private static async Task<int> MainAsync(string[] arguments)

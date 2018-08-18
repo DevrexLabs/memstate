@@ -37,10 +37,7 @@ namespace Memstate.Host
                 .Select(m => m.MakeGenericMethod(modelType))
                 .First();
 
-            var modelCreator = Settings.CreateModelCreator();
-
-            var model = CreateModel(modelType, modelCreator);
-
+            var model = Activator.CreateInstance(modelType);
             _server = CreateServer(Settings, model);
         }
 
@@ -66,24 +63,6 @@ namespace Memstate.Host
         private static void Stop<T>(MemstateServer<T> server) where T : class
         {
             server.Stop();
-        }
-
-        private static object CreateModel(Type modelType, IModelCreator modelCreator)
-        {
-            var method = typeof(Host).GetMethods(BindingFlags)
-                .Where(m => m.Name == "CreateModel" && m.IsGenericMethod && m.GetGenericArguments().Length == 1)
-                .Select(m => m.MakeGenericMethod(modelType))
-                .First();
-
-            var model = method.Invoke(null, new object[] {modelCreator});
-            return model;
-        }
-
-        [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
-        private static T CreateModel<T>(IModelCreator modelCreator)
-        {
-            var model = modelCreator.Create<T>();
-            return model;
         }
 
         private static object CreateServer(EngineSettings settings, object model)

@@ -47,6 +47,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Logging\LogProviders\TraceEventTypeValues.cs.pp" />
     <Compile Remove="Logging\LogProviders\TypeExtensions.cs.pp" />
     <Compile Remove="Config\StorageProvider.cs" />
+    <Compile Remove="IModelCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="CommandChunk.cs" />

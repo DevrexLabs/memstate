@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Memstate.MsConfig\Memstate.MsConfig.csproj" />
     <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
+    <ProjectReference Include="..\Memstate.AppMetrics\Memstate.AppMetrics.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />

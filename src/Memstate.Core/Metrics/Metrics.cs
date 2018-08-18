@@ -5,7 +5,7 @@ namespace Memstate
 {
     public class Metrics
     {
-        private const string AppMetricsProviderType = "Memstate.AppMetricsProvider, Memstate.AppMetrics";
+        private const string AppMetricsProviderType = "Memstate.AppMetrics.AppMetricsProvider, Memstate.AppMetrics";
 
         public static MetricsProvider Provider { get; set; }
 

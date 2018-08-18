@@ -5,9 +5,9 @@ namespace Memstate
 {
     internal class StorageProviders : Providers<StorageProvider>
     {
-        private const string EventStoreProviderType = "Memstate.EventStoreProviderType.EventStoreProvider, Memstate.EventStoreProviderType";
+        private const string EventStoreProviderType = "Memstate.EventStore.EventStoreProvider, Memstate.EventStore";
 
-        private const string PostgresProviderType = "Memstate.PostgresProviderType.PostgresProvider, Memstate.PostgresProviderType";
+        private const string PostgresProviderType = "Memstate.Postgres.PostgresProvider, Memstate.Postgres";
 
         public StorageProviders()
         {

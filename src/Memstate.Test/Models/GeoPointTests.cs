@@ -46,12 +46,18 @@ namespace Memstate.Test.Models
 
         private static IEnumerable<GeoLocation> TestData()
         {
+            var rnd = new Random();
+            const int MAX_ITEMS = 10;
+            int items = 0;
+
             using (var reader = new StringReader(raw))
             {
-                while(true)
+                while(items < MAX_ITEMS)
                 {
                     var line = reader.ReadLine();
                     if (line == null) break;
+                    if (rnd.NextDouble() > 0.3) continue;
+                    items++;
 
                     var arr = line.Split('\t');
                     var name = arr[0];

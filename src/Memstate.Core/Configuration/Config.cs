@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using TinyIoC;
 using Memstate.Logging;
+using System.Text;
 
 namespace Memstate.Configuration
 {
@@ -172,6 +173,23 @@ namespace Memstate.Configuration
                 return converter.Invoke(value);
             }
             else throw new NotImplementedException("Conversion to type " + type.FullName + " not supported");
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder("-- CONFIG --");
+            builder.AppendLine(nameof(SerializerName) + "=" + SerializerName);
+            builder.AppendLine(nameof(StorageProviderName) + "=" + StorageProviderName);
+            builder.AppendLine(nameof(FileSystem) + "=" + FileSystem);
+            builder.AppendLine(nameof(Version) + "=" + Version);
+
+            builder.AppendLine("-- DATA --");
+            foreach(var key in Data.Keys)
+            {
+                builder.AppendLine(key + "=" + Data[key]);
+            }
+            return builder.ToString();
+
         }
 
         public static readonly Dictionary<Type, Func<string, object>> Converters

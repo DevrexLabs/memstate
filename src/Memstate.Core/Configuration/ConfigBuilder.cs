@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Memstate.Configuration
 {
+
     public class ConfigBuilder
     {
         private Dictionary<string, string> _args;
@@ -40,9 +41,22 @@ namespace Memstate.Configuration
             {
                 if (PrefixIsMatch(key, prefix))
                 {
-                    _args[key.Replace("_", ":")] = (string) vars[key];
+                    _args[key.Replace("_", ":")] = (string)vars[key];
                 }
             }
+            return this;
+        }
+
+        public ConfigBuilder AddIniFiles()
+        {
+            var env = Environment.GetEnvironmentVariable("ENV");
+            if (!String.IsNullOrEmpty(env))
+            {
+                env = env.ToLower();
+                var file = $"memstate.{env}.ini";
+                IniFile.MergeIfExists(file, _args);
+            }
+            IniFile.MergeIfExists("memstate.ini", _args);
             return this;
         }
 

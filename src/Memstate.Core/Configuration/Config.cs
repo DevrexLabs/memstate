@@ -8,11 +8,8 @@ namespace Memstate.Configuration
 {
     public sealed class Config
     {
-
-
-
         /// <summary>
-        /// The underlying key value pairs
+        /// The underlying key value pairs with case insensitive keys
         /// </summary>
         internal Dictionary<string, string> Data { get; }
 
@@ -63,24 +60,38 @@ namespace Memstate.Configuration
             }
         }
 
-        //todo: move to an extension method in a Test namespace
-        public void UseInMemoryFileSystem()
+        /// <summary>
+        /// Helper method to set the <see cref="Config.FileSystem"/> 
+        /// property with a new instance of <see cref="InMemoryFileSystem"/>
+        /// </summary>
+        public Config UseInMemoryFileSystem()
         {
-            FileSystem = new InMemoryFileSystem();    
+            FileSystem = new InMemoryFileSystem();
+            return this;
         }
 
+        /// <summary>
+        /// Version of the Memstate.Core library.
+        /// Always corresponds to the release version on GH and nuget
+        /// </summary>
+        /// <value>The version.</value>
         public Version Version => GetType().GetTypeInfo().Assembly.GetName().Version;
 
+        /// <summary>
+        /// Configurable file system, defaults to file system on the host.
+        /// Useful for testing, see <see cref="InMemoryFileSystem"/>.
+        /// </summary>
+        /// <value>The file system.</value>
         public IFileSystem FileSystem { get; set; } = new HostFileSystem();
 
         public ISerializer CreateSerializer(string serializer = null) => Serializers.Resolve(serializer ?? SerializerName);
 
         private static Config BuildDefault()
         {
-            //todo: add support for a config file. INI perhaps ???
             var args = Environment.GetCommandLineArgs();
 
             var config = new ConfigBuilder()
+                .AddIniFiles()
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
@@ -96,6 +107,10 @@ namespace Memstate.Configuration
             Container.Register(this);
         }
 
+        /// <summary>
+        /// Get a singleton reference to a <see cref="Settings"/> object which has been configured with values from 
+        /// the underlying configuration parameters, <see cref="Config.Bind"/>
+        /// </summary>
         public T GetSettings<T>() where T : Settings
         {
             if (_singletonCache.TryGetValue(typeof(T), out object result))
@@ -113,8 +128,9 @@ namespace Memstate.Configuration
 
         /// <summary>
         /// Copy data from the configuration to matching public 
-        /// properties on the object
+        /// properties on the object.
         /// </summary>
+        /// <param name="prefix">Prefix excluding colon</param>
         public void Bind(Object @object, string prefix)
         {
             foreach(var property in @object.GetType().GetProperties())
@@ -128,9 +144,8 @@ namespace Memstate.Configuration
             }
         }
 
-
         /// <summary>
-        /// Assign a storage provider or leave null and it will
+        /// Assign a storage provider instance or leave null and it will
         /// be assigned automatically based on the value of StorageProviderName
         /// </summary>
         public void SetStorageProvider(StorageProvider storageProvider)
@@ -162,6 +177,10 @@ namespace Memstate.Configuration
         internal Serializers Serializers { get; set; }
             = new Serializers();
 
+        /// <summary>
+        /// Name of a well known serializer or resolvable type name OR the value Auto (default)
+        /// </summary>
+        /// <value>The name of the serializer.</value>
         public string SerializerName { get; set; } = "Auto";
 
         private object Convert(string value, Type type)

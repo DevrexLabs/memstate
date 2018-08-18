@@ -177,7 +177,8 @@ namespace Memstate.Configuration
 
         public override string ToString()
         {
-            var builder = new StringBuilder("-- CONFIG --");
+            var builder = new StringBuilder();
+            builder.AppendLine("-- CONFIG --");
             builder.AppendLine(nameof(SerializerName) + "=" + SerializerName);
             builder.AppendLine(nameof(StorageProviderName) + "=" + StorageProviderName);
             builder.AppendLine(nameof(FileSystem) + "=" + FileSystem);

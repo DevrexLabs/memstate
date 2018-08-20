@@ -4,7 +4,6 @@ using NUnit.Framework;
 
 namespace Memstate.Test
 {
-
     [TestFixture]
     public class ConfigTests
     {

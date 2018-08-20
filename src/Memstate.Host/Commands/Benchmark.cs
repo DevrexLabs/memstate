@@ -26,7 +26,6 @@ namespace Memstate.Host.Commands
         {
             Settings = Config.Current.GetSettings<EngineSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
-            //Settings.LoggerFactory.AddConsole((category, level) => level > LogLevel.Debug);
 
             Logger = LogProvider.GetCurrentClassLogger();
 

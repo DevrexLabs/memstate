@@ -8,6 +8,8 @@ namespace Memstate
 
         /// <summary>
         /// Maximum number of commands per batch sent to journal writer
+        /// Adjust this value to control latency and throughput. 
+        /// Lower values = lower latency / lower throughput
         /// </summary>
         public int MaxBatchSize { get; set; } = 1024;
 
@@ -16,7 +18,12 @@ namespace Memstate
         /// Will be used as filename, stream name, table name, etc
         /// </summary>
         public string StreamName { get; set; } = "memstate";
-        
+
+        /// <summary>
+        /// Limit the number of commands in the queue waiting to be written to the journal.
+        /// If commands are arriving faster than they can be written, they will be queued.
+        /// By default, the there is no limit to the size of the queue.
+        /// </summary>
         public int MaxBatchQueueLength { get; set; } = int.MaxValue;
 
         /// <summary>

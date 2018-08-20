@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate
@@ -48,20 +47,20 @@ namespace Memstate
 
             while (!_items.IsCompleted)
             {
-                if (!_items.TryTake(out var firstItem, 1000))
+                //Wait for an item to arrive
+                if (_items.TryTake(out var firstItem, 1000))
                 {
-                    continue;
+                    buffer.Add(firstItem);
+
+                    //then take items as long as they are available or more items until we reach 
+                    while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
+                    {
+                        buffer.Add(item);
+                    }
+
+                    _batchHandler.Invoke(buffer);
+                    buffer.Clear();
                 }
-
-                buffer.Add(firstItem);
-
-                while (buffer.Count < _maxBatchSize && _items.TryTake(out var item))
-                {
-                    buffer.Add(item);
-                }
-
-                _batchHandler.Invoke(buffer);
-                buffer.Clear();
             }
         }
     }

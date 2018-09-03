@@ -7,7 +7,7 @@
 
     public abstract class Query<TModel, TResult> : Query
     {
-        public abstract TResult Execute(TModel db);
+        public abstract TResult Execute(TModel model);
 
         public bool? ResultIsIsolated { get; set; }
 

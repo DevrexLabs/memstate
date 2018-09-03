@@ -19,15 +19,17 @@ namespace Memstate
 
         public Task<Engine<T>> Build<T>() where T : class
         {
-            var model = typeof(T).IsInterface
-                            ? CreateInstance<T>()
-                            : Activator.CreateInstance<T>();
-            return Build(model);
+            Type modelType = typeof(T); 
+            if (modelType.IsInterface)
+                modelType = DeriveClassFromInterface(modelType);
+
+            var initialState = (T) Activator.CreateInstance(modelType);
+            return Build(initialState);
         }
 
-        private T CreateInstance<T>()
+        internal static Type DeriveClassFromInterface(Type interfaceType)
         {
-            var interfaceName = typeof(T).AssemblyQualifiedName;
+            var interfaceName = interfaceType.AssemblyQualifiedName;
             var idx = interfaceName.LastIndexOf(".I");
 
             //Inner interfaces will have a plus sign instead of dot
@@ -35,22 +37,38 @@ namespace Memstate
 
             var className = interfaceName.Remove(idx + 1, 1);
 
-            var type = Type.GetType(className);
-            return (T) Activator.CreateInstance(type);
+            var type = Type.GetType(className, throwOnError: true);
+            return type;
         }
 
-        public async Task<Engine<T>> Build<T>(T initialModel) where T : class
+        public async Task<Engine<T>> Build<T>(T initialState) where T : class
         {
             var reader = _storageProvider.CreateJournalReader();
-            var loader = new ModelLoader();
-            var model = loader.Load(reader, initialModel);
-            var nextRecordNumber = loader.LastRecordNumber + 1;
-
-            await reader.DisposeAsync().ConfigureAwait(false);
+            var model = Load(reader, initialState, out long lastRecordNumber);
+            var nextRecordNumber = lastRecordNumber + 1;
+            await reader.DisposeAsync().ConfigureAwait(false);                                                                     
 
             var writer = _storageProvider.CreateJournalWriter(nextRecordNumber);
             var subscriptionSource = _storageProvider.CreateJournalSubscriptionSource();
             return new Engine<T>(_settings, model, subscriptionSource, writer, nextRecordNumber);
+        }
+
+        internal static TState Load<TState>(IJournalReader reader, TState initial, out long lastRecordNumber)
+        {
+            lastRecordNumber = -1;
+            foreach (var journalRecord in reader.GetRecords())
+            {
+                try
+                {
+                    journalRecord.Command.ExecuteImpl(initial);
+                    lastRecordNumber = journalRecord.RecordNumber;
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            return initial;
         }
     }
 }

@@ -11,8 +11,6 @@ namespace Memstate
 {
     public class RemoteClient<TModel> : Client<TModel> where TModel : class
     {
-        private readonly EngineSettings _settings;
-
         private readonly ILog _logger;
 
         /// <summary>
@@ -59,7 +57,6 @@ namespace Memstate
         public RemoteClient()
         {
             var cfg = Config.Current;
-            _settings = cfg.GetSettings<EngineSettings>();
             _serializer = cfg.CreateSerializer();
             _deserializer = cfg.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();

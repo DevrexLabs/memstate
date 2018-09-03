@@ -34,7 +34,7 @@ namespace Memstate
         /// <summary>
         /// Name of the model type
         /// </summary>
-        public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
+        //public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
 
     }
 }

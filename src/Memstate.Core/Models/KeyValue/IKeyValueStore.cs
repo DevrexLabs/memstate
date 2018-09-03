@@ -1,4 +1,4 @@
-﻿namespace Memstate.Models.KeyValue
+﻿namespace Memstate.Models
 {
     public interface IKeyValueStore<T>
     {

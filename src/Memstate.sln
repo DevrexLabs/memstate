@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.MsConfig", "Memsta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.AppMetrics", "Memstate.AppMetrics\Memstate.AppMetrics.csproj", "{D5578C83-8679-4EA7-9525-4F55E49DDA2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Runner", "Memstate.Runner\Memstate.Runner.csproj", "{59457968-F597-401C-BCAD-23E1DDDAFD9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,14 @@ Global
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Release|x64.ActiveCfg = Release|Any CPU
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Release|x64.Build.0 = Release|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Debug|x64.Build.0 = Debug|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|x64.ActiveCfg = Release|Any CPU
+		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

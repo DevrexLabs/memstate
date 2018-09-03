@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Memstate.Models;
 using Memstate.Logging;
 using Memstate.Configuration;
 
-namespace Memstate.Host.Commands
+namespace Memstate.Runner.Commands
 {
     public abstract class Benchmark : ICommand
     {

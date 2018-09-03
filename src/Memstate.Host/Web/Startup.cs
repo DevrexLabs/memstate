@@ -15,8 +15,8 @@ namespace Memstate.Host.Web
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", true)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
@@ -50,16 +50,20 @@ namespace Memstate.Host.Web
                 application.UseExceptionHandler("/error");
             }
 
+            var type = GetType();
+            var path = type.Namespace + ".wwwroot";
+            var fileProvider = new EmbeddedFileProvider(type.Assembly, path);
+
             application.UseDefaultFiles(
                 new DefaultFilesOptions
                 {
-                    FileProvider = new EmbeddedFileProvider(GetType().GetTypeInfo().Assembly, GetType().Namespace + ".wwwroot")
+                    FileProvider = fileProvider
                 });
 
             application.UseStaticFiles(
                 new StaticFileOptions
                 {
-                    FileProvider = new EmbeddedFileProvider(GetType().GetTypeInfo().Assembly, GetType().Namespace + ".wwwroot")
+                    FileProvider = fileProvider
                 });
 
             application.UseMvc();

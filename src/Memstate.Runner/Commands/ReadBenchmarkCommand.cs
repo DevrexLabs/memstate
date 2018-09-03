@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Memstate.Models.KeyValue;
 using Memstate.Logging;
 
-namespace Memstate.Host.Commands
+namespace Memstate.Runner.Commands
 {
     public class ReadBenchmarkCommand : Benchmark
     {

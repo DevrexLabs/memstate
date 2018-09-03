@@ -59,5 +59,6 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
+    <Folder Include="Clients\" />
   </ItemGroup>
 </Project>

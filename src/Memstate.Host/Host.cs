@@ -1,86 +1,75 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using Memstate.Tcp;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Memstate.Host
 {
-    public class Host
+
+    /// <summary>
+    /// Service host for a MemstateServer and an optional web console
+    /// </summary>
+    public class Host<TModel> where TModel: class
     {
-        private const BindingFlags BindingFlags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+        MemstateServer<TModel> _server;
+        IWebHost _webConsole;
+        HostSettings _settings;
 
-        private const string CalledViaReflection = "The method is called via reflection.";
+        public Engine<TModel> TheEngine { get; private set; }
 
-        private readonly object _server;
-
-        private readonly MethodInfo _startMethod;
-
-        private readonly MethodInfo _stopMethod;
-
-        public Host(params string[] arguments)
+        public Host(HostSettings settings)
         {
-            Settings = Config.Current.GetSettings<EngineSettings>();
-
-            var modelType = Type.GetType(Settings.Model);
-
-            _startMethod = GetType()
-                .GetMethods(BindingFlags)
-                .Where(m => m.Name == "Start" && m.IsGenericMethod && m.GetGenericArguments().Length == 1)
-                .Select(m => m.MakeGenericMethod(modelType))
-                .First();
-
-            _stopMethod = GetType()
-                .GetMethods(BindingFlags)
-                .Where(m => m.Name == "Stop" && m.IsGenericMethod && m.GetGenericArguments().Length == 1)
-                .Select(m => m.MakeGenericMethod(modelType))
-                .First();
-
-            var model = Activator.CreateInstance(modelType);
-            _server = CreateServer(Settings, model);
+            _settings = settings;
         }
 
-        public EngineSettings Settings { get; }
-
-        public void Start()
+        /// <summary>
+        /// Start the Host in the background,
+        /// the Task completes when the host is ready to accept connections
+        /// </summary>
+        public async Task Start()
         {
-            _startMethod.Invoke(null, new[] {_server});
+            TheEngine = await Engine.Start<TModel>();
+            _server = new MemstateServer<TModel>(TheEngine);
+            _server.Start();
+            await StartWebConsole();
         }
 
-        public void Stop()
+        public Task Stop()
         {
-            _stopMethod.Invoke(null, new[] {_server});
+            return Task.WhenAll(
+                _server.Stop(),
+                StopWebConsole());
         }
 
-        [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
-        private static void Start<T>(MemstateServer<T> server) where T : class
+        private Task StopWebConsole()
         {
-            server.Start();
+            if (!_settings.WebConsoleEnabled) return Task.CompletedTask;
+            return _webConsole.StopAsync();
         }
 
-        [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
-        private static void Stop<T>(MemstateServer<T> server) where T : class
+        private Task StartWebConsole()
         {
-            server.Stop();
+            if (!_settings.WebConsoleEnabled) return Task.CompletedTask;
+
+            _webConsole = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+                .UseStartup<Web.Startup>()
+                .ConfigureServices(ConfigureServices)
+                .Build();
+
+            return _webConsole.StartAsync();
         }
 
-        private static object CreateServer(EngineSettings settings, object model)
+        private void ConfigureServices(IServiceCollection services)
         {
-            var method = typeof(Host).GetMethods(BindingFlags)
-                .Where(m => m.Name == "CreateServer" && m.IsGenericMethod && m.GetGenericArguments().Length == 1)
-                .Select(m => m.MakeGenericMethod(model.GetType()))
-                .First();
-
-            var server = method.Invoke(null, new[] {settings, model});
-            return server;
+            var settings = Config.Current.GetSettings<EngineSettings>();
+            services.AddSingleton(settings);
+            services.AddSingleton(TheEngine);
         }
 
-        [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = CalledViaReflection)]
-        private static MemstateServer<T> CreateServer<T>(EngineSettings settings, T model) where T : class
-        {
-            var engine = new EngineBuilder().Build(model).Result;
-            return new MemstateServer<T>(settings, engine);
-        }
     }
 }

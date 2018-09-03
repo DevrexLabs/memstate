@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Memstate.Host.Commands
+namespace Memstate.Runner.Commands
 {
     public class BenchmarkCommand : ICommand
     {

@@ -1,38 +1,28 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Memstate.Configuration;
 
 namespace Memstate
 {
     public static class Engine
     {
-
         /// <summary>
         /// Load an existing or create a new engine
         /// </summary>
-        public static Task<Engine<T>> Start<T>() where T : class, new()
+        /// <returns>A task that completes when the engine is ready to process messages</returns>
+        public static Task<Engine<T>> Start<T>() where T : class
         {
             return new EngineBuilder().Build<T>();
         }
 
-        /// <summary>
-        /// Start the engine from an existing journal, 
-        /// will throw if the journal doesn't exist
-        /// </summary>
-        public static Task<Engine<T>> Load<T>() where T: class
+        public static async Task<Engine<T>> For<T>() where T : class
         {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Start an engine with a new empty journal file, will
-        /// throw if the journal already exists 
-        /// </summary>
-        /// <returns>The create.</returns>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public static Task<Engine<T>> Create<T>() where T : class
-        {
-            throw new NotImplementedException();
+            var container = Config.Current.Container;
+            if (!container.CanResolve<Engine<T>>())
+            {
+                var engine = await Start<T>();
+                container.Register(engine);
+            }
+            return container.Resolve<Engine<T>>();
         }
     }
 }

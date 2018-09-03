@@ -1,8 +1,35 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate
 {
+    public static class Client
+    {
+        /// <summary>
+        /// Return a remote or local client depending on the configuration
+        /// </summary>
+        /// <returns>The for.</returns>
+        /// <typeparam name="TModel">The 1st type parameter.</typeparam>
+        public static async Task<Client<TModel>> For<TModel>() where TModel: class
+        {
+            var cfg = Config.Current;
+            var settings = cfg.GetSettings<ClientSettings>();
+
+            if(settings.IsLocal)
+            {
+                var engine = await Engine.For<TModel>();
+                return new LocalClient<TModel>(engine);
+            }
+            else
+            {
+                var client = new RemoteClient<TModel>();
+                await client.Connect();
+                return client;
+            }
+        }
+    }
+
     public abstract class Client<TModel>
     {
 

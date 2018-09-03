@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -27,14 +28,11 @@ namespace Memstate.Tcp
 
         private readonly ISet<Task> _connections = new HashSet<Task>();
 
-        private readonly EngineSettings _settings;
-
         private Task _listenerTask;
 
-        public MemstateServer(EngineSettings config, Engine<T> engine)
+        public MemstateServer(Engine<T> engine)
         {
             _engine = engine;
-            _settings = config;
 
             // TODO: Endpoint should be configurable.
             var ip = IPAddress.Any;
@@ -56,12 +54,27 @@ namespace Memstate.Tcp
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var tcpClient = await _tcpListener.AcceptTcpClientAsync();
-                _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
-                _log.Info("Connection from {0}", tcpClient.Client.RemoteEndPoint);
+                var (ok, tcpClient) = await TryAcceptTcpClientAsync(_tcpListener);
+                if (ok)
+                {
+                    _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
+                    _log.Info("Connection from {0}", tcpClient.Client.RemoteEndPoint);
+                }
             }
         }
 
+        private async Task<(bool, TcpClient)> TryAcceptTcpClientAsync(TcpListener listener)
+        {
+            try
+            {
+                var tcpClient = await listener.AcceptTcpClientAsync();
+                return (true, tcpClient);
+            }
+            catch (Exception ex)
+            {
+                return (false, null);
+            }
+        }
         private async Task HandleConnection(TcpClient tcpClient)
         {
             var serializer = Config.Current.CreateSerializer();
@@ -102,15 +115,14 @@ namespace Memstate.Tcp
                 await packet.WriteTo(stream);
                 await stream.FlushAsync();
             }
-        }
+        } 
 
-        public void Stop()
+        public async Task Stop()
         {
             _log.Info("Closing");
-            _cancellationSource.Cancel();
-            _listenerTask.Wait();
-            // TODO: Should we stop before Cancel() and Wait() ?
             _tcpListener.Stop();
+            _cancellationSource.Cancel();
+            await _listenerTask;
             _log.Debug("Closed");
         }
     }

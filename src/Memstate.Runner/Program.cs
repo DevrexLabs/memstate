@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Memstate.Host.Commands;
+using Memstate.Host;
+using Memstate.Runner.Commands;
 
-namespace Memstate.Host
+namespace Memstate.Runner
 {
-    public static class Program
+
+    /// <summary>
+    /// This will evolve into some kind of CLI or interactive terminal
+    /// </summary>
+    class Program
     {
         private static readonly Dictionary<string, Type> Commands = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
         {
+            {"redis", typeof(RedisServerCommand)},
             {"demo", typeof(DemoCommand)},
-            {"server", typeof(ServerCommand)},
             {"benchmark", typeof(BenchmarkCommand)},
             {"read-benchmark", typeof(ReadBenchmarkCommand)},
             {"write-benchmark", typeof(WriteBenchmarkCommand)}
@@ -27,7 +32,7 @@ namespace Memstate.Host
         {
             var signal = new AutoResetEvent(false);
 
-            var input = arguments.Length > 0 ? arguments[0] : "server";
+            var input = arguments.Length > 0 ? arguments[0] : "redis";
 
             arguments = arguments.Length > 0 ? arguments.Skip(1).ToArray() : arguments;
 
@@ -37,11 +42,11 @@ namespace Memstate.Host
 
                 return -1;
             }
-            
-            var command = (ICommand) Activator.CreateInstance(type);
+
+            var command = (ICommand)Activator.CreateInstance(type);
 
             command.Done += (sender, args) => signal.Set();
-            Console.CancelKeyPress += (sender, args) => signal.Set();
+            OnExit.Register(() => signal.Set());
 
             try
             {

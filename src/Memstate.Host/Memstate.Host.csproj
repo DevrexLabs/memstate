@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Devrex Labs</Authors>
+    <Company>Devrex Labs</Company>
+    <Product>Memstate</Product>
+    <PackageId>Memstate.Host</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description></Description>
+    <Copyright>Devrex Labs</Copyright>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <Version>0.2.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
+    <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
+    <ProjectReference Include="..\Memstate.MsConfig\Memstate.MsConfig.csproj" />
+    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+    <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
+    <ProjectReference Include="..\Memstate.AppMetrics\Memstate.AppMetrics.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Web\wwwroot\**\*" />
+  </ItemGroup>
+</Project>

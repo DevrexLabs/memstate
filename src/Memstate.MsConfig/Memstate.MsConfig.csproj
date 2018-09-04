@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <Copyright>Devrex Labs</Copyright>
+    <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DevrexLabs/memstate/</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <Authors>Devrex Labs</Authors>
+    <Product>Memstate</Product>
+    <Description>Memstate module adding support for configuration based on Microsoft.Extensions.Configuration</Description>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+  </ItemGroup>
+
+</Project>

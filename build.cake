@@ -6,7 +6,18 @@ Task("Default")
 
 Task("Build")
   .Does(() =>{
-    DotNetBuild("./memstate.sln");
+    DotNetBuild("./src/memstate.sln");
+  });
+
+  Task("Pack").Does(() =>{
+    var settings = new DotNetCorePackSettings
+    {
+      Configuration = "Release",
+      OutputDirectory = "./artifacts/",
+      VersionSuffix = "42"
+    };
+
+     DotNetCorePack("./src/Memstate.Host/Memstate.Host.csproj", settings);
   });
 
 Task("SystemTest")

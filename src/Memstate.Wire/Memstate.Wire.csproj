@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.0</PackageVersion>
+    <Authors>Devrex Labs</Authors>
+    <PackageId>Memstate.Wire</PackageId>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <Owners>Devrex Labs</Owners>
+    <PackageProjectUrl>https://github.com/devrexlabs/memstate/</PackageProjectUrl>
+    <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <Summary>Serialization module for Memstate based on the high performance binary serializer Wire.
+</Summary>
+    <Title>Memstate.Wire</Title>
+    <Description>Serialization module for Memstate based on the high performance binary serializer Wire.
+https://github.com/rogeralsing/Wire</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Wire" Version="0.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Class1.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -2,6 +2,10 @@
 {
     public class InitCustomer : Command<LoyaltyDB, Customer>
     {
+        // we have an empty default constructor here because
+        // we're using the NewtonSoft.Json serializer that needs
+        // commands to have public empty constructors.
+
         public InitCustomer()
         {
         }

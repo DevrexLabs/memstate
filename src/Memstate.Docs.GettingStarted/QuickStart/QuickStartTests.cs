@@ -73,10 +73,11 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             await engine.DisposeAsync();
         }
 
-        // rules for using Json serialisation
+        // rules for Command using Json serialisation
         // ----------------------------------
-        // Commands must have public empty constructors
-        // properties must have { get; set; } or at minimum { get; private set; }
+        // Commands must have public empty constructors 
+        // For now, properties must have { get; set; } or at minimum { get; private set; }
+        // Note : we are working hard to make everything as far as possible serializer agnostic so expect this restriction to be lifted shortly, woo hoo!
 
         [Test]
         public async Task Simple_end_to_end_getting_started_configure_to_use_json_serializer_with_filesytem_storage()

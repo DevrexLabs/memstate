@@ -70,7 +70,7 @@ namespace Memstate.Tcp
                 var tcpClient = await listener.AcceptTcpClientAsync();
                 return (true, tcpClient);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return (false, null);
             }

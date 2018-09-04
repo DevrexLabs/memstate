@@ -11,6 +11,7 @@ using Memstate.Logging;
 
 namespace Memstate.Tcp
 {
+
     /// <summary>
     /// TCP Server implementation.
     /// Listens for tcp connections and spins off a <c>Session</c> for each incoming request.
@@ -32,11 +33,11 @@ namespace Memstate.Tcp
 
         public MemstateServer(Engine<T> engine)
         {
+            var settings = Config.Current.GetSettings<ServerSettings>();
+            settings.Validate(); 
             _engine = engine;
-
-            // TODO: Endpoint should be configurable.
-            var ip = IPAddress.Any;
-            var endPoint = new IPEndPoint(ip, 3001);
+            var ip = IPAddress.Parse(settings.Ip);
+            var endPoint = new IPEndPoint(ip, settings.Port);
             _tcpListener = new TcpListener(endPoint);
             _log = LogProvider.GetCurrentClassLogger();
             _cancellationSource = new CancellationTokenSource();

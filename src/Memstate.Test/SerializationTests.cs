@@ -37,6 +37,23 @@ namespace Memstate.Test
             var clone = serializer.Clone(command);
             Assert.AreEqual(command.Id, clone.Id);
         }
+
+        [Test, TestCaseSource(nameof(Serializers))]
+        public void Can_serialize_poco_with_readonly_fields(ISerializer serializer)
+        {
+            var poco = new PocoWithReadonlyFields("homer");
+            var clone = serializer.Clone(poco);
+            Assert.AreEqual("homer", clone.Name);
+        }
+
+        [Test, TestCaseSource(nameof(Serializers))]
+        public void Can_serialize_poco_with_no_default_constructor(ISerializer serializer)
+        {
+            var poco = new PocoWithPrivateSettersAndNoDefaultConstructor("homer");
+            var clone = serializer.Clone(poco);
+            Assert.AreEqual("homer", clone.Name);
+        }
+
     }
 
     internal class Poco {
@@ -49,6 +66,26 @@ namespace Memstate.Test
         {
             get;
             set;
+        }
+    }
+
+    public class PocoWithPrivateSettersAndNoDefaultConstructor
+    {
+        public string Name { get; private set; }
+
+        public PocoWithPrivateSettersAndNoDefaultConstructor(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public class PocoWithReadonlyFields
+    {
+        public readonly string Name;
+
+        public PocoWithReadonlyFields(string name)
+        {
+            Name = name;
         }
     }
 }

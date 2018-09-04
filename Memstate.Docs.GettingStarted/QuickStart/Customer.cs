@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace Memstate.Docs.GettingStarted.QuickStart
+﻿namespace Memstate.Docs.GettingStarted.QuickStart
 {
-    [Serializable]
     public class Customer
     {
         public Customer(int id, int loyaltyPointBalance)

@@ -1,6 +1,5 @@
 ﻿namespace Memstate.Docs.GettingStarted.QuickStart.Commands
 {
-
     public class EarnPoints : Command<LoyaltyDB, Customer>
     {
         public EarnPoints()

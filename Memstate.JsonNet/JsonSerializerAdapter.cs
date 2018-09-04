@@ -59,7 +59,7 @@ namespace Memstate.JsonNet
             var writer = new JsonTextWriter(streamWriter);
             
             _serializer.Serialize(writer, @object);
-            
+            streamWriter.WriteLine();
             writer.Flush();
             streamWriter.Flush();
         }

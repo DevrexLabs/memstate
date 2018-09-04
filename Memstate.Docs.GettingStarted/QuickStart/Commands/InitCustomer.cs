@@ -1,6 +1,7 @@
-﻿namespace Memstate.Docs.GettingStarted.QuickStart.Commands
-{
+﻿using Newtonsoft.Json;
 
+namespace Memstate.Docs.GettingStarted.QuickStart.Commands
+{
     public class InitCustomer : Command<LoyaltyDB, Customer>
     {
         public InitCustomer()
@@ -13,7 +14,10 @@
             Points = points;
         }
 
+        [JsonProperty("ID")]
         public int ID { get; private set; }
+
+        [JsonProperty("Points")]
         public int Points { get; private set; }
 
         public override Customer Execute(LoyaltyDB model)

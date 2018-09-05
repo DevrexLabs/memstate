@@ -12,6 +12,6 @@
 
         public int LoyaltyPointBalance { get; }
 
-        public override string ToString() => $"{ID}, {LoyaltyPointBalance} points";
+        public override string ToString() => $"Customer[{ID}] balance {LoyaltyPointBalance} points.";
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace Memstate.Docs.GettingStarted.QuickStart.Commands
 {
-
     public class SpendPoints : Command<LoyaltyDB, Customer>
     {
         public SpendPoints()

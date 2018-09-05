@@ -1,8 +1,11 @@
 ﻿namespace Memstate.Docs.GettingStarted.QuickStart.Commands
 {
-
     public class InitCustomer : Command<LoyaltyDB, Customer>
     {
+        // we have an empty default constructor here because
+        // we're using the NewtonSoft.Json serializer that needs
+        // commands to have public empty constructors.
+
         public InitCustomer()
         {
         }
@@ -14,6 +17,7 @@
         }
 
         public int ID { get; private set; }
+
         public int Points { get; private set; }
 
         public override Customer Execute(LoyaltyDB model)

@@ -1,11 +1,8 @@
 ﻿namespace Memstate.Docs.GettingStarted.QuickStart.Commands
 {
-
     public class EarnPoints : Command<LoyaltyDB, Customer>
     {
-        public EarnPoints()
-        {
-        }
+        // Don't need an empty public constructor if we're using Wire serializer.
 
         public EarnPoints(int id, int points)
         {

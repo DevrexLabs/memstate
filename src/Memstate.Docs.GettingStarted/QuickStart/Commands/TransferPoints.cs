@@ -2,14 +2,20 @@
 {
     public class TransferPointsResult
     {
-        public TransferPointsResult(Customer sender, Customer recipient)
+        public TransferPointsResult(Customer sender, Customer recipient, int points)
         {
             Sender = sender;
             Recipient = recipient;
+            Points = points;
         }
 
+        public int Points { get; }
         public Customer Sender { get; }
         public Customer Recipient { get; }
+        public override string ToString()
+        {
+            return $"Sent {Points} points. | Sender, {Sender} | Recipient, {Recipient}";
+        }
     }
 
     public class TransferPoints : Command<LoyaltyDB, TransferPointsResult>
@@ -40,7 +46,7 @@
             var newReceiver = new Customer(receiver.ID, receiver.LoyaltyPointBalance + Points);
             model.Customers[SenderId] = newSender;
             model.Customers[RecieverId] = newReceiver;
-            return new TransferPointsResult(newSender, newReceiver);
+            return new TransferPointsResult(newSender, newReceiver, Points);
         }
     }
 

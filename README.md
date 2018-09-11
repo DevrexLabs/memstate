@@ -35,17 +35,28 @@ As the journal grows over time, replaying billions of commands can take a signif
 **Did we mention how simple Memstate is to use?**
 
 ```csharp
-    // host db engine using default settings - database will be saved to disk as "DemoDatabase.journal"  
-    var settings = new MemstateSettings { StreamName = "DemoDatabase" };
-    var db = await new EngineBuilder(settings).BuildAsync<LoyaltyDB>();
+        [Test]
+        public async Task Most_compact_start_using_all_default_configurations()
+        {
+            var engine = await Engine.Start<LoyaltyDB>();
+            Print(await engine.Execute(new InitCustomer(10, 10)));
+            Print(await engine.Execute(new InitCustomer(20, 20)));
+            Print(await engine.Execute(new TransferPoints(10, 20, 5)));
+            await engine.DisposeAsync();
 
-    int id = 1;
-    await db.ExecuteAsync(new InitCustomerIfNotExist(id, 10));
-    var customer = await db.ExecuteAsync(new EarnPoints(id, 20));
-    Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points."); 
+            // Produces the following output :)
 
-    var top10 = await db.ExecuteAsync(new Top10Customers());
-    top10.ToList().ForEach(Console.WriteLine);
+            /*             
+            Customer[10] balance 10 points.
+            Customer[20] balance 20 points.
+            Sent 5 points. | Sender, Customer[10] balance 5 points. | Recipient, Customer[20] balance 25 points.
+            */
+        }
+
+        private void Print(object o)
+        {
+            Console.WriteLine(o.ToString());
+        }
 ```
 
 ## Quickstart - getting started

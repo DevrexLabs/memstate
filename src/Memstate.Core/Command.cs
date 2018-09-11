@@ -9,7 +9,7 @@ namespace Memstate
             Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; private set; }
+        public Guid Id { get; internal set; }
 
         internal abstract object ExecuteImpl(object model);
 

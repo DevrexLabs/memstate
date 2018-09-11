@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Docs.GettingStarte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F9764AB9-8B67-4D1C-8CD8-CE87034B93CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Bundle", "Memstate.Bundle\Memstate.Bundle.csproj", "{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Core", "Memstate.Core\Memstate.Core.csproj", "{8B94F51C-A931-41E6-88DD-EFBE17C8B235}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Wire", "Memstate.Wire\Memstate.Wire.csproj", "{1A3730D5-159B-40A0-91E2-D4345AEDF21B}"
@@ -40,6 +38,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.AppMetrics", "Memstate.AppMetrics\Memstate.AppMetrics.csproj", "{D5578C83-8679-4EA7-9525-4F55E49DDA2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Runner", "Memstate.Runner\Memstate.Runner.csproj", "{59457968-F597-401C-BCAD-23E1DDDAFD9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.All", "Memstate.All\Memstate.All.csproj", "{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,14 +129,6 @@ Global
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Release|x64.ActiveCfg = Release|Any CPU
 		{1C144C3F-B32E-419C-B432-8050EF122401}.Release|x64.Build.0 = Release|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Debug|x64.Build.0 = Debug|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|x64.ActiveCfg = Release|Any CPU
-		{EC204EB2-0EB1-4C6E-BA7A-FA189A2FFB05}.Release|x64.Build.0 = Release|Any CPU
 		{8B94F51C-A931-41E6-88DD-EFBE17C8B235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B94F51C-A931-41E6-88DD-EFBE17C8B235}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B94F51C-A931-41E6-88DD-EFBE17C8B235}.Debug|x64.ActiveCfg = Debug|x64
@@ -177,6 +169,14 @@ Global
 		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|x64.ActiveCfg = Release|Any CPU
 		{59457968-F597-401C-BCAD-23E1DDDAFD9B}.Release|x64.Build.0 = Release|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A191739-1DD8-4CE8-8C63-F3AE94D3D0AC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,7 +17,7 @@ namespace Memstate
 
         public readonly Command Command;
 
-        public JournalRecord(long recordNumber, DateTime written, Command command)
+        public JournalRecord(long recordNumber, DateTimeOffset written, Command command)
         {
             RecordNumber = recordNumber;
             Command = command;

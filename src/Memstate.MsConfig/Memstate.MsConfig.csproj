@@ -12,6 +12,11 @@
     <Product>Memstate</Product>
     <Description>Memstate module adding support for configuration based on Microsoft.Extensions.Configuration</Description>
     <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.3.4</PackageVersion>
+    <Owners>Devrex Labs</Owners>
+    <Summary>MsConfig integration for Memstate</Summary>
+    <Title>Memstate.MsConfig</Title>
   </PropertyGroup>
 
   <ItemGroup>

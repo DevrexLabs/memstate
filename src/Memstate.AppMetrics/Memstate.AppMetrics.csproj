@@ -8,6 +8,15 @@
     <Product>Memstate</Product>
     <Description>Metrics module for memstate based on the App.Metrics library</Description>
     <Copyright>Devrex Labs</Copyright>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.2.1</PackageVersion>
+    <Owners>Devrex Labs</Owners>
+    <Summary>Metrics implementation for MemState based on AppMetrics</Summary>
+    <Title>Memstate.AppMetrics</Title>
+    <PackageId>Memstate.AppMetrics</PackageId>
+    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Memstate.Configuration
 {
+
     public sealed class Config
     {
         /// <summary>
@@ -154,12 +155,9 @@ namespace Memstate.Configuration
         }
 
         /// <summary>
-        /// Name of a well known storage provider OR resolvable type name
-        /// OR the literal "Auto" (which is default) for automatic resolution.
-        /// Automatic resolution will take the first available of eventstore,
-        /// postgres or filestorage.
+        /// Name of a well known storage provider OR resolvable type name.
         /// </summary>
-        public string StorageProviderName { get; set; } = "Auto";
+        public string StorageProviderName { get; set; } = StorageProviders.FILE;
 
         public StorageProvider GetStorageProvider()
         {
@@ -181,7 +179,7 @@ namespace Memstate.Configuration
         /// Name of a well known serializer or resolvable type name OR the value Auto (default)
         /// </summary>
         /// <value>The name of the serializer.</value>
-        public string SerializerName { get; set; } = "Auto";
+        public string SerializerName { get; set; } = Serializers.AUTO;
 
         private object Convert(string value, Type type)
         {

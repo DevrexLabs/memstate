@@ -49,10 +49,14 @@ namespace Memstate.Configuration
         {
             get
             {
-                lock (_lock)
+                if (_current == null)
                 {
-                    if (_current == null) _current = BuildDefault();
+                    lock (_lock)
+                    {
+                        if (_current == null) _current = BuildDefault();
+                    }
                 }
+                
                 return _current;
             }
             internal set

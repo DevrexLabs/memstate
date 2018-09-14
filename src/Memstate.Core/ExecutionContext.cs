@@ -4,11 +4,24 @@ namespace Memstate
 {
     public class ExecutionContext
     {
+        private static ExecutionContext _current;
+
         /// <summary>
         /// The context of the currently executing command.
         /// </summary>
         /// <value>The current.</value>
-        public static ExecutionContext Current { get; set; }
+        public static ExecutionContext Current
+        { 
+            get
+            {
+                if (_current == null) _current = new ExecutionContext(-1);
+                return _current;
+            } 
+            set
+            {
+                _current = value;
+            }
+        }
 
         /// <summary>
         /// Record number of the currently executing command

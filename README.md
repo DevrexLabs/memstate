@@ -61,7 +61,7 @@ As the journal grows over time, replaying billions of commands can take a signif
 
 ## Quickstart - getting started
 
-[Full quick start getting started sample code here...](/Memstate.Docs.GettingStarted/QuickStart)
+[Full quick start getting started sample code here...](/src/Memstate.Docs.GettingStarted/QuickStart)
 
 
 ## Governance, Support and Contributions

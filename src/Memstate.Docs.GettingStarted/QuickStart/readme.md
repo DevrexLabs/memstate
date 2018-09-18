@@ -16,8 +16,10 @@ The following topics are covered:
 ## Creating a project for your custom domain model
 Normally you would create a separate class library where you define the domain model. But for the quick start create a simple console application for either .NET Core or .NET Framework.
 
-## Add a reference to the Memstate libraries
-Add a reference to the [Memstate.Bundle nuget package](http://nuget.org/List/Packages/Memstate.Bundle)
+## Add a reference to Memstate libraries
+Add a reference to  [Memstate.Bundle nuget package](http://nuget.org/List/Packages/Memstate.All)
+
+> install-package Memstate.Bundle
 
 ## Define the in-memory model
 Define a root class to serve as the model and any supporting types such as entities. An instance of this class will be kept in-memory and represents the state of your application.

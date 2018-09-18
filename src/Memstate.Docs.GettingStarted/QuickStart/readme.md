@@ -19,7 +19,7 @@ Normally you would create a separate class library where you define the domain m
 ## Add a reference to Memstate libraries
 Add a reference to  [Memstate.All nuget package](http://nuget.org/List/Packages/Memstate.All)
 
-> install-package Memstate.Bundle
+> install-package Memstate.All
 
 ## Define the in-memory model
 Define a root class to serve as the model and any supporting types such as entities. An instance of this class will be kept in-memory and represents the state of your application.

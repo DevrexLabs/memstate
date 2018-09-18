@@ -17,7 +17,7 @@ The following topics are covered:
 Normally you would create a separate class library where you define the domain model. But for the quick start create a simple console application for either .NET Core or .NET Framework.
 
 ## Add a reference to Memstate libraries
-Add a reference to  [Memstate.Bundle nuget package](http://nuget.org/List/Packages/Memstate.All)
+Add a reference to  [Memstate.All nuget package](http://nuget.org/List/Packages/Memstate.All)
 
 > install-package Memstate.Bundle
 

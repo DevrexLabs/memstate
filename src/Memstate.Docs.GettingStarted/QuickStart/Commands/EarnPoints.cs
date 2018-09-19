@@ -2,15 +2,13 @@
 {
     public class EarnPoints : Command<LoyaltyDB, Customer>
     {
-        // Don't need an empty public constructor if we're using Wire serializer.
-
-        public EarnPoints(int id, int points)
+        public EarnPoints(int customerId, int points)
         {
-            ID = id;
+            CustomerId = customerId;
             Points = points;
         }
 
-        public int ID { get; }
+        public int CustomerId { get; }
         public int Points { get; }
 
         // it is safe to return a live customer object linked to the Model because
@@ -20,10 +18,10 @@
 
         public override Customer Execute(LoyaltyDB model)
         {
-            var customer = model.Customers[ID];
+            var customer = model.Customers[CustomerId];
             var newPoints = customer.LoyaltyPointBalance + Points;
-            var customerWithNewBalance = new Customer(ID, newPoints);
-            model.Customers[ID] = customerWithNewBalance;
+            var customerWithNewBalance = new Customer(CustomerId, newPoints);
+            model.Customers[CustomerId] = customerWithNewBalance;
             return customerWithNewBalance;
         }
     }

@@ -2,26 +2,22 @@
 {
     public class SpendPoints : Command<LoyaltyDB, Customer>
     {
-        public SpendPoints()
+        public SpendPoints(int customerId, int points)
         {
-        }
-
-        public SpendPoints(int id, int points)
-        {
-            ID = id;
+            CustomerId = customerId;
             Points = points;
         }
 
-        public int ID { get; private set; }
+        public int CustomerId { get; }
 
-        public int Points { get; private set; }
+        public int Points { get; }
 
         public override Customer Execute(LoyaltyDB model)
         {
-            var customer = model.Customers[ID];
+            var customer = model.Customers[CustomerId];
             var newPoints = customer.LoyaltyPointBalance - Points;
-            var customerWithNewBalance = new Customer(ID, newPoints);
-            model.Customers[ID] = customerWithNewBalance;
+            var customerWithNewBalance = new Customer(CustomerId, newPoints);
+            model.Customers[CustomerId] = customerWithNewBalance;
             // It is safe to return live customer objects, because customer is immutable.
             return customerWithNewBalance;
         }

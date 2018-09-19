@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace Memstate.Docs.GettingStarted.QuickStart.Queries
 {
-    [Serializable]
     public class Top10Customers : Query<LoyaltyDB, Customer[]>
     {
         public override Customer[] Execute(LoyaltyDB db) => db.Customers

@@ -50,6 +50,7 @@ Define a root class to serve as the model and any supporting types such as entit
 
         public override string ToString() => $"Customer[{ID}] balance {LoyaltyPointBalance} points.";
     }
+```    
 
 ## Create commands
 
@@ -101,12 +102,10 @@ Creating command objects and passing them to the engine for execution. The follo
 Note how the `EarnPoints` Command, returns an immutable `Customer` object with the new balance as a return value.
 
 ```csharp
-
 await engine.Execute(new InitCustomer(10, 100));
 var customer = await engine.Execute(new EarnPoints(id,100));
 Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points.");
 ```
-
 ## Executing queries
 
 You can  write strongly typed query classes.
@@ -128,7 +127,7 @@ Customer[] customers = await engine.Execute(new Top10Customers());
 
 ## Transactions
 
-(TBD) tests and documentation currently in progress.
+> (TBD) tests and documentation currently in progress.
 
 ## Summary
 

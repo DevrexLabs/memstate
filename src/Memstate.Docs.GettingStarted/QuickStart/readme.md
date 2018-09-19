@@ -131,6 +131,8 @@ Customer[] customers = await engine.Execute(new Top10Customers());
 
 ## Summary
 
-We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.
+We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used an anemic model and the transaction script pattern. 
 
 * For a full end to end working example see [QuickStartTests.cs](QuickStartTests.cs)
+
+Documentation for more advanced topics are currently being written. There are extensive unit and integration tests as well that can give you some excellent insights into more advanced details.  

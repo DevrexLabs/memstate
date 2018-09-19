@@ -131,7 +131,7 @@ Customer[] customers = await engine.Execute(new Top10Customers());
 
 ## Summary
 
-We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used an anemic model and the transaction script pattern. 
+We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used an anemic model and the transaction script pattern for this sample code. 
 
 * For a full end to end working example see [QuickStartTests.cs](QuickStartTests.cs)
 

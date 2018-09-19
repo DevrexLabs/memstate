@@ -39,16 +39,16 @@ Define a root class to serve as the model and any supporting types such as entit
 ```csharp
     public class Customer
     {
-        public Customer(int id, int loyaltyPointBalance)
+        public Customer(int customerId, int loyaltyPointBalance)
         {
-            ID = id;
+            CustomerId = customerId;
             LoyaltyPointBalance = loyaltyPointBalance;
         }
 
-        public int ID { get; }
+        public int CustomerId { get; }
         public int LoyaltyPointBalance { get; }
 
-        public override string ToString() => $"Customer[{ID}] balance {LoyaltyPointBalance} points.";
+        public override string ToString() => $"Customer[{CustomerId}] balance {LoyaltyPointBalance} points.";
     }
 ```    
 

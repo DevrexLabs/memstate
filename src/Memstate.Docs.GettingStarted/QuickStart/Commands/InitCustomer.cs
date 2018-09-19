@@ -2,28 +2,20 @@
 {
     public class InitCustomer : Command<LoyaltyDB, Customer>
     {
-        // we have an empty default constructor here because
-        // we're using the NewtonSoft.Json serializer that needs
-        // commands to have public empty constructors.
-
-        public InitCustomer()
+        public InitCustomer(int customerId, int points)
         {
-        }
-
-        public InitCustomer(int id, int points)
-        {
-            ID = id;
+            CustomerId = customerId;
             Points = points;
         }
 
-        public int ID { get; private set; }
+        public int CustomerId { get; }
 
-        public int Points { get; private set; }
+        public int Points { get; }
 
         public override Customer Execute(LoyaltyDB model)
         {
-            var customer = new Customer(ID, Points);
-            model.Customers[ID] = customer;
+            var customer = new Customer(CustomerId, Points);
+            model.Customers[CustomerId] = customer;
             return customer;
         }
     }

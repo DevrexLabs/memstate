@@ -39,8 +39,18 @@ Define a root class to serve as the model and any supporting types such as entit
 ```csharp
     public class Customer
     {
+        public Customer(int customerId, int loyaltyPointBalance)
+        {
+            CustomerId = customerId;
+            LoyaltyPointBalance = loyaltyPointBalance;
+        }
+
+        public int CustomerId { get; }
+        public int LoyaltyPointBalance { get; }
+
+        public override string ToString() => $"Customer[{CustomerId}] balance {LoyaltyPointBalance} points.";
     }
-```
+```    
 
 ## Create commands
 
@@ -52,17 +62,13 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 ```csharp
     public class EarnPoints : Command<LoyaltyModel, Customer>
     {
-        public EarnPoints()
+        public EarnPoints(int customerId, int points)
         {
-        }
-
-        public EarnPoints(int id, int points)
-        {
-            ID = id;
+            CustomerId = customerId;
             Points = points;
         }
 
-        public int ID { get; }
+        public int CustomerID { get; }
         public int Points { get; }
 
         // it is safe to return a live customer object linked to the Model because
@@ -74,8 +80,8 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
         {
             var customer = model.Customers[ID];
             var newPoints = customer.LoyaltyPointBalance + Points;
-            var customerWithNewBalance = new Customer(ID, newPoints);
-            model.Customers[ID] = customerWithNewBalance;
+            var customerWithNewBalance = new Customer(CustomerId, newPoints);
+            model.Customers[CustomerId] = customerWithNewBalance;
             return customerWithNewBalance;
         }
     }
@@ -83,26 +89,23 @@ Commands are used to update the model. Derive from `Command<M>` or `Command<M,R>
 
 ## Hosting the engine
 
-`new EngineBuilder(settings).BuildAsync<T>()` will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
+The following code will create an initial model, write it as a snapshot to disk and then return an engine ready to execute commands and queries.
 
 ```csharp
-  var settings = new MemstateSettings { StreamName = "LoyaltyDbFile" };
-  var engine = await new EngineBuilder(settings).BuildAsync<LoyaltyModel>();
+    var engine = await Engine.Start<LoyaltyDB>();
 ```
 
 ## Executing commands
 
-Create a command object and pass it to the engine for execution:
+Creating command objects and passing them to the engine for execution. The following code initialises a new customer with id[10] with 100 loyalty points. Then we execute the EarnPoints command, and finnally we write out the customer balance.
+
+Note how the `EarnPoints` Command, returns an immutable `Customer` object with the new balance as a return value.
 
 ```csharp
-// The engine will execute the command against the model and persist to the command journal.
-
-int id = 1;
-var earnPointsCommand = new EarnPoints(id,100);
-var customer = await engine.Execute(earnPointsCommand);
+await engine.Execute(new InitCustomer(10, 100));
+var customer = await engine.Execute(new EarnPoints(id,100));
 Console.WriteLine($"your new balance is {customer.LoyaltyPoints} points.");
 ```
-
 ## Executing queries
 
 You can  write strongly typed query classes.
@@ -110,7 +113,6 @@ You can  write strongly typed query classes.
 ```csharp
 
 // executing a query
-[Serializable]
 public class Top10Customers : Query<LoyaltyModel, Customer[]>
 {
     public override Customer[] Execute(LoyaltyModel model) {
@@ -125,10 +127,12 @@ Customer[] customers = await engine.Execute(new Top10Customers());
 
 ## Transactions
 
-(TBD) tests and documentation currently in progress.
+> (TBD) tests and documentation currently in progress.
 
 ## Summary
 
-We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used explicit transactions, an anemic model and the transaction script pattern. Next, you might wan't to check out [implicit transactions](../../modeling/proxy), where commands and queries are derived from methods on the model eliminating the need to explicitly author commands and queries.
+We've covered the absolute basics here, but essentially there's not much more to developing than defining the model, and writing commands and queries. We used an anemic model and the transaction script pattern for this sample code. 
 
 * For a full end to end working example see [QuickStartTests.cs](QuickStartTests.cs)
+
+Documentation for more advanced topics are currently being written. There are extensive unit and integration tests as well that can give you some excellent insights into more advanced details.  

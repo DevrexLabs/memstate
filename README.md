@@ -61,8 +61,7 @@ As the journal grows over time, replaying billions of commands can take a signif
 
 ## Quickstart - getting started
 
-[Full quick start getting started sample code here...](/src/Memstate.Docs.GettingStarted/QuickStart)
-
+[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 
 
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, an LLC based in Sweden.
@@ -128,4 +127,4 @@ Memstate relies on a backing storage provider for persistence and global message
 
 * **Kafka** - discontinued, end to end latency is too poor.
 
-[Detailed Documentation](docs) | [quickstart](/src/Memstate.Docs.GettingStarted/QuickStart)
+[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 

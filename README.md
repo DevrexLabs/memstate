@@ -1,6 +1,6 @@
 # Memstate
 
-[Detailed Documentation](docs) | [quickstart](/src/Memstate.Docs.GettingStarted/QuickStart)
+[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 
 
 [![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -61,7 +61,7 @@ As the journal grows over time, replaying billions of commands can take a signif
 
 ## Quickstart - getting started
 
-[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 
+[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart)
 
 ## Governance, Support and Contributions
 Memstate is an open source project sponsored and governed by Devrex Labs, an LLC based in Sweden.

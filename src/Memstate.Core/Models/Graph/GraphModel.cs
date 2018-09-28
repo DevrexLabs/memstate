@@ -15,10 +15,7 @@ namespace Memstate.Models.Graph
         private readonly SortedDictionary<long, Node> _nodesById;
         private readonly SortedDictionary<long, Edge> _edgesById;
 
-        [NonSerialized]
         private SortedDictionary<string, SortedSet<Node>> _nodesByLabel;
-
-        [NonSerialized]
         private SortedDictionary<string, SortedSet<Edge>> _edgesByLabel;
 
 
@@ -99,9 +96,7 @@ namespace Memstate.Models.Graph
         private T GetById<T>(IDictionary<long, T> items, long id)
         {
             if (items.TryGetValue(id, out var item)) return item;
-            // TODO: OrigoDB used CommandAbortedException
             throw new ArgumentException("No such node: " + id);
-
         }
 
         private static void AddByLabel<T>(IDictionary<string, SortedSet<T>> index, T item, string label)

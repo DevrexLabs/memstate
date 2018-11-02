@@ -4,7 +4,7 @@ using Wire;
 
 namespace Memstate.Wire
 {
-    public class WireSerializerAdapter : ISerializer
+    public class WireSerializerAdapter : BinarySerializer
     {
         private readonly Serializer _serializer;
 
@@ -15,7 +15,7 @@ namespace Memstate.Wire
             _serializer = new Serializer(options);
         }
 
-        public void WriteObject(Stream stream, object @object)
+        public override void WriteObject(Stream stream, object @object)
         {
             if (@object is JournalRecord[])
             {
@@ -27,17 +27,17 @@ namespace Memstate.Wire
             else _serializer.Serialize(@object, stream);
         }
 
-        public object ReadObject(Stream stream)
+        public override object ReadObject(Stream stream)
         {
             return _serializer.Deserialize(stream);
         }
 
-        public IEnumerable<T> ReadObjects<T>(Stream stream)
-        {
-            while (stream.Position < stream.Length - 1)
-            {
-                yield return _serializer.Deserialize<T>(stream);
-            }
-        }
+        //public IEnumerable<T> ReadObjects<T>(Stream stream)
+        //{
+        //    while (stream.Position < stream.Length - 1)
+        //    {
+        //        yield return _serializer.Deserialize<T>(stream);
+        //    }
+        //}
     }
 }

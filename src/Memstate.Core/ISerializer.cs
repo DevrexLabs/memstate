@@ -1,8 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Memstate
 {
+
+    public abstract class BinarySerializer : ISerializer
+    {
+        public abstract object ReadObject(Stream stream);
+
+        public abstract void WriteObject(Stream stream, object @object);
+
+
+        public IEnumerable<T> ReadObjects<T>(Stream stream)
+        {
+            while (stream.Position < stream.Length - 1)
+            {
+                yield return (T)ReadObject(stream);
+            }
+        }
+    }
+
+    public class BinaryFormatterAdapter : BinarySerializer
+    {
+        readonly BinaryFormatter _formatter = new BinaryFormatter();
+
+        public override object ReadObject(Stream stream)
+            => _formatter.Deserialize(stream);
+
+        public override void WriteObject(Stream stream, object @object)
+            => _formatter.Serialize(stream, @object);
+    }
+
     public interface ISerializer
     {
         void WriteObject(Stream stream, object @object);
@@ -10,17 +39,5 @@ namespace Memstate
         object ReadObject(Stream stream);
 
         IEnumerable<T> ReadObjects<T>(Stream stream);
-    }
-
-    public interface ISerializable
-    {
-        void Save(out string typeName, out string data);
-        void Restore(string data);
-    }
-
-    public interface IJournalRecordFormatter
-    {
-        string Stringify(JournalRecord journalRecord);
-        JournalRecord Parse(string data);
     }
 }

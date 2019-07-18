@@ -127,4 +127,10 @@ Memstate relies on a backing storage provider for persistence and global message
 
 * **Kafka** - discontinued, end to end latency is too poor.
 
+## Memstate in the press
+
+* 28th June 2019 - https://dotnetcore.show/episode-28-memstate-with-robert-friberg/
+
+## Getting started
+
 [Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 

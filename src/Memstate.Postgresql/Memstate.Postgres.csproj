@@ -13,7 +13,7 @@
     <Win32Resource />
     <PackageId>Memstate.Postgres</PackageId>
     <PackageVersion>0.2.0</PackageVersion>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Owners>Devrex Labs</Owners>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <Summary>Storage provider for Memstate based on PostgreSQL</Summary>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Copyright>Devrex Labs</Copyright>
     <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DevrexLabs/memstate/</RepositoryUrl>

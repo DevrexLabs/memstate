@@ -2,6 +2,7 @@
 
 namespace Memstate
 {
+    [Serializable]
     public abstract class Command
     {
         protected Command()
@@ -18,6 +19,7 @@ namespace Memstate
         }
     }
 
+    [Serializable]
     public abstract class Command<TModel> : Command
     {
         public abstract void Execute(TModel model);
@@ -29,6 +31,7 @@ namespace Memstate
         }
     }
 
+    [Serializable]
     public abstract class Command<TModel, TResult> : Command
     {
         public abstract TResult Execute(TModel model);

@@ -5,6 +5,7 @@ using System.IO;
 using Memstate.JsonNet;
 using Memstate.Test.EventfulTestDomain;
 using Memstate.Wire;
+using System;
 
 namespace Memstate.Test
 {
@@ -15,6 +16,7 @@ namespace Memstate.Test
         {
             yield return new WireSerializerAdapter();
             yield return new JsonSerializerAdapter();
+            yield return new BinaryFormatterAdapter();
         }
 
         [Test, TestCaseSource(nameof(Serializers))]
@@ -56,6 +58,7 @@ namespace Memstate.Test
 
     }
 
+    [Serializable]
     internal class Poco {
         public string Name
         {
@@ -69,6 +72,7 @@ namespace Memstate.Test
         }
     }
 
+    [Serializable]
     public class PocoWithPrivateSettersAndNoDefaultConstructor
     {
         public string Name { get; private set; }
@@ -79,6 +83,7 @@ namespace Memstate.Test
         }
     }
 
+    [Serializable]
     public class PocoWithReadonlyFields
     {
         public readonly string Name;

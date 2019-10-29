@@ -14,10 +14,8 @@ namespace Memstate.Test.Models
         private GraphModel _graph;
         private long _user1;
 
-        private string WireFileName = "gsmoke_test_with_defaults_wire";
         private string WireJournalFile = "gsmoke_test_with_defaults_wire.journal";
 
-        private string JsonFileName = "gsmoke_test_with_defaults_json";
         private string JsonJournalFile = "gsmoke_test_with_defaults_json.journal";
 
         [SetUp]

@@ -11,6 +11,10 @@ Memstate can run in a number or modes:
 Memstate Server can run in a standalone process. You connect to the server using a RemoteClient.
 
 TODO - starting the server, adding application specific assemblies, choosing 32
+1. Create a host project of type console, either .NET Core or .NET Framework 
+2. Add references to the project containing your model, commands and queries
+3. Add a reference to `Memstate.Host` nuget package
+4. In the main method of the project
 
 ## Docker mode
 Memstate Server can run in a docker container. You can use the image at devrexlabs/memstate

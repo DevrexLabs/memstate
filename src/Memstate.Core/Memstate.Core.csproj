@@ -13,7 +13,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <PackageReleaseNotes>See http://github.com/devrexlabs/memstate/releases</PackageReleaseNotes>
     <RepositoryUrl>http://github.com/DevrexLabs/memstate</RepositoryUrl>
     <PackageProjectUrl>http://github.com/DevrexLabs/memstate</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Platforms>AnyCPU;x64</Platforms>
     <PackOnBuild>true</PackOnBuild>
     <PackageVersion>0.2.0</PackageVersion>

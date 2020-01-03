@@ -26,17 +26,15 @@ namespace Memstate.Examples.TodoMvc
         {
             services.AddMvc();
 
-            services.AddSingleton(async provider =>
-            {
-                return await new EngineBuilder().Build<TodoModel>().ConfigureAwait(false);
-            });
+            services.AddSingleton(async provider 
+                => await new EngineBuilder()
+                    .Build<TodoModel>());
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggingBuilder loggingBuilder)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
+            loggingBuilder.AddConsole().AddDebug();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

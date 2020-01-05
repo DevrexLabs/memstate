@@ -7,3 +7,4 @@
 [assembly: InternalsVisibleTo("Memstate.Runner")]
 [assembly: InternalsVisibleTo("Memstate.EventStore")]
 [assembly: InternalsVisibleTo("Memstate.Postgressql.Tests")]
+[assembly: InternalsVisibleTo("Memstate.SqlStreamStore")]

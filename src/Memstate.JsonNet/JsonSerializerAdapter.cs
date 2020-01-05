@@ -49,6 +49,16 @@ namespace Memstate.JsonNet
             }
         }
 
+        public string ToString(object @object)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public object FromString(string s)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void WriteObject(Stream serializationStream, object @object)
         {
             var streamWriter = new StreamWriter(serializationStream);

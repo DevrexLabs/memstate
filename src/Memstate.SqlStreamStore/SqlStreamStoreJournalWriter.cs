@@ -1,23 +1,40 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using SqlStreamStore;
+using SqlStreamStore.Streams;
 
 namespace Memstate.SqlStreamStore
 {
-    public class SqlStreamStoreJournalWriter : IJournalWriter
+    public class SqlStreamStoreJournalWriter : BatchingJournalWriter
     {
-        public SqlStreamStoreJournalWriter(long nextRecordNumber)
+        private readonly IStreamStore _streamStore;
+        private readonly StreamId _streamId;
+        private readonly ISerializer _serializer;
+
+        public SqlStreamStoreJournalWriter(IStreamStore streamStore, StreamId streamId, ISerializer serializer)
         {
-            throw new NotImplementedException();
+            _streamStore = streamStore;
+            _streamId = streamId;
+            _serializer = serializer;
         }
 
-        public Task DisposeAsync()
+        public override Task DisposeAsync() => Task.CompletedTask;
+
+        protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
-            throw new NotImplementedException();
+            var messages = commands.Select(ToNewStreamMessage).ToArray();
+           var result =  _streamStore.AppendToStream(_streamId, ExpectedVersion.Any, messages )
+               .GetAwaiter()
+               .GetResult();
         }
 
-        public void Send(Command command)
+        private NewStreamMessage ToNewStreamMessage(Command command)
         {
-            throw new NotImplementedException();
+            var commandAsString = _serializer.ToString(command);
+            var id = command.Id;
+            return new NewStreamMessage(id, command.GetType().Name, commandAsString);
         }
     }
 }

@@ -8,4 +8,8 @@
       <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="SqlStreamStore" Version="1.1.3" />
+    </ItemGroup>
+
 </Project>

@@ -18,7 +18,7 @@ namespace Memstate
         private readonly IJournalWriter _journalWriter;
 
         /// <summary>
-        /// Commands that have been sent to the journal but not yet receieved 
+        /// Commands that have been sent to the journal but not yet received 
         /// and processed on the subscription
         /// </summary>
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;

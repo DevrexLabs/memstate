@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -18,6 +19,18 @@ namespace Memstate
             {
                 yield return (T)ReadObject(stream);
             }
+        }
+
+        public string ToString(object @object)
+        {
+            var bytes = this.Serialize(@object);
+            return Convert.ToBase64String(bytes);
+        }
+
+        public object FromString(string s)
+        {
+            var bytes  = Convert.FromBase64String(s);
+            return this.Deserialize(bytes);
         }
     }
 
@@ -39,5 +52,9 @@ namespace Memstate
         object ReadObject(Stream stream);
 
         IEnumerable<T> ReadObjects<T>(Stream stream);
+
+        String ToString(object @object);
+
+        object FromString(String s);
     }
 }

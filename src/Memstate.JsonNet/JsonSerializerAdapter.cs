@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Memstate.JsonNet
@@ -51,12 +52,14 @@ namespace Memstate.JsonNet
 
         public string ToString(object @object)
         {
-            throw new System.NotImplementedException();
+            var bytes = this.Serialize(@object);
+            return Encoding.UTF8.GetString(bytes);
         }
 
         public object FromString(string s)
         {
-            throw new System.NotImplementedException();
+            var bytes = Encoding.UTF8.GetBytes(s);
+            return this.Deserialize(bytes);
         }
 
         public void WriteObject(Stream serializationStream, object @object)

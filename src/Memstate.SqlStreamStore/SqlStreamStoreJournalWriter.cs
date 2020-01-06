@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SqlStreamStore;
 using SqlStreamStore.Streams;
 
@@ -19,8 +17,6 @@ namespace Memstate.SqlStreamStore
             _streamId = streamId;
             _serializer = serializer;
         }
-
-        public override Task DisposeAsync() => Task.CompletedTask;
 
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {

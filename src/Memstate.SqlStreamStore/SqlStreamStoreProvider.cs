@@ -7,16 +7,21 @@ namespace Memstate.SqlStreamStore
     public class SqlStreamStoreProvider: StorageProvider
     {
         private readonly StreamId _streamId;
-        private readonly ISerializer _serializer;
-        
+        private readonly ISerializer _serializer;        
         private readonly IStreamStore _streamStore;
-        public SqlStreamStoreProvider(Config config)
+
+        public SqlStreamStoreProvider()
         {
+            Config config = Config.Current;
             _serializer = config.CreateSerializer();
             var settings = config.GetSettings<EngineSettings>();
             _streamId = new StreamId(settings.StreamName);
-            _streamStore = new InMemoryStreamStore();
+            if (!config.Container.TryResolve(out _streamStore))
+            {
+                _streamStore = new InMemoryStreamStore();
+            }
         }
+
         public override IJournalReader CreateJournalReader()
         {
             return new SqlStreamSourceJournalReader(

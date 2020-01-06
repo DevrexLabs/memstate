@@ -53,11 +53,23 @@ namespace Memstate.SqlStreamStore
                 handler.Invoke(journalRecord);
             }
 
-            bool ready = false;
+            // pass null to subscribe from the beginning
+            //or the version of the previous record
+            int? version = null;
+            if (from > 0) version = (int)from - 1;
+
+            bool caughtUp = false;
+
             var sub = _streamStore.SubscribeToStream(
-                _streamId, (int) from, MessageReceived, SubscriptionDropped, hasCaughtUp => ready = hasCaughtUp);
+                _streamId,
+                version,
+                MessageReceived,
+                SubscriptionDropped,
+                hasCaughtUp => caughtUp = hasCaughtUp);
+
             sub.MaxCountPerRead = 100;
-            return new SqlStreamStoreSubscription(sub, () => ready);
+          
+            return new SqlStreamStoreSubscription(sub, () => caughtUp);
         }
 
         private void SubscriptionDropped(IStreamSubscription subscription, SubscriptionDroppedReason reason,

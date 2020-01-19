@@ -2,9 +2,7 @@
 
 [Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 
 
-[![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Build status](https://ci.appveyor.com/api/projects/status/7tv5rh74v1o4upc9?svg=true)](https://ci.appveyor.com/project/rofr/memstate)
+[![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/7tv5rh74v1o4upc9?svg=true)](https://ci.appveyor.com/project/rofr/memstate) [![NuGet Badge](https://buildstats.info/nuget/memstate.all)](https://www.nuget.org/packages/memstate.all/)
 
 # What is Memstate?
 In-memory event-sourced ACID-transactional replicated object graph engine. What? Can you say that again? Ok, it's an application server that keeps all your data in RAM. It runs without a database because all the transactions are recorded in a log and used to restore the state of the application at startup or when setting up a replica. You define the object model, commands and queries using C#. Besides being very simple Memstate is also very fast and will outperform any relational database.

@@ -48,8 +48,7 @@ namespace Memstate
 
         protected T AutoResolve()
         {
-            var candidates = AutoResolutionCandidates();
-            foreach (var candidate in candidates)
+            foreach (var candidate in AutoResolutionCandidates())
             {
                 if (TryResolve(candidate, out var provider))
                 {

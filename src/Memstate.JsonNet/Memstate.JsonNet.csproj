@@ -8,7 +8,7 @@
     <Product>Memstate</Product>
     <Description>Json serialization for Memstate</Description>
     <Copyright>Devrex Labs</Copyright>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <PackageVersion>0.2.0</PackageVersion>
@@ -23,7 +23,7 @@
     <Compile Remove="SurrogateConverter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />

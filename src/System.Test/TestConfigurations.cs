@@ -4,6 +4,7 @@ using System.Linq;
 using Memstate;
 using Memstate.Configuration;
 using Serilog;
+using SqlStreamStore;
 
 namespace System.Test
 {
@@ -41,6 +42,8 @@ namespace System.Test
                     var settings = cfg.GetSettings<EngineSettings>();
                     settings.WithRandomSuffixAppendedToStreamName();
                     cfg.StorageProviderName = providerName;
+                    if (providerName == "sqlstreamsource")
+                        ConfigurePgSqlStreamStore(cfg);
                     yield return cfg;
                 }
             }
@@ -57,6 +60,7 @@ namespace System.Test
             yield return "file";
             yield return "postgres";
             yield return "eventstore";
+            yield return "sqlstreamstore";
         }
 
         private object[] ToObjectArray(object o)
@@ -64,23 +68,26 @@ namespace System.Test
             return new[] { o };
         }
 
+        private static void ConfigurePgSqlStreamStore(Config config)
+        {
+            var connectionString = "Host=localhost;Port=5432;User Id=postgres;Database=postgres";
+            var settings = new PostgresStreamStoreSettings(connectionString);
+            var pgStreamStore = new PostgresStreamStore(settings);
+            config.Container.Register<IStreamStore>(pgStreamStore);
+            pgStreamStore.CreateSchemaIfNotExists().GetAwaiter().GetResult();
+        }
+
         public class Cluster : TestConfigurations
         {
             protected override IEnumerable<string> ProviderNames()
             {
                 yield return "eventstore";
+                yield return "sqlstreamstore";
 #if POSTGRES
                 yield return "postgres";
 #endif
             }
         }
 
-        internal static void Configure(Config config)
-        {
-            Config.Current = config;
-            var settings = config.GetSettings<EngineSettings>();
-            settings.WithRandomSuffixAppendedToStreamName();
-            Console.WriteLine(config);
-        }
     }
 }

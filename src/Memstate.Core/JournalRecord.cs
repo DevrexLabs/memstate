@@ -2,6 +2,7 @@ using System;
 
 namespace Memstate
 {
+    [Serializable]
     public class JournalRecord
     {
         /// <summary>

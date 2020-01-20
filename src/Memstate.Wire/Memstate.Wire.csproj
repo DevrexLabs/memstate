@@ -6,7 +6,7 @@
     <PackageVersion>0.0</PackageVersion>
     <Authors>Devrex Labs</Authors>
     <PackageId>Memstate.Wire</PackageId>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Owners>Devrex Labs</Owners>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate/</PackageProjectUrl>
     <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>

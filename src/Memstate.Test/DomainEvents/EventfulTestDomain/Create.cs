@@ -2,6 +2,7 @@
 
 namespace Memstate.Test.EventfulTestDomain
 {
+    [Serializable]
     public class Create : Command<UsersModel, User>
     {
         public Create(string username)

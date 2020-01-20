@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,13 +14,13 @@
     <Summary>Metrics implementation for MemState based on AppMetrics</Summary>
     <Title>Memstate.AppMetrics</Title>
     <PackageId>Memstate.AppMetrics</PackageId>
-    <PackageLicenseUrl>https://github.com/DevrexLabs/memstate/blob/master/LICENSE_LGPL</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="App.Metrics" Version="2.1.0" />
+    <PackageReference Include="App.Metrics" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>

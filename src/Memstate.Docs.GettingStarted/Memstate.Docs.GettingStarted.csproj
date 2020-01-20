@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="microsoft.net.test.sdk" Version="15.7.0" />
-    <PackageReference Include="nunit" Version="3.10.1" />
-    <PackageReference Include="nunit3testadapter" Version="3.10.0" />
+    <PackageReference Include="microsoft.net.test.sdk" Version="16.4.0" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="nunit3testadapter" Version="3.16.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Memstate.JsonNet
@@ -47,6 +48,18 @@ namespace Memstate.JsonNet
                     yield return _serializer.Deserialize<T>(reader);
                 }
             }
+        }
+
+        public string ToString(object @object)
+        {
+            var bytes = this.Serialize(@object);
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public object FromString(string s)
+        {
+            var bytes = Encoding.UTF8.GetBytes(s);
+            return this.Deserialize(bytes);
         }
 
         public void WriteObject(Stream serializationStream, object @object)

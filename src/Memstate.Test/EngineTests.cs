@@ -6,6 +6,7 @@ using Memstate.Configuration;
 
 namespace Memstate.Test
 {
+    [TestFixture]
     public class EngineTests
     {
         private IJournalSubscriptionSource _fakeSubscriptionSource;

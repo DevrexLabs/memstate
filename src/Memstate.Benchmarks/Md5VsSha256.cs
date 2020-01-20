@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
 
 namespace Memstate.Benchmarks
 {
@@ -11,7 +10,7 @@ namespace Memstate.Benchmarks
     /// This is the sample from the getting started guide of the benchmarkdotnet documentation
     /// at http://benchmarkdotnet.org/Guides/GettingStarted.htm
     /// </summary>
-    [ClrJob, CoreJob]
+    [SimpleJob]
     public class Md5VsSha256
     {
         private const int N = 10000;

@@ -56,7 +56,9 @@ namespace Memstate
                     return provider;
                 }
             }
-            throw new Exception("Autoresolve failed for " + typeof(T));
+
+            var hint = "Please check to see if you need to add a reference to 'Memstate.Wire', or 'Memstate.JsonNet'. Adding any of these two nuget packages will automatically use either package for serialisation.";
+            throw new Exception($"Autoresolve failed for {typeof(T)}. {hint}");
         }
 
         internal class Registry : Dictionary<string, Func<T>>

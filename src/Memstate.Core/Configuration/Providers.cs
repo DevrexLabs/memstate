@@ -40,6 +40,11 @@ namespace Memstate
             RegisteredProviders[name] = constructor;
         }
 
+        internal protected void UnRegister(string name)
+        {
+            RegisteredProviders.Remove(name);
+        }
+
         protected static T InstanceFromTypeName(string typeName)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
@@ -48,7 +53,8 @@ namespace Memstate
 
         protected T AutoResolve()
         {
-            foreach (var candidate in AutoResolutionCandidates())
+            var candidates = AutoResolutionCandidates();
+            foreach (var candidate in candidates)
             {
                 if (TryResolve(candidate, out var provider))
                 {
@@ -56,7 +62,8 @@ namespace Memstate
                     return provider;
                 }
             }
-            throw new Exception("Autoresolve failed for " + typeof(T));
+            //TODO: Add reference to docs for user.
+            throw new Exception($"Autoresolve failed for {typeof(T)}. Please check to see if you need to add a reference to 'Memstate.Wire', or 'Memstate.JsonNet'. Adding any of these two nuget packages will automatically use either package for serialisation.");
         }
 
         internal class Registry : Dictionary<string, Func<T>>

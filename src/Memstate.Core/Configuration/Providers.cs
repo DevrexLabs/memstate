@@ -40,11 +40,6 @@ namespace Memstate
             RegisteredProviders[name] = constructor;
         }
 
-        internal protected void UnRegister(string name)
-        {
-            RegisteredProviders.Remove(name);
-        }
-
         protected static T InstanceFromTypeName(string typeName)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);

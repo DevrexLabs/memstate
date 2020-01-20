@@ -19,7 +19,7 @@ namespace Memstate.Test.EngineBuilderTests
         }
 
         [Test]
-        public async Task WhenNoSerializerFound_Build_ShouldReturnErrorMessageContainingSuggestedPackagesToReferenceToPossiblyFixProblem()
+        public async Task WhenNoSerializers_BuildShould_ReturnErrorMessageContainingSuggestedPackagesToReference()
         {
             // pretend this is a new users project and no defaults could be loaded
             // remove the default storage providers that will be picked up 

@@ -25,10 +25,7 @@ namespace Memstate.Examples.TodoMvc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.AddSingleton(async provider 
-                => await new EngineBuilder()
-                    .Build<TodoModel>());
+            services.AddSingleton(new EngineBuilder().Build<TodoModel>().GetAwaiter().GetResult());
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggingBuilder loggingBuilder)

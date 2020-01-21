@@ -18,12 +18,12 @@ https://github.com/rogeralsing/Wire</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Wire" Version="0.8.2" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Remove="Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Hyperion" Version="0.9.12" />
   </ItemGroup>
 </Project>

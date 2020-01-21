@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Wire;
+﻿using System.IO;
+using Hyperion;
 
 namespace Memstate.Wire
 {
@@ -31,13 +30,5 @@ namespace Memstate.Wire
         {
             return _serializer.Deserialize(stream);
         }
-
-        //public IEnumerable<T> ReadObjects<T>(Stream stream)
-        //{
-        //    while (stream.Position < stream.Length - 1)
-        //    {
-        //        yield return _serializer.Deserialize<T>(stream);
-        //    }
-        //}
     }
 }

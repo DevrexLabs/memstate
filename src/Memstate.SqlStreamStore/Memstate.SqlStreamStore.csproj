@@ -2,6 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <PackOnBuild>true</PackOnBuild>
+        <PackageVersion>0.2</PackageVersion>
+        <Authors>Devrex Labs</Authors>
+        <Description>Storage provider based on SqlStreamStore allowing the use of any sql backend supported by SqlStreamStore. MsSql, PostgreSQL</Description>
     </PropertyGroup>
 
     <ItemGroup>

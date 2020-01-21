@@ -18,6 +18,7 @@ namespace System.Test
                 .MinimumLevel.Verbose()
                 .CreateLogger();
         }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

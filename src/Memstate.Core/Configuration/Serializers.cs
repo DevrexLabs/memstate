@@ -4,8 +4,6 @@ namespace Memstate
 {
     internal class Serializers : Providers<ISerializer>
     {
-
-
         /// <summary>
         /// Take the first available serializer in the order: Newtonsoft.Json, Wire.
         /// </summary>
@@ -27,12 +25,14 @@ namespace Memstate
         public Serializers()
         {
             Register("Auto", AutoResolve);
+            Register("BinaryFormatter", () => InstanceFromTypeName(nameof(BinaryFormatterAdapter)));
             Register("Wire", () => InstanceFromTypeName(Wire));
             Register("NewtonSoft.Json", () => InstanceFromTypeName(NewtonSoftJson));
         }
 
         protected override IEnumerable<string> AutoResolutionCandidates()
         {
+            yield return "BinaryFormatter";
             yield return "Newtonsoft.Json";
             yield return "Wire";
         }

@@ -2,7 +2,7 @@ version: 1.0.{build}
 image: Visual Studio 2019
 init:
 - ps: >-
-    wget https://eventstore.org/downloads/EventStore-OSS-Win-v4.1.0.zip -o c:\eventstore.zip
+    wget https://eventstore.org/downloads/win/EventStore-OSS-Win-v5.0.5.zip -o c:\eventstore.zip
 
     expand-archive c:\eventstore.zip c:\eventstore
 

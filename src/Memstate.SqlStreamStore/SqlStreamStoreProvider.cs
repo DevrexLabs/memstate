@@ -10,7 +10,11 @@ namespace Memstate.SqlStreamStore
         private readonly ISerializer _serializer;
         private readonly IStreamStore _streamStore;
 
-        public SqlStreamStoreProvider(IStreamStore streamStore = null)
+        public SqlStreamStoreProvider() : this(null)
+        {
+            
+        }
+        public SqlStreamStoreProvider(IStreamStore streamStore)
         {
             Config config = Config.Current;
             _serializer = config.CreateSerializer();

@@ -34,8 +34,9 @@ namespace Memstate.Test
         [Test]
         public void Constructor_subscribes_to_journal_records_from_correct_recordNumber()
         {
-            A.CallTo(() => _fakeSubscriptionSource.Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
-                .MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _fakeSubscriptionSource
+                    .Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
+                .MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -44,7 +45,7 @@ namespace Memstate.Test
             await _engine.DisposeAsync().ConfigureAwait(false);
 
             A.CallTo(() => _fakeSubscription.Dispose())
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace Memstate.Test
         { 
             await _engine.DisposeAsync().ConfigureAwait(false);
             A.CallTo(() => _fakeJournalWriter.DisposeAsync())
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappenedOnceExactly();
         }
 
     }

@@ -8,7 +8,7 @@ using SqlStreamStore.Subscriptions;
 
 namespace Memstate.SqlStreamStore
 {
-    public class SqlStreamStoreSubscriptionSource 
+    public class SqlStreamStoreSubscriptionSource
         : IJournalSubscriptionSource
     {
         private class SqlStreamStoreSubscription : IJournalSubscription
@@ -21,13 +21,13 @@ namespace Memstate.SqlStreamStore
                 _readyDelegate = readyDelegate;
                 _subscription = sub;
             }
-            public void Dispose() 
+            public void Dispose()
                 => _subscription.Dispose();
 
-            public bool Ready() 
+            public bool Ready()
                 => _readyDelegate.Invoke();
         }
-        
+
         private readonly IStreamStore _streamStore;
         private readonly StreamId _streamId;
         private readonly ISerializer _serializer;
@@ -44,7 +44,6 @@ namespace Memstate.SqlStreamStore
 
         public IJournalSubscription Subscribe(long @from, Action<JournalRecord> handler)
         {
-            
             async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
                 CancellationToken cancellationToken)
             {
@@ -58,7 +57,7 @@ namespace Memstate.SqlStreamStore
             int? version = null;
             if (from > 0) version = (int)from - 1;
 
-            bool caughtUp = false;
+            var caughtUp = false;
 
             var sub = _streamStore.SubscribeToStream(
                 _streamId,
@@ -68,7 +67,7 @@ namespace Memstate.SqlStreamStore
                 hasCaughtUp => caughtUp = hasCaughtUp);
 
             sub.MaxCountPerRead = 100;
-          
+
             return new SqlStreamStoreSubscription(sub, () => caughtUp);
         }
 

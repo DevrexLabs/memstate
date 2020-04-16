@@ -65,12 +65,12 @@ namespace Memstate.JsonNet
         public void WriteObject(Stream serializationStream, object @object)
         {
             var streamWriter = new StreamWriter(serializationStream);
-            
+
             var writer = new JsonTextWriter(streamWriter);
 
-            if (@object is JournalRecord[])
+            if (@object is JournalRecord[] records)
             {
-                foreach (var record in (@object as JournalRecord[]))
+                foreach (var record in records)
                 {
                     _serializer.Serialize(writer, record);
                     streamWriter.WriteLine();
@@ -81,7 +81,7 @@ namespace Memstate.JsonNet
                 _serializer.Serialize(writer, @object);
                 streamWriter.WriteLine();
             }
-            
+
             writer.Flush();
             streamWriter.Flush();
         }

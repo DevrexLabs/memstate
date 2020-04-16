@@ -2,7 +2,7 @@
 
 namespace Memstate.Postgres
 {
-    public static class MemstateSettingsExtensions
+    public static class ConfigExtensions
     {
         public static Config UsePostgresqlProvider(this Config config)
         {

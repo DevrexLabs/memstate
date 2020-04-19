@@ -1,0 +1,56 @@
+@using Memstate.Examples.Trello.Core
+@model BoardView
+
+@{
+    Layout = "_Layout";
+}
+
+<h2>@Model.Name - <a href="#" id="addColumnButton" class="btn btn-sm btn-link">Add column</a></h2>
+<div data-bind="foreach: columns" style="height:100%" class="container h-100">
+    <div class="d-inline-block h-100">
+        <h4 data-bind="text: name"></h4>
+        <div class="card-columns" data-bind="foreach: cards">
+            <div class="card">
+                <h3 data-bind="text: title"></h3>
+                <p data-bind="text: notes"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+
+@section Scripts
+{
+<script>
+  $(async function(){
+        let log = console.log;
+        const trello = Trello(ko);
+        const viewModel = new trello.BoardViewModel('@Model.Id', '@Model.Name');
+        ko.applyBindings(viewModel);
+        viewModel.loadColumns();
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/trelloHub")
+            .withAutomaticReconnect()
+            .build();
+        
+        connection.on("ColumnAdded", columnAdded => {
+            log("Received ColumnAdded:", columnAdded);
+            viewModel.addColumn(columnAdded);
+        });
+        
+        connection.on("CardAdded", card =>{
+            log("Received CardAdded:" , card);
+        });
+        await connection.start();
+        
+        await connection.send("Subscribe", viewModel.id);
+    
+        $("#addColumnButton").on('click', e => {
+            $.post("/Trello/Column/" + viewModel.id, {name: "New Column"});
+            log("addColumnButton.onclick"); 
+        });
+  });
+</script>    
+}

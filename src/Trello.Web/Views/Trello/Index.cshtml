@@ -1,0 +1,23 @@
+@using Memstate.Examples.Trello.Core
+@model List<BoardView>
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Boards</h2>
+@if (!Model.Any())
+{
+    <p>There are no boards, create one below</p>
+}
+@foreach (var board in Model)
+{
+    <li>@Html.ActionLink(board.Name, "Board", new {id = board.Id})</li>
+}
+
+@using(Html.BeginForm("Create", "Trello", FormMethod.Post))
+{
+    <input class="form-control" type="text" name="name"/> <button type="submit" class="btn btn-primary">Create</button>
+}
+

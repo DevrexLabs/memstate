@@ -50,7 +50,7 @@ namespace Memstate.Test
 
         [Test]
         public async Task Writer_is_disposed_when_engine_is_disposed()
-        { 
+        {
             await _engine.DisposeAsync().ConfigureAwait(false);
             A.CallTo(() => _fakeJournalWriter.DisposeAsync())
                 .MustHaveHappenedOnceExactly();

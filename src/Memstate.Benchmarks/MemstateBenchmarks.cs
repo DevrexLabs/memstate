@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -62,7 +61,7 @@ namespace Memstate.Benchmarks
         {
             public MemstateConfig()
             {
-                Add(
+                AddColumn(
                     StatisticColumn.Kurtosis,
                     StatisticColumn.OperationsPerSecond,
                     StatisticColumn.P90,

@@ -13,7 +13,7 @@ namespace Memstate.SqlStreamStore
         /// <returns></returns>
         public static Config UseSqlStreamStore(this Config config, IStreamStore streamStore = null)
         {
-            config.StorageProviderName = StorageProviders.SQLSTREAMSTORE;
+            config.StorageProviderName = StorageProviders.SqlStreamStore;
             config.Container.Register(streamStore);
             return config;
         }

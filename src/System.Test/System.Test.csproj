@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
     <ProjectReference Include="..\Memstate.MsConfig\Memstate.MsConfig.csproj" />
     <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
+    <ProjectReference Include="..\Memstate.Pravega\Memstate.Pravega.csproj" />
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
     <ProjectReference Include="..\Memstate.SqlStreamStore\Memstate.SqlStreamStore.csproj" />
   </ItemGroup>

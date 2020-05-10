@@ -161,7 +161,7 @@ namespace Memstate.Configuration
         /// <summary>
         /// Name of a well known storage provider OR resolvable type name.
         /// </summary>
-        public string StorageProviderName { get; set; } = StorageProviders.FILE;
+        public string StorageProviderName { get; set; } = StorageProviders.File;
 
         public StorageProvider GetStorageProvider()
         {
@@ -183,7 +183,7 @@ namespace Memstate.Configuration
         /// Name of a well known serializer or resolvable type name OR the value Auto (default)
         /// </summary>
         /// <value>The name of the serializer.</value>
-        public string SerializerName { get; set; } = Serializers.AUTO;
+        public string SerializerName { get; set; } = Serializers.Auto;
 
         private object Convert(string value, Type type)
         {

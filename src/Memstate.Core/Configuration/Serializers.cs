@@ -5,36 +5,37 @@ namespace Memstate
     internal class Serializers : Providers<ISerializer>
     {
         /// <summary>
-        /// Take the first available serializer in the order: Newtonsoft.Json, Wire.
+        /// Take the first available serializer
+        /// as determined by <see cref="AutoResolutionCandidates"/>
         /// </summary>
-        public const string AUTO = "Auto";
+        public const string Auto = "Auto";
 
         /// <summary>
         /// Wire binary serializer
         /// </summary>
-        public const string WIRE = "Wire";
+        public const string Wire = "Wire";
 
         /// <summary>
         /// NewtonSoft JSON serializer
         /// </summary>
-        public const string NEWTONSOFT_JSON = "Newtonsoft.Json";
+        public const string NewtonsoftJson = "Newtonsoft.Json";
 
-        private const string Wire = "Memstate.Wire.WireSerializerAdapter, Memstate.Wire";
-        private const string NewtonSoftJson = "Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet";
+        private const string WireTypeName = "Memstate.Wire.WireSerializerAdapter, Memstate.Wire";
+        private const string NewtonSoftJsonTypeName = "Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet";
 
         public Serializers()
         {
             Register("Auto", AutoResolve);
             Register("BinaryFormatter", () => InstanceFromTypeName(nameof(BinaryFormatterAdapter)));
-            Register("Wire", () => InstanceFromTypeName(Wire));
-            Register("NewtonSoft.Json", () => InstanceFromTypeName(NewtonSoftJson));
+            Register("Wire", () => InstanceFromTypeName(WireTypeName));
+            Register("NewtonSoft.Json", () => InstanceFromTypeName(NewtonSoftJsonTypeName));
         }
 
         protected override IEnumerable<string> AutoResolutionCandidates()
         {
-            yield return "BinaryFormatter";
-            yield return "Newtonsoft.Json";
             yield return "Wire";
+            yield return "Newtonsoft.Json";
+            yield return "BinaryFormatter";
         }
     }
 }

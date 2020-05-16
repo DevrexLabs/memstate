@@ -34,43 +34,44 @@ namespace Memstate.SqlStreamStore
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            BlockingCollection<JournalRecord> queue = new BlockingCollection<JournalRecord>();
-
-            async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
-                CancellationToken cancellationToken)
+            using (var queue = new BlockingCollection<JournalRecord>())
             {
-                if (message.StreamVersion < fromRecord)
-                    return;
-                var command = (Command)_serializer.FromString(await message.GetJsonData());
-                var journalRecord = new JournalRecord(message.StreamVersion, message.CreatedUtc, command);
-                queue.Add(journalRecord);
-            }
-
-            // pass null to subscribe from the beginning
-            //or the version of the previous record
-            int? version = null;
-            if (fromRecord > 0) version = (int)fromRecord - 1;
-
-            var caughtUp = false;
-
-            using (
-                var sub = _streamStore.SubscribeToStream(
-                    _streamId,
-                    version,
-                    MessageReceived,
-                    SubscriptionDropped,
-                    hasCaughtUp => caughtUp = hasCaughtUp))
-            {
-                sub.MaxCountPerRead = 100;
-
-                JournalRecord journalRecord;
-                while (!caughtUp || queue.Any())
+                async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
+                    CancellationToken cancellationToken)
                 {
+                    if (message.StreamVersion < fromRecord)
+                        return;
+                    var command = (Command)_serializer.FromString(await message.GetJsonData());
+                    var journalRecord = new JournalRecord(message.StreamVersion, message.CreatedUtc, command);
+                    queue.Add(journalRecord);
+                }
 
-                    if (queue.TryTake(out journalRecord))
-                        yield return journalRecord;
-                    else if (!caughtUp)
-                        Thread.Sleep(100);
+                // pass null to subscribe from the beginning
+                //or the version of the previous record
+                int? version = null;
+                if (fromRecord > 0) version = (int)fromRecord - 1;
+
+                var caughtUp = false;
+
+                using (
+                    var sub = _streamStore.SubscribeToStream(
+                        _streamId,
+                        version,
+                        MessageReceived,
+                        SubscriptionDropped,
+                        hasCaughtUp => caughtUp = hasCaughtUp))
+                {
+                    sub.MaxCountPerRead = 100;
+
+                    JournalRecord journalRecord;
+                    while (!caughtUp || queue.Any())
+                    {
+
+                        if (queue.TryTake(out journalRecord))
+                            yield return journalRecord;
+                        else if (!caughtUp)
+                            Thread.Sleep(100);
+                    }
                 }
             }
         }

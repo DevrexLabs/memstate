@@ -32,10 +32,15 @@ namespace Memstate.SqlStreamStore
 
         public override IJournalReader CreateJournalReader()
         {
-            return new SqlStreamSourceJournalReader(
+            return new SqlSteamStoreSubscriptionJournalReader(
                 _streamStore,
                 _streamId,
                 _serializer);
+
+            //return new SqlStreamSourceJournalReader(
+            //    _streamStore,
+            //    _streamId,
+            //    _serializer);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)

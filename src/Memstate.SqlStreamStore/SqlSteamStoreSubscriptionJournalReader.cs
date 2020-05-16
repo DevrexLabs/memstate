@@ -69,7 +69,7 @@ namespace Memstate.SqlStreamStore
 
                     if (queue.TryTake(out journalRecord))
                         yield return journalRecord;
-                    if (!caughtUp)
+                    else if (!caughtUp)
                         Thread.Sleep(100);
                 }
             }

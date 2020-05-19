@@ -83,7 +83,11 @@ namespace System.Test
             }
             else
             {
-                subSource.Subscribe(0, records.Add);
+                subSource.Subscribe(0, r =>
+                {
+                    records.Add(r);
+                    Console.WriteLine("record received # " + r.RecordNumber);
+                });
                 await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
                 Assert.AreEqual(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
             }

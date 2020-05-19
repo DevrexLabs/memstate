@@ -11,28 +11,22 @@ namespace Memstate.Pravega
         private readonly Action<JournalRecord> _handler;
         private readonly IAsyncStreamReader<ReadEventsResponse> _reader;
         private readonly ISerializer _serializer;
-        private readonly long _firstRecordNumberToRead;
         private Task _task;
         private readonly CancellationTokenSource _cts;
 
-        public PravegaJournalSubscription(Action<JournalRecord> handler, IAsyncStreamReader<ReadEventsResponse> reader, long fromRecord)
+        public PravegaJournalSubscription(Action<JournalRecord> handler, IAsyncStreamReader<ReadEventsResponse> reader)
         {
             _handler = handler;
             _reader = reader;
             _serializer = Config.Current.CreateSerializer();
-            _firstRecordNumberToRead = fromRecord;
             _cts = new CancellationTokenSource();
         }
 
         public void Start() => _task = Run();
         private async Task Run()
         {
-            var recordNumber = 0;
             while (await _reader.MoveNext(_cts.Token))
             {
-                //Skip forward to the position we want to start reading from
-                //todo: learn how to request from a specific StreamCut
-                if (recordNumber < _firstRecordNumberToRead) continue;
                 var eventsResponse = _reader.Current;
                 var bytes = eventsResponse.Event.ToByteArray();
                 var savedRecord = (JournalRecord) _serializer.Deserialize(bytes);

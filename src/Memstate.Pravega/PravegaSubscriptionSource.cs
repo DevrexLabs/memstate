@@ -18,7 +18,6 @@ namespace Memstate.Pravega
             request.Scope = Config.Current.GetSettings<EngineSettings>().StreamName;
             request.Stream = "mystream";
             var response =  _client.ReadEvents(request);
-            Console.WriteLine("ReadEvents status:" + response.GetStatus());
             var streamReader = response.ResponseStream;
             var sub = new PravegaJournalSubscription(handler, streamReader, @from);
             sub.Start();

@@ -55,7 +55,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LibLog" Version="5.0.8" />
-    <PackageReference Include="System.Reflection.DispatchProxy" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.DispatchProxy" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />

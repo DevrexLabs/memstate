@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
-using Memstate.Configuration;
+using PravegaClient = PravegaGateway.PravegaGatewayClient;
 
 namespace Memstate.Pravega
 {
@@ -11,21 +10,26 @@ namespace Memstate.Pravega
     {
         private readonly CancellationToken _cancellationToken;
         private readonly CancellationTokenSource _cts;
-        
-        private readonly PravegaGateway.PravegaGatewayClient _client;
+
+        private readonly PravegaClient _client;
         private readonly ISerializer _serializer;
 
         private readonly string _scope;
-        private readonly string _streamName = "mystream";
+        private readonly string _stream = "mystream";
 
-        public PravegaJournalReader(PravegaGateway.PravegaGatewayClient client, ISerializer serializer)
+        private Action<StreamCut> _lastEventReadHandler;
+
+        public PravegaJournalReader(PravegaClient client, ISerializer serializer, string scope, string stream, Action<StreamCut> lastEventRead)
         {
             _client = client;
             _cts = new CancellationTokenSource();
             _cancellationToken = _cts.Token;
             _serializer = serializer;
-            _scope = Config.Current.GetSettings<EngineSettings>().StreamName;
+            _scope = scope;
+            _stream = stream;
+            _lastEventReadHandler = lastEventRead;
         }
+
         public Task DisposeAsync()
         {
             _cts.Cancel();
@@ -35,31 +39,41 @@ namespace Memstate.Pravega
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
+
+            var endStreamCut = GetEndStreamCut();
+            _lastEventReadHandler.Invoke(endStreamCut);
+
             var request = new ReadEventsRequest
             {
                 Scope = _scope,
-                Stream = _streamName,
+                Stream = _stream,
+                ToStreamCut = endStreamCut
             };
 
             var recordNumber = 0;
-            var response = _client.ReadEvents(request, cancellationToken: _cancellationToken);
-            while (!_cancellationToken.IsCancellationRequested)
-            {
-                var responseStream = response.ResponseStream;
-                while (responseStream.MoveNext().GetAwaiter().GetResult())
-                {
-                    if (recordNumber <= fromRecord) continue;
-                    var @event = responseStream.Current;
-                    var bytes = @event.Event.ToByteArray();
-                    Console.WriteLine("Position:" + @event.Position);
-                    Console.WriteLine("StreamCut:" + @event.StreamCut);
-                    Console.WriteLine("EventPointer:" + @event.EventPointer);
+            using var call = _client.ReadEvents(request, cancellationToken: _cancellationToken);
 
-                    var savedRecord = (JournalRecord) _serializer.Deserialize(bytes);
-                    var record = new JournalRecord(recordNumber++, savedRecord.Written, savedRecord.Command);
-                    yield return record;
-                }
+            var responseStream = call.ResponseStream;
+            while (responseStream.MoveNext(_cancellationToken).GetAwaiter().GetResult())
+            {
+                if (recordNumber <= fromRecord) continue;
+                var @event = responseStream.Current;
+                var bytes = @event.Event.ToByteArray();
+                var savedRecord = (JournalRecord) _serializer.Deserialize(bytes);
+                var record = new JournalRecord(recordNumber++, savedRecord.Written, savedRecord.Command);
+                yield return record;
             }
+        }
+
+        /// <summary>
+        /// Get a reference to the current end of the stream
+        /// </summary>
+        /// <returns></returns>
+        private StreamCut GetEndStreamCut()
+        {
+            var request = new GetStreamInfoRequest { Scope = _scope, Stream = _stream };
+            var response = _client.GetStreamInfo(request);
+            return response.TailStreamCut;
         }
     }
 }

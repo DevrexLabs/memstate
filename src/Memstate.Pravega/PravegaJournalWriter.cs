@@ -1,40 +1,53 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
-using Memstate.Configuration;
 
 namespace Memstate.Pravega
 {
-    public class PravegaJournalWriter : IJournalWriter
+    public class PravegaJournalWriter : BatchingJournalWriter
     {
         private readonly PravegaGateway.PravegaGatewayClient _client;
         private readonly ISerializer _serializer;
         private readonly AsyncClientStreamingCall<WriteEventsRequest, WriteEventsResponse> _writer;
-        public PravegaJournalWriter(PravegaGateway.PravegaGatewayClient client, ISerializer serializer)
+        private readonly string _scope;
+        private readonly string _stream;
+
+        public PravegaJournalWriter(PravegaGateway.PravegaGatewayClient client, ISerializer serializer, string scope, string stream)
         {
             _serializer = serializer;
             _client = client;
+            _scope = scope;
+            _stream = stream;
             _writer = _client.WriteEvents();
         }
 
         public Task DisposeAsync()
         {
+            _writer.Dispose();
             return Task.CompletedTask;
         }
 
-        public async void Send(Command command)
+
+        protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
-            var record = new JournalRecord(0, DateTimeOffset.Now, command);
-            var bytes = _serializer.Serialize(record);
-            
-            var request = new WriteEventsRequest
+            foreach(var command in commands)
             {
-                Event = ByteString.CopyFrom(bytes),
-                Stream = "mystream",
-                Scope = Config.Current.GetSettings<EngineSettings>().StreamName
-            };
-            await _writer.RequestStream.WriteAsync(request);
+                var record = new JournalRecord(0, DateTimeOffset.Now, command);
+                var bytes = _serializer.Serialize(record);
+
+                var request = new WriteEventsRequest
+                {
+                    Event = ByteString.CopyFrom(bytes),
+                    Stream = _stream,
+                    Scope = _scope
+                };
+
+                _writer.RequestStream.WriteAsync(request).GetAwaiter().GetResult();
+            }
+
+            _writer.RequestStream.CompleteAsync().GetAwaiter().GetResult();
         }
     }
 }

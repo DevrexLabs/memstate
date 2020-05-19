@@ -25,6 +25,7 @@ namespace Memstate.Pravega
         public void Start() => _task = Run();
         private async Task Run()
         {
+            var recordNumber = 0;
             while (await _reader.MoveNext(_cts.Token))
             {
                 var eventsResponse = _reader.Current;

@@ -19,7 +19,7 @@ namespace Memstate.Pravega
             request.Stream = "mystream";
             var response =  _client.ReadEvents(request);
             var streamReader = response.ResponseStream;
-            var sub = new PravegaJournalSubscription(handler, streamReader, @from);
+            var sub = new PravegaJournalSubscription(handler, streamReader);
             sub.Start();
             return sub;
         }

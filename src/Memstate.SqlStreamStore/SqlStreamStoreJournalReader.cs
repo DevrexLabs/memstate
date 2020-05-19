@@ -6,13 +6,13 @@ using SqlStreamStore.Streams;
 
 namespace Memstate.SqlStreamStore
 {
-    public class SqlStreamSourceJournalReader : IJournalReader
+    public class SqlStreamStoreJournalReader : IJournalReader
     {
         private readonly IStreamStore _streamStore;
         private readonly StreamId _streamId;
         private readonly ISerializer _serializer;
         
-        public SqlStreamSourceJournalReader(
+        public SqlStreamStoreJournalReader(
             IStreamStore streamStore, 
             StreamId streamId,
             ISerializer serializer)

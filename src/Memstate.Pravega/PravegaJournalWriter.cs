@@ -23,10 +23,10 @@ namespace Memstate.Pravega
             _writer = _client.WriteEvents();
         }
 
-        public Task DisposeAsync()
+        public override async Task DisposeAsync()
         {
+            await base.DisposeAsync();
             _writer.Dispose();
-            return Task.CompletedTask;
         }
 
 

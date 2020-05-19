@@ -41,7 +41,7 @@ namespace Memstate.Pravega
         public override IJournalReader CreateJournalReader()
         {
             var serializer = Config.Current.CreateSerializer();
-            return new PravegaJournalReader(_client, serializer, _scope, _stream);
+            return new PravegaJournalReader(_client, serializer, _scope, _stream, null);
         }
 
         public override IJournalWriter CreateJournalWriter(long nextRecordNumber)

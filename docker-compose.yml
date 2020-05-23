@@ -1,0 +1,19 @@
+version: '3'
+services:
+  pravega:
+    image: pravega/pravega:0.7.0
+    command: standalone
+    environment: 
+      HOST_IP:
+    ports:
+      - "9090:9090"
+      - "12345:12345"
+  gateway:
+    restart: always
+    image: claudiofahey/pravega-grpc-gateway:0.7.0
+    depends_on:
+      - pravega
+    ports:
+      - "54672:80"
+    environment: 
+        PRAVEGA_CONTROLLER:

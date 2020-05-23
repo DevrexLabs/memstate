@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SqlStreamStore;
@@ -21,7 +22,7 @@ namespace Memstate.SqlStreamStore
         protected override void OnCommandBatch(IEnumerable<Command> commands)
         {
             var messages = commands.Select(ToNewStreamMessage).ToArray();
-           var result =  _streamStore.AppendToStream(_streamId, ExpectedVersion.Any, messages )
+            var result =  _streamStore.AppendToStream(_streamId, ExpectedVersion.Any, messages )
                .GetAwaiter()
                .GetResult();
         }

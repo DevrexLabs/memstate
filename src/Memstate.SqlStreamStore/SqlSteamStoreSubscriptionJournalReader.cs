@@ -39,9 +39,8 @@ namespace Memstate.SqlStreamStore
                 async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
                     CancellationToken cancellationToken)
                 {
-                    if (message.StreamVersion < fromRecord)
-                        return;
-                    var command = (Command)_serializer.FromString(await message.GetJsonData());
+                    var json = await message.GetJsonData(cancellationToken);
+                    var command = (Command)_serializer.FromString(json);
                     var journalRecord = new JournalRecord(message.StreamVersion, message.CreatedUtc, command);
                     queue.Add(journalRecord);
                 }
@@ -63,11 +62,9 @@ namespace Memstate.SqlStreamStore
                 {
                     sub.MaxCountPerRead = 100;
 
-                    JournalRecord journalRecord;
                     while (!caughtUp || queue.Any())
                     {
-
-                        if (queue.TryTake(out journalRecord))
+                        if (queue.TryTake(out var journalRecord))
                             yield return journalRecord;
                         else if (!caughtUp)
                             Thread.Sleep(100);

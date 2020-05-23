@@ -29,7 +29,7 @@ namespace Memstate.SqlStreamStore
 
         public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
         {
-            var pageSize = 20;
+            var pageSize = 200;
 
             while (true)
             {

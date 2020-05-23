@@ -20,6 +20,7 @@ Devrex Labs</Owners>
 
     <ItemGroup>
       <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+      <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
 
 </Project>

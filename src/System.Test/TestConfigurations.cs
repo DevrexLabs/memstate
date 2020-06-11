@@ -59,10 +59,10 @@ namespace System.Test
         protected virtual IEnumerable<string> ProviderNames()
         {
             yield return "file";
-            //yield return "postgres";
-            //yield return "eventstore";
-            //yield return "sqlstreamstore";
-            yield return "pravega";
+            yield return "postgres";
+            yield return "eventstore";
+            yield return "sqlstreamstore";
+            //yield return "pravega";
         }
 
         private object[] ToObjectArray(object o)
@@ -85,7 +85,7 @@ namespace System.Test
             {
                 yield return "eventstore";
                 yield return "sqlstreamstore";
-                yield return "pravega";
+                //yield return "pravega";
 #if POSTGRES
                 yield return "postgres";
 #endif

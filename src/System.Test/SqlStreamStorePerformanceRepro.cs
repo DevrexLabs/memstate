@@ -9,7 +9,7 @@ using SqlStreamStore;
 
 namespace System.Test
 {
-    [TestFixture]
+    [TestFixture, Ignore("Performance")]
     public class SqlStreamStorePerformanceRepro
     {
 

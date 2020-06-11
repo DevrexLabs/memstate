@@ -54,10 +54,10 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Logging.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LibLog" Version="5.0.8" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="obj\Release\netstandard2.0\NuGet\23B4A9CBFE6DDE09D069937105AD751B5528A8B8" />
     <Folder Include="Storage\" />
     <Folder Include="Clients\" />
   </ItemGroup>

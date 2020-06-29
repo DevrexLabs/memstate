@@ -24,6 +24,6 @@ https://github.com/rogeralsing/Wire</Description>
     <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Hyperion" Version="0.9.15" />
+    <PackageReference Include="Hyperion" Version="0.9.16" />
   </ItemGroup>
 </Project>

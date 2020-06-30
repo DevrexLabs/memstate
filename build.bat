@@ -1,1 +1,0 @@
-PowerShell -NoProfile -ExecutionPolicy Bypass -file .\build.ps1 -Target %1

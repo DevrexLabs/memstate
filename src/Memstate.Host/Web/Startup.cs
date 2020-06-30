@@ -15,7 +15,7 @@ namespace Memstate.Host.Web
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
@@ -34,13 +34,15 @@ namespace Memstate.Host.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddLogging(lb =>
+            {
+                lb.AddDebug();
+                lb.AddConsole();
+            });
         }
 
-        public void Configure(IApplicationBuilder application, IHostingEnvironment environment, ILoggerFactory logger)
+        public void Configure(IApplicationBuilder application, IHostingEnvironment environment)
         {
-            logger.AddConsole(Configuration.GetSection("Logging"));
-            logger.AddDebug();
-
             if (environment.IsDevelopment())
             {
                 application.UseDeveloperExceptionPage();

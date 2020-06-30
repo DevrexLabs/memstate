@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using App.Metrics;
@@ -21,7 +22,7 @@ namespace Memstate.AppMetrics
 
         private static IMetricsRoot DefaultConfig()
         {
-            return new MetricsBuilder().Build();
+            return new MetricsBuilder().OutputMetrics.AsJson().Build();
         }
 
         public override IEngineMetrics GetEngineMetrics()

@@ -58,7 +58,7 @@ namespace Memstate.Runner
         {
             var settings = Config.Current.GetSettings<EngineSettings>();
             settings.StreamName = "redis";
-            _host = new HostBuilder<RedisModel>().Build();
+            _host = new HostBuilder<RedisModel>().UseWebConsole().Build();
             await _host.Start();
             _cliTask = Task.Run(RunCli);
         }

@@ -9,3 +9,4 @@
 [assembly: InternalsVisibleTo("Memstate.Postgressql.Tests")]
 [assembly: InternalsVisibleTo("Memstate.SqlStreamStore")]
 [assembly: InternalsVisibleTo("Memstate.Pravega")]
+[assembly: InternalsVisibleTo("Memstate.Azure")]

@@ -1,7 +1,7 @@
+using System;
+
 namespace Memstate
 {
-    using System;
-
     public static class Ensure
     {
         public static void NotNull(object o, string name)

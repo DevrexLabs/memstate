@@ -1,17 +1,17 @@
-﻿using Memstate.Configuration;
+﻿using Fig;
+using Memstate.Configuration;
 
 namespace Memstate.EventStore
 {
     public class EventStoreSettings : Settings
     {
-        public EventStoreSettings()
+        public EventStoreSettings():base("Memstate.EventStore")
         {
             var config = Config.Current;
             var memstateSettings = config.GetSettings<EngineSettings>();
             StreamName = memstateSettings.StreamName;
 
         }
-        public override string Key { get; } = "Memstate:EventStore";
 
         public const string DefaultSerializer = "newtonsoft.json";
 
@@ -23,7 +23,7 @@ namespace Memstate.EventStore
 
         public int EventsPerSlice { get; set; } = 1024;
 
-        public override void Validate()
+        public void Validate()
         {
             Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
         }

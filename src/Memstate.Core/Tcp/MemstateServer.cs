@@ -34,7 +34,7 @@ namespace Memstate.Tcp
         public MemstateServer(Engine<T> engine)
         {
             var settings = Config.Current.GetSettings<ServerSettings>();
-            settings.Validate(); 
+            settings.EnsureValid(); 
             _engine = engine;
             var ip = IPAddress.Parse(settings.Ip);
             var endPoint = new IPEndPoint(ip, settings.Port);

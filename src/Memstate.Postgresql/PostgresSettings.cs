@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Fig;
 using Memstate.Configuration;
 using Npgsql;
 
@@ -8,8 +9,6 @@ namespace Memstate.Postgres
 {
     public class PostgresSettings : Settings
     {
-        public override string Key { get; } = "Memstate:Postgres";
-
         public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
         public const string InitSqlResourceName = "Memstate.Postgres.init_sql";
@@ -19,7 +18,7 @@ namespace Memstate.Postgres
 
         private readonly EngineSettings _memstateSettings;
 
-        public PostgresSettings()
+        public PostgresSettings() : base("Memstate.Postgres")
         {
             _memstateSettings = Config.Current.GetSettings<EngineSettings>();
         }
@@ -74,7 +73,7 @@ namespace Memstate.Postgres
 
         public Lazy<string> InitSql => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
 
-        public override void Validate()
+        public void Validate()
         {
             Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
             Ensure.NotNullOrEmpty(Table, nameof(Table));

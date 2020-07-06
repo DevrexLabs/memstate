@@ -31,8 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Core", "Memstate.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Wire", "Memstate.Wire\Memstate.Wire.csproj", "{1A3730D5-159B-40A0-91E2-D4345AEDF21B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.MsConfig", "Memstate.MsConfig\Memstate.MsConfig.csproj", "{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.AppMetrics", "Memstate.AppMetrics\Memstate.AppMetrics.csproj", "{D5578C83-8679-4EA7-9525-4F55E49DDA2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memstate.Runner", "Memstate.Runner\Memstate.Runner.csproj", "{59457968-F597-401C-BCAD-23E1DDDAFD9B}"
@@ -147,14 +145,6 @@ Global
 		{1A3730D5-159B-40A0-91E2-D4345AEDF21B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1A3730D5-159B-40A0-91E2-D4345AEDF21B}.Release|x64.ActiveCfg = Release|Any CPU
 		{1A3730D5-159B-40A0-91E2-D4345AEDF21B}.Release|x64.Build.0 = Release|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Debug|x64.Build.0 = Debug|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Release|x64.ActiveCfg = Release|Any CPU
-		{B1EC6C4B-EEA5-441A-94FE-F85D2DA14C97}.Release|x64.Build.0 = Release|Any CPU
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5578C83-8679-4EA7-9525-4F55E49DDA2D}.Debug|x64.ActiveCfg = Debug|Any CPU

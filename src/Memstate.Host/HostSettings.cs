@@ -1,8 +1,10 @@
-﻿namespace Memstate.Host
+﻿using Fig;
+
+namespace Memstate.Host
 {
     public class HostSettings : Settings
     {
-        public override string Key => "Memstate:Host";
+        public HostSettings() : base("Memstate.Host") { }
 
         public bool WebConsoleEnabled
         {

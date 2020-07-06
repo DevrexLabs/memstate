@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text;
 using Memstate.Configuration;
 using Npgsql;
@@ -22,8 +23,13 @@ namespace Memstate.SqlStreamStore
             bool useSubscriptionBasedReader = false,
             int maxRecordsPerRead = 100)
         {
-            config.Data["SqlStreamStore.UseSubscriptionBasedReader"] = useSubscriptionBasedReader.ToString();
-            config.Data["SqlStreamStore.MaxRecordsPerRead"] = maxRecordsPerRead.ToString();
+            //TODO: Fix this, we need a way to inject 
+            var settings = config.GetSettings<SqlStreamStoreSettings>();
+            settings.UseSubscriptionBasedReader = useSubscriptionBasedReader;
+            settings.MaxRecordsPerRead = maxRecordsPerRead;
+            
+            //config.Data["SqlStreamStore.UseSubscriptionBasedReader"] = useSubscriptionBasedReader.ToString();
+            //config.Data["SqlStreamStore.MaxRecordsPerRead"] = maxRecordsPerRead.ToString();
             
             config.StorageProviderName = StorageProviders.SqlStreamStore;
             config.Container.Register(streamStore);

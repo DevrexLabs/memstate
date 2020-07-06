@@ -1,9 +1,10 @@
-﻿namespace Memstate
+﻿using Fig;
+
+namespace Memstate
 {
     public class ClientSettings : Settings
     {
-        public override string Key => "Memstate:Client";
-
+        public ClientSettings() : base("Memstate.Client") { }
         public ConnectionType Type { get; set; }
 
         public bool IsLocal => Type == ConnectionType.Local;

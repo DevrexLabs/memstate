@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Memstate
 {
-    internal class Serializers : Providers<ISerializer>
+    public class Serializers : Providers<ISerializer>
     {
         /// <summary>
         /// Take the first available serializer
@@ -33,8 +33,14 @@ namespace Memstate
 
         protected override IEnumerable<string> AutoResolutionCandidates()
         {
+            //If wire can be found, it is probable that the user has
+            //explicitly added a reference with then intention of using it
             yield return "Wire";
+            
             yield return "Newtonsoft.Json";
+
+            // Built into Memstate.Core so this is our fallback if no other serializer has
+            // been referenced using nuget
             yield return "BinaryFormatter";
         }
     }

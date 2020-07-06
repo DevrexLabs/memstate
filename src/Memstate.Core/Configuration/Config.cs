@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Reflection;
 using TinyIoC;
 using System.Text;
+using Fig;
 
 namespace Memstate.Configuration
 {
 
-    public sealed class Config
+    public sealed class Config : Settings
     {
-        /// <summary>
-        /// The underlying key value pairs with case insensitive keys
-        /// </summary>
-        internal Dictionary<string, string> Data { get; }
 
+        /// <summary>
+        /// Underlying Fig settings
+        /// </summary>
+        public readonly Settings Settings;
+        
         /// <summary>
         /// Rebuilds the <see cref="Current"/> config from inputs,
         /// discarding any modifications or cached settings objects. 
@@ -89,25 +91,30 @@ namespace Memstate.Configuration
         /// <value>The file system.</value>
         public IFileSystem FileSystem { get; set; } = new HostFileSystem();
 
-        public ISerializer CreateSerializer(string serializer = null) => Serializers.Resolve(serializer ?? SerializerName);
+        public ISerializer CreateSerializer(string serializer = null) 
+            => Serializers.Resolve(serializer ?? SerializerName);
 
-        private static Config BuildDefault()
-        {
-            var args = Environment.GetCommandLineArgs();
+        public static Config BuildDefault(string[] args = null)
+        { 
+            args = args ?? System.Environment.GetCommandLineArgs();
 
-            var config = new ConfigBuilder()
-                .AddIniFiles()
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
+            var settings = new SettingsBuilder()
+                .UseCommandLine(args)
+                .UseEnvironmentVariables("MEMSTATE_", dropPrefix:false)
+                .UseIniFile("memstate.${ENV}.ini", required:false)
+                .UseIniFile("memstate.ini", required: false)
                 .Build();
 
-            return config;
+            return new Config(settings);
         }
 
-        public Config(Dictionary<string, string> args = null)
+        //public Config(){}
+ 
+        public Config(Settings settings, string bindingPath = "Memstate") 
+            : base(bindingPath)
         {
-            args = args ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            Data = args;
+            Settings = settings;
+            settings.Bind(this, requireAll:false, prefix:"");
             Container = new TinyIoCContainer();
             Container.Register(this);
         }
@@ -116,39 +123,20 @@ namespace Memstate.Configuration
         /// Get a singleton reference to a <see cref="Settings"/> object which has been configured with values from 
         /// the underlying configuration parameters, <see cref="Config.Bind"/>
         /// </summary>
-        public T GetSettings<T>() where T : Settings
+        public T GetSettings<T>() where T : class, new()
         {
             if (_singletonCache.TryGetValue(typeof(T), out object result))
             {
-                return (T)result;
+                return (T) result;
             }
             else
             {
-                var newInstance = Container.Resolve<T>();
-                _singletonCache[typeof(T)] = newInstance;
-                Bind(newInstance, newInstance.Key);
-                return newInstance;
+                var instance = Settings.Bind<T>(requireAll: false);
+                _singletonCache[typeof(T)] = instance;
+                return instance;
             }
         }
-
-        /// <summary>
-        /// Copy data from the configuration to matching public 
-        /// properties on the object.
-        /// </summary>
-        /// <param name="prefix">Prefix excluding colon</param>
-        public void Bind(Object @object, string prefix)
-        {
-            foreach(var property in @object.GetType().GetProperties())
-            {
-                var candidateKey = prefix + ":" + property.Name;
-                if (Data.TryGetValue(candidateKey, out string value))
-                {
-                    Console.WriteLine("Bind (" + candidateKey + ") = (" + value + ")");
-                    property.SetValue(@object, Convert(value, property.PropertyType));
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Assign a storage provider instance or leave null and it will
         /// be assigned automatically based on the value of StorageProviderName
@@ -159,7 +147,8 @@ namespace Memstate.Configuration
         }
 
         /// <summary>
-        /// Name of a well known storage provider OR resolvable type name.
+        /// Name of a well known storage provider OR resolvable type name,
+        /// default is File which uses the local file system
         /// </summary>
         public string StorageProviderName { get; set; } = StorageProviders.File;
 
@@ -185,15 +174,6 @@ namespace Memstate.Configuration
         /// <value>The name of the serializer.</value>
         public string SerializerName { get; set; } = Serializers.Auto;
 
-        private object Convert(string value, Type type)
-        {
-            if (Converters.TryGetValue(type, out var converter))
-            {
-                return converter.Invoke(value);
-            }
-            else throw new NotImplementedException("Conversion to type " + type.FullName + " not supported");
-        }
-
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -204,21 +184,8 @@ namespace Memstate.Configuration
             builder.AppendLine(nameof(Version) + "=" + Version);
 
             builder.AppendLine("-- DATA --");
-            foreach(var key in Data.Keys)
-            {
-                builder.AppendLine(key + "=" + Data[key]);
-            }
+            builder.Append(Settings);
             return builder.ToString();
-
         }
-
-        public static readonly Dictionary<Type, Func<string, object>> Converters
-            = new Dictionary<Type, Func<string, object>>()
-            {
-                {typeof(Int32), s => Int32.Parse(s)},
-                {typeof(Int64), s => Int64.Parse(s)},
-                {typeof(bool), s => bool.Parse(s)},
-                {typeof(string), s => s}
-            };
     }    
 }

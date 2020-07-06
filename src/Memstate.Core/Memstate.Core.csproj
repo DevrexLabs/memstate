@@ -48,12 +48,14 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Compile Remove="Logging\LogProviders\TypeExtensions.cs.pp" />
     <Compile Remove="Config\StorageProvider.cs" />
     <Compile Remove="IModelCreator.cs" />
+    <Compile Remove="Configuration\ConfigBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="CommandChunk.cs" />
     <Compile Remove="Logging.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Fig" Version="1.8.2" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>

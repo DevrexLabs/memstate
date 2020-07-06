@@ -1,14 +1,16 @@
-﻿using Memstate.Configuration;
+﻿using Fig;
+using Memstate.Configuration;
 
 namespace Memstate
 {
     public class FileStorageSettings : Settings
     {
-        public override string Key { get;  } = "Memstate:StorageProviders:FileStorage";
+        
 
         private readonly EngineSettings _memstateSettings;
 
-        public FileStorageSettings()
+        public FileStorageSettings() 
+            : base("Memstate.StorageProviders.FileStorage")
         {
             _memstateSettings = Config.Current.GetSettings<EngineSettings>();
         }

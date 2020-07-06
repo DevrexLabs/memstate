@@ -1,11 +1,15 @@
 using System;
+using Fig;
 
 namespace Memstate
 {
     public class EngineSettings : Settings
     {
-        public override string Key { get; } = "Memstate:Engine";
-
+        public EngineSettings()
+            :base(bindingPath:"Memstate.Engine")
+        {
+            
+        }
         /// <summary>
         /// Maximum number of commands per batch sent to journal writer
         /// Adjust this value to control latency and throughput. 
@@ -30,11 +34,5 @@ namespace Memstate
         /// If set to true, Engine will halt if there is a gap in the stream of commands.
         /// </summary>
         public bool AllowBrokenSequence { get; set; } = false;
-
-        /// <summary>
-        /// Name of the model type
-        /// </summary>
-        //public string Model { get; set; } = typeof(Models.KeyValueStore<int>).AssemblyQualifiedName;
-
     }
 }

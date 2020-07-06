@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Net;
+using Fig;
 
-namespace Memstate.Tcp
+namespace Memstate
 {
     public class ServerSettings : Settings
     {
-        public override string Key => "Memstate:Server";
+        public ServerSettings() 
+            : base(bindingPath: "Memstate.Server")
+        {
+        }
 
         /// <summary>
-        /// The port to listen on
+        /// The native TCP port to listen on
         /// </summary>
         public int Port { get; set; } = 3001;
 
@@ -17,9 +21,11 @@ namespace Memstate.Tcp
         /// </summary>
         public string Ip { get; set; } = "0.0.0.0";
 
-        public override void Validate()
+        /// <summary>
+        /// Throw an exception if the settings are invalid
+        /// </summary>
+        public void EnsureValid()
         {
-            base.Validate();
             if (Port < 1 || Port > 65535) throw new ArgumentOutOfRangeException(nameof(Port));
             if (!IPAddress.TryParse(Ip, out var dummy))
             {

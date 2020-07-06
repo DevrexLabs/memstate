@@ -4,7 +4,7 @@ using Memstate.Logging;
 
 namespace Memstate
 {
-    internal abstract class Providers<T> where T : class
+    public abstract class Providers<T> where T : class
     {
         protected readonly Registry RegisteredProviders = new Registry();
 
@@ -61,7 +61,7 @@ namespace Memstate
             throw new Exception($"Autoresolve failed for {typeof(T)}. {hint}");
         }
 
-        internal class Registry : Dictionary<string, Func<T>>
+        protected class Registry : Dictionary<string, Func<T>>
         {
             public Registry() : base(StringComparer.OrdinalIgnoreCase)
             {

@@ -8,11 +8,22 @@ namespace Memstate.Test
     public class ConfigTests
     {
         [Test]
-        public void CanGetDefaultSerializer()
+        public void BinarySerializerIsDefault()
         {
             var config = Config.Reset();
             var serializer = config.CreateSerializer();
-            Assert.NotNull(serializer);
+            Assert.IsInstanceOf<BinarySerializer>(serializer);
+        }
+
+        [Test]
+        public void EngineSettingsAreBound()
+        {
+            int expected = 123;
+            var key = "MEMSTATE_ENGINE_MAXBATCHSIZE";
+            Environment.SetEnvironmentVariable(key, expected.ToString());
+            var config = Config.Reset();
+            var engineSettings = config.GetSettings<EngineSettings>();
+            Assert.AreEqual(expected, engineSettings.MaxBatchSize);
         }
 
         [Test]
@@ -23,8 +34,8 @@ namespace Memstate.Test
             string value = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(varName, value);
             var config = Config.Reset();
-            Console.WriteLine(config.Settings.ToString());
-            Assert.DoesNotThrow(() => config.Settings.Get(key));
+            Console.WriteLine(config.ConfigurationData.ToString());
+            Assert.DoesNotThrow(() => config.ConfigurationData.Get(key));
         }
 
         [Test]
@@ -35,8 +46,8 @@ namespace Memstate.Test
             string value = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(varName, value);
             var config = Config.Reset();
-            Console.WriteLine(config.Settings.ToString());
-            Assert.DoesNotThrow(() => config.Settings.Get(key));
+            Console.WriteLine(config.ConfigurationData.ToString());
+            Assert.DoesNotThrow(() => config.ConfigurationData.Get(key));
         }
     }
 }

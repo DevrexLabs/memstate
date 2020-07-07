@@ -1,15 +1,12 @@
 using System;
-using Fig;
 
 namespace Memstate
 {
     public class EngineSettings : Settings
     {
         public EngineSettings()
-            :base(bindingPath:"Memstate.Engine")
-        {
-            
-        }
+            :base(bindingPath:"Memstate.Engine") { }
+
         /// <summary>
         /// Maximum number of commands per batch sent to journal writer
         /// Adjust this value to control latency and throughput. 

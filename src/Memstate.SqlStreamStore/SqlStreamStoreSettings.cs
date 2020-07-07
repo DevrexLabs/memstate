@@ -1,10 +1,9 @@
-using Fig;
-
 namespace Memstate.SqlStreamStore
 {
     public class SqlStreamStoreSettings : Settings
     {
-        public SqlStreamStoreSettings() : base("Memstate.SqlStreamStore")
+        public SqlStreamStoreSettings() 
+            : base("Memstate.SqlStreamStore")
         {
         }
 

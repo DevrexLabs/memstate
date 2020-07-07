@@ -22,7 +22,6 @@
     <ProjectReference Include="..\Memstate.AppMetrics\Memstate.AppMetrics.csproj" />
     <ProjectReference Include="..\Memstate.Core\Memstate.Core.csproj" />
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
-    <ProjectReference Include="..\Memstate.MsConfig\Memstate.MsConfig.csproj" />
   </ItemGroup>
 
 </Project>

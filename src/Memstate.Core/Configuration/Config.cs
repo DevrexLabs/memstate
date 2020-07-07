@@ -97,7 +97,7 @@ namespace Memstate.Configuration
 
         public static Config BuildDefault(string[] args = null)
         { 
-            args ??= Environment.GetCommandLineArgs();
+            args = args ?? Environment.GetCommandLineArgs();
 
             var settings = new SettingsBuilder()
                 .UseCommandLine(args)

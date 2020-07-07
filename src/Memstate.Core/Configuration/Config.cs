@@ -183,7 +183,14 @@ namespace Memstate.Configuration
             builder.AppendLine(nameof(Version) + "=" + Version);
 
             builder.AppendLine("-- DATA --");
-            builder.Append(ConfigurationData);
+            try
+            {
+                builder.Append(ConfigurationData);
+            }
+            catch (Exception ex)
+            {
+                builder.Append("No data");
+            }
             return builder.ToString();
         }
     }    

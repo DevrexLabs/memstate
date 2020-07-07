@@ -10,7 +10,6 @@ namespace System.Test
 {
     public class TestConfigurations : IEnumerable<object[]>
     {
-
         static TestConfigurations()
         {
             Log.Logger = new LoggerConfiguration()

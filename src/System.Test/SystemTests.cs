@@ -10,7 +10,6 @@ namespace System.Test
     [TestFixture]
     public class SystemTests
     {
-
         public static IEnumerable<Config> Configurations()
         {
             return new TestConfigurations().GetConfigurations();

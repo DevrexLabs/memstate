@@ -22,7 +22,6 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             if (File.Exists(WireJournalFile)) File.Delete(WireJournalFile);
             if (File.Exists(JsonJournalFile)) File.Delete(JsonJournalFile);
-            Config.Reset();
         }
 
         [Test]
@@ -30,13 +29,13 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print("   (using Wire format  & local filesystem storage)");
-            var config = Config.Current;
-            config.SerializerName = "Wire";
+            var config = Config.Reset();
+            config.SerializerName = Serializers.Wire;
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = WireFileName;
             var engine = await Engine.Start<LoyaltyDB>();
             
-            Print("AND I initialise the database with 20 customers, each with 10 loyalty points");
+            Print("AND I initialize the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
                 await engine.Execute(new InitCustomer(i + 1, 10));

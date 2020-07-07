@@ -8,19 +8,19 @@ using Fig;
 namespace Memstate.Configuration
 {
 
-    public sealed class Config : Settings
+    public sealed class Config
     {
-
         /// <summary>
         /// Underlying Fig settings
         /// </summary>
-        public readonly Settings Settings;
-        
+        public Fig.Settings ConfigurationData { get; }
+
         /// <summary>
         /// Rebuilds the <see cref="Current"/> config from inputs,
-        /// discarding any modifications or cached settings objects. 
+        /// discarding any modifications or cached settings objects.
+        /// </summary> 
         /// <returns>The newly reset Current config</returns>
-        public static Config Reset()
+        internal static Config Reset()
         {
             Current = null;
             return Current;
@@ -36,7 +36,7 @@ namespace Memstate.Configuration
         private StorageProvider _storageProvider;
 
         /// <summary>
-        /// We want everything to be singleton by default unless explictly requested/registered 
+        /// We want everything to be singleton by default unless explicitly requested/registered 
         /// </summary>
         private readonly Dictionary<Type, object> _singletonCache
             = new Dictionary<Type, object>();
@@ -70,6 +70,7 @@ namespace Memstate.Configuration
         /// <summary>
         /// Helper method to set the <see cref="Config.FileSystem"/> 
         /// property with a new instance of <see cref="InMemoryFileSystem"/>
+        /// This is useful for test when using File storage
         /// </summary>
         public Config UseInMemoryFileSystem()
         {
@@ -96,34 +97,31 @@ namespace Memstate.Configuration
 
         public static Config BuildDefault(string[] args = null)
         { 
-            args = args ?? System.Environment.GetCommandLineArgs();
+            args ??= Environment.GetCommandLineArgs();
 
             var settings = new SettingsBuilder()
                 .UseCommandLine(args)
-                .UseEnvironmentVariables("MEMSTATE_", dropPrefix:false)
-                .UseIniFile("memstate.${ENV}.ini", required:false)
+                .UseEnvironmentVariables("MEMSTATE_", dropPrefix: false)
+                .UseIniFile("memstate.${ENV}.ini", required: false)
                 .UseIniFile("memstate.ini", required: false)
                 .Build();
 
             return new Config(settings);
         }
-
-        //public Config(){}
- 
-        public Config(Settings settings, string bindingPath = "Memstate") 
-            : base(bindingPath)
+        
+        public Config(Fig.Settings settings)
         {
-            Settings = settings;
-            settings.Bind(this, requireAll:false, prefix:"");
+            ConfigurationData = settings;
+            ConfigurationData.Bind(this, requireAll:false, prefix:"Memstate");
             Container = new TinyIoCContainer();
             Container.Register(this);
         }
 
         /// <summary>
-        /// Get a singleton reference to a <see cref="Settings"/> object which has been configured with values from 
-        /// the underlying configuration parameters, <see cref="Config.Bind"/>
+        /// Get a singleton reference to a <see cref="ConfigurationData"/> object which has been configured with values from 
+        /// the underlying configuration parameters
         /// </summary>
-        public T GetSettings<T>() where T : class, new()
+        public T GetSettings<T>() where T : Settings, new()
         {
             if (_singletonCache.TryGetValue(typeof(T), out object result))
             {
@@ -131,7 +129,8 @@ namespace Memstate.Configuration
             }
             else
             {
-                var instance = Settings.Bind<T>(requireAll: false);
+                var instance = new T();
+                ConfigurationData.Bind(instance, prefix: instance.BindingPath, requireAll: false);
                 _singletonCache[typeof(T)] = instance;
                 return instance;
             }
@@ -184,7 +183,7 @@ namespace Memstate.Configuration
             builder.AppendLine(nameof(Version) + "=" + Version);
 
             builder.AppendLine("-- DATA --");
-            builder.Append(Settings);
+            builder.Append(ConfigurationData);
             return builder.ToString();
         }
     }    

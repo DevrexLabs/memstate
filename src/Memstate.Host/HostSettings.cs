@@ -1,6 +1,4 @@
-﻿using Fig;
-
-namespace Memstate.Host
+﻿namespace Memstate.Host
 {
     public class HostSettings : Settings
     {

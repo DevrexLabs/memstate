@@ -1,6 +1,4 @@
-﻿using Fig;
-
-namespace Memstate
+﻿namespace Memstate
 {
     public class ClientSettings : Settings
     {

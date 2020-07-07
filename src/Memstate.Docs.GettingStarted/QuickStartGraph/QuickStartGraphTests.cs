@@ -21,7 +21,6 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
         public void SetupTeardown()
         {
             if (File.Exists(JournalFilename)) File.Delete(JournalFilename);
-            Config.Reset();
         }
 
         [Test]
@@ -29,7 +28,7 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
         {
             Print("GIVEN I start a new Memstate engine for a graph model using default settings");
             Print("   (using Wire format & local filesystem storage)");
-            var config = Config.Current;
+            var config = Config.Reset();
             config.SerializerName = JournalSerializer;
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = JournalFile;
@@ -39,14 +38,14 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             Assert.True(File.Exists(JournalFilename));
 
             Print("WHEN I add some graph data");
-            var _user1 = await engine.Execute(new CreateNode("user"));
-            var _user2 = await engine.Execute(new CreateNode("user"));
-            var _tweet = await engine.Execute(new CreateNode("tweet"));
+            var user1 = await engine.Execute(new CreateNode("user"));
+            var user2 = await engine.Execute(new CreateNode("user"));
+            var tweet = await engine.Execute(new CreateNode("tweet"));
 
-            await engine.Execute(new CreateEdge(_user1.Id, _tweet.Id, "tweeted"));
-            await engine.Execute(new CreateEdge(_user2.Id, _tweet.Id, "retweeted"));
-            await engine.Execute(new CreateEdge(_user1.Id, _user2.Id, "followed"));
-            await engine.Execute(new CreateEdge(_user1.Id, _user1.Id, "followed"));
+            await engine.Execute(new CreateEdge(user1.Id, tweet.Id, "tweeted"));
+            await engine.Execute(new CreateEdge(user2.Id, tweet.Id, "retweeted"));
+            await engine.Execute(new CreateEdge(user1.Id, user2.Id, "followed"));
+            await engine.Execute(new CreateEdge(user1.Id, user1.Id, "followed"));
 
             Print("THEN there should be three nodes");
             var nodes = await engine.Execute(new GetNodes());
@@ -64,7 +63,7 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             Assert.AreEqual(null, usersWithTweets.First().Get("likes"));
 
             Print("WHEN I increment likes");
-            var tweet = await engine.Execute(new IncrementLikes(_tweet.Id));
+            tweet = await engine.Execute(new IncrementLikes(tweet.Id));
 
             Print("THEN there should be one like");
             Assert.AreEqual(1, tweet.Get("likes"));
@@ -89,14 +88,14 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             Assert.AreEqual(4, edges2.Count());
 
             Print("THEN there should still be one user");
-            var usersWithTweets2 = await engine.Execute(new GetUsersWithTweets());
+            var usersWithTweets2 = (await engine.Execute(new GetUsersWithTweets())).ToList();
             Assert.AreEqual(1, usersWithTweets2.Count());
 
             Print("THEN that user should still have one tweet");
-            Assert.AreEqual(1, usersWithTweets.First().Get("likes"));
+            Assert.AreEqual(1, usersWithTweets2.First().Get("likes"));
 
             Print("WHEN I increment likes");
-            var tweet2 = await engine.Execute(new IncrementLikes(_tweet.Id));
+            var tweet2 = await engine.Execute(new IncrementLikes(tweet.Id));
 
             Print("THEN there should be one like");
             Assert.AreEqual(2, tweet2.Get("likes"));

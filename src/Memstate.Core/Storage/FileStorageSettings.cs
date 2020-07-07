@@ -1,5 +1,4 @@
-﻿using Fig;
-using Memstate.Configuration;
+﻿using Memstate.Configuration;
 
 namespace Memstate
 {

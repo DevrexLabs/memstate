@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Memstate.Configuration;
 
 namespace Memstate
 {
@@ -23,12 +24,12 @@ namespace Memstate
             {AzureTableStorage, "Memstate.Azure.TableStorageProvider, Memstate.Azure"}
         };
 
-        public StorageProviders()
+        public StorageProviders(Config config)
         {
-            Register(File, () => new FileStorageProvider());
+            Register(File, () => new FileStorageProvider(config));
             foreach (var keyValuePair in TypeNames)
             {
-                Register(keyValuePair.Key, () => InstanceFromTypeName(keyValuePair.Value));
+                Register(keyValuePair.Key, () => InstanceFromTypeName(config, keyValuePair.Value));
             }
         }
 

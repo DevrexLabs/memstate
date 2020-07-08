@@ -15,12 +15,14 @@ namespace Memstate.Host
     {
         MemstateServer<TModel> _server;
         IWebHost _webConsole;
-        HostSettings _settings;
+        readonly HostSettings _settings;
+        private readonly Config _config;
 
         public Engine<TModel> TheEngine { get; private set; }
 
-        public Host(HostSettings settings)
+        public Host(Config config, HostSettings settings)
         {
+            _config = config;
             _settings = settings;
         }
 
@@ -31,7 +33,7 @@ namespace Memstate.Host
         public async Task Start()
         {
             TheEngine = await Engine.Start<TModel>();
-            _server = new MemstateServer<TModel>(TheEngine);
+            _server = new MemstateServer<TModel>(_config, TheEngine);
             _server.Start();
             await StartWebConsole();
         }
@@ -66,7 +68,7 @@ namespace Memstate.Host
 
         private void ConfigureServices(IServiceCollection services)
         {
-            var settings = Config.Current.GetSettings<EngineSettings>();
+            var settings = _config.GetSettings<EngineSettings>();
             services.AddSingleton(settings);
             services.AddSingleton(TheEngine);
         }

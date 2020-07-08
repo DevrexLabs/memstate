@@ -8,10 +8,8 @@ namespace Memstate
     {
         private readonly Batcher<Command> _batcher;
 
-        protected BatchingJournalWriter()
+        protected BatchingJournalWriter(EngineSettings settings)
         {
-            var config = Config.Current;
-            var settings = config.GetSettings<EngineSettings>();
             var maxBatchSize = settings.MaxBatchSize;
             var maxBatchQueueLength = settings.MaxBatchQueueLength;
             _batcher = new Batcher<Command>(OnCommandBatch, maxBatchSize, maxBatchQueueLength);

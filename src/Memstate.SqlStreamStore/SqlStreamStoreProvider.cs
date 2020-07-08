@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Memstate.Configuration;
 using Npgsql;
@@ -14,14 +15,13 @@ namespace Memstate.SqlStreamStore
         private readonly IStreamStore _streamStore;
 
         private readonly bool UseSubscriptionBasedReader = false;
+        private readonly Config _config;
 
-        public SqlStreamStoreProvider() : this(null)
+        public SqlStreamStoreProvider(Config config) 
+            : this(config, null) { }
+        public SqlStreamStoreProvider(Config config, IStreamStore streamStore)
         {
-            
-        }
-        public SqlStreamStoreProvider(IStreamStore streamStore)
-        {
-            Config config = Config.Current;
+            _config = config;
             _serializer = config.CreateSerializer();
             var settings = config.GetSettings<EngineSettings>();
             _streamId = new StreamId(settings.StreamName);
@@ -29,7 +29,7 @@ namespace Memstate.SqlStreamStore
             if (streamStore == null)
             {
                 if (!config.Container.TryResolve(out streamStore))
-                    streamStore = new InMemoryStreamStore();
+                    throw new Exception("Cannot resolve IStreamStore, call config.UseSqlStreamStore()");
             }
 
             _streamStore = streamStore;
@@ -54,7 +54,7 @@ namespace Memstate.SqlStreamStore
         /// <inheritdoc/>
         public IJournalWriter CreateJournalWriter()
         {
-            return new SqlStreamStoreJournalWriter(_streamStore, _streamId, _serializer);
+            return new SqlStreamStoreJournalWriter(_config, _streamStore, _streamId);
         }
         
         /// <summary>

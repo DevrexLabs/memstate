@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 using EventStore.ClientAPI;
@@ -9,14 +8,13 @@ namespace Memstate.EventStore
     public class EventStoreProvider : IStorageProvider, IAsyncDisposable
     {
         private readonly IEventStoreConnection _connection;
+        private readonly Config _config;
 
-        private readonly EventStoreSettings _eventStoreSettings;
-
-        public EventStoreProvider()
+        public EventStoreProvider(Config config)
         {
-            var config = Config.Current;
-            _eventStoreSettings = config.GetSettings<EventStoreSettings>();
-            _connection = EventStoreConnection.Create(_eventStoreSettings.ConnectionString);
+            _config = config;
+            var eventStoreSettings = config.GetSettings<EventStoreSettings>();
+            _connection = EventStoreConnection.Create(eventStoreSettings.ConnectionString);
         }
 
         public Task Provision()
@@ -26,14 +24,13 @@ namespace Memstate.EventStore
 
         public IJournalReader CreateJournalReader()
         {
-            return new EventStoreReader(_connection);
+            return new EventStoreReader(_config, _connection);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
-            return new EventStoreWriter(_connection);
+            return new EventStoreWriter(_config, _connection);
         }
-
 
         public Task DisposeAsync()
         {

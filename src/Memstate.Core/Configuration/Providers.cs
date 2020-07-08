@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate
@@ -40,12 +42,19 @@ namespace Memstate
             RegisteredProviders[name] = constructor;
         }
 
+        protected static T InstanceFromTypeName(Config config, string typeName)
+        {
+            var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
+            var constructor = type.GetConstructor(new []{typeof(Config)});
+            if (constructor is null) throw new Exception("Add a constructor that takes a Config argument");
+            return (T) constructor.Invoke(new object[] {config});
+        }
+
         protected static T InstanceFromTypeName(string typeName)
         {
             var type = Type.GetType(typeName, throwOnError: true, ignoreCase: true);
             return (T) Activator.CreateInstance(type);
         }
-
         protected T AutoResolve()
         {
             foreach (var candidate in AutoResolutionCandidates())

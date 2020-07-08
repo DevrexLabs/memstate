@@ -22,10 +22,8 @@ namespace Memstate.EventStore
 
         private readonly ILog _logger;
 
-        public EventStoreReader(IEventStoreConnection connection)
+        public EventStoreReader(Config config, IEventStoreConnection connection)
         {
-            var config = Config.Current;
-            var settings = config.GetSettings<EngineSettings>();
             var eventStoreSettings = config.GetSettings<EventStoreSettings>();
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;

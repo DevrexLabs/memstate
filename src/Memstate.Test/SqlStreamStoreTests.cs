@@ -17,8 +17,8 @@ namespace Memstate.Test
         [Test]
         public void ConfigUsingSqlStreamStoreDefault()
         {
-            var config = Config.Current;
-            config.UseSqlStreamStore();
+            var config = Config.CreateDefault();
+            config.UseSqlStreamStore(new InMemoryStreamStore());
             var provider = config.GetStorageProvider();
             Assert.IsInstanceOf<SqlStreamStoreProvider>(provider);
         }
@@ -26,7 +26,7 @@ namespace Memstate.Test
         [Test]
         public void ConfigUsingSqlStreamStore()
         {
-            var config = Config.Current;
+            var config = Config.CreateDefault();
             var streamStore = new InMemoryStreamStore();
             config.UseSqlStreamStore(streamStore);
 
@@ -40,9 +40,9 @@ namespace Memstate.Test
         [Test]
         public void ConfigSetStorageProvider()
         {
-            var config = Config.Current;
+            var config = Config.CreateDefault();
             var streamStore = new InMemoryStreamStore();
-            var provider = new SqlStreamStoreProvider(streamStore);
+            var provider = new SqlStreamStoreProvider(config, streamStore);
 
             config.SetStorageProvider(provider);
             var resolvedProvider = config.GetStorageProvider();
@@ -50,12 +50,13 @@ namespace Memstate.Test
             Assert.AreSame(provider, resolvedProvider);
         }
 
-        [Test, Ignore("Failing due to a concurrency bug")]
+        //, Ignore("Failing due to a concurrency bug")
+        [Test]
         public async Task Smoke()
         {
-            var config = Config.Current;
+            var config = Config.CreateDefault();
             config.GetSettings<EngineSettings>().StreamName = "stream1";
-            var streamStoreProvider = new SqlStreamStoreProvider();
+            var streamStoreProvider = new SqlStreamStoreProvider(config, new InMemoryStreamStore());
             var writer = streamStoreProvider.CreateJournalWriter();
             foreach(var i in Enumerable.Range(1,101))
                 await writer.Write(new Set<int>("key" + i, i));

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Memstate.Host;
 using Memstate.Models.Redis;
 using Memstate.Runner.Commands;
@@ -56,7 +55,7 @@ namespace Memstate.Runner
 
         public async Task Start(string[] arguments)
         {
-            var settings = Config.Current.GetSettings<EngineSettings>();
+            var settings = Program.Config.GetSettings<EngineSettings>();
             settings.StreamName = "redis";
             _host = new HostBuilder<RedisModel>().UseWebConsole().Build();
             await _host.Start();

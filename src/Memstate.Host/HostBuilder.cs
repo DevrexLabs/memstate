@@ -5,15 +5,17 @@ namespace Memstate.Host
     public class HostBuilder<TModel> where TModel : class
     {
         readonly HostSettings _settings;
+        private readonly Config _config;
 
-        public HostBuilder()
+        public HostBuilder(Config config = null)
         {
-            _settings = Config.Current.GetSettings<HostSettings>();
+            _config = config ?? Config.CreateDefault();
+            _settings = _config.GetSettings<HostSettings>();
         }
 
         public Host<TModel> Build()
         {
-            return new Host<TModel>(_settings);
+            return new Host<TModel>(_config, _settings);
         }
 
         public HostBuilder<TModel> UseWebConsole()

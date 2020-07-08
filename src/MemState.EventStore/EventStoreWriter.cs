@@ -14,9 +14,9 @@ namespace Memstate.EventStore
         private readonly string _streamName;
         private readonly ILog _logger;
 
-        public EventStoreWriter(IEventStoreConnection connection)
+        public EventStoreWriter(Config config, IEventStoreConnection connection)
+            :base(config.GetSettings<EngineSettings>())
         {
-            var config = Config.Current;
             var settings = config.GetSettings<EventStoreSettings>();
             _connection = connection;
             _logger = LogProvider.GetCurrentClassLogger();

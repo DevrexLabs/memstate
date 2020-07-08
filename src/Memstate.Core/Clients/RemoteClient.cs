@@ -54,11 +54,10 @@ namespace Memstate
 
         private readonly Dictionary<Type, Action<Event>> _eventHandlers;
 
-        public RemoteClient()
+        public RemoteClient(Config config)
         {
-            var cfg = Config.Current;
-            _serializer = cfg.CreateSerializer();
-            _deserializer = cfg.CreateSerializer();
+            _serializer = config.CreateSerializer();
+            _deserializer = config.CreateSerializer();
             _pendingRequests = new Dictionary<Guid, TaskCompletionSource<Message>>();
             _logger = LogProvider.GetCurrentClassLogger();
             _cancellationSource = new CancellationTokenSource();

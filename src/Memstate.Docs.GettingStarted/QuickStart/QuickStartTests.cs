@@ -29,11 +29,11 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         {
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print("   (using Wire format  & local filesystem storage)");
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             config.SerializerName = Serializers.Wire;
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = WireFileName;
-            var engine = await Engine.Start<LoyaltyDB>();
+            var engine = await Engine.Start<LoyaltyDB>(config);
             
             Print("AND I initialize the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
@@ -59,7 +59,7 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Assert.True(File.Exists(WireJournalFile));
 
             Print("WHEN I start up another engine");
-            engine = await Engine.Start<LoyaltyDB>();
+            engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
             var allCustomers = await engine.Execute(new GetCustomers());
@@ -85,11 +85,11 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print($"   (using Json format & local filesystem storage)");
 
-            var config = Config.Current;
+            var config = Config.CreateDefault();
             config.SerializerName = "NewtonSoft.Json";
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = JsonFileName;
-            var engine = await Engine.Start<LoyaltyDB>();
+            var engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("AND I initialise the database with 2 customers, each with 10, and 20 loyalty points");
             await engine.Execute(new InitCustomer(10, 10));
@@ -112,7 +112,7 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             Assert.True(File.Exists(JsonJournalFile));
 
             Print("WHEN I start up another engine");
-            engine = await Engine.Start<LoyaltyDB>();
+            engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
             var allCustomers = await engine.Execute(new GetCustomers());

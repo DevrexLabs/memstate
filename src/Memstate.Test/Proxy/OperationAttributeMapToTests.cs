@@ -41,17 +41,17 @@ namespace Memstate.Test.Proxy
             }
         }
 
-        [Test, Ignore("hangs on call to proxySetCustomer")]
+        [Test, Ignore("Hangs on proxy.SetCustomer()")]
         public async Task MapsToCommand()
         {
             //Arrange
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             config.UseInMemoryFileSystem();
-            var settings = Config.Current.GetSettings<EngineSettings>();
+            var settings = config.GetSettings<EngineSettings>();
             settings.WithRandomSuffixAppendedToStreamName();
             
             var storageProvider = config.GetStorageProvider();
-            var client = await Client.For<ITestModel>();
+            var client = await Client.For<ITestModel>(config);
             var proxy = client.GetDispatchProxy();
 
             //Act

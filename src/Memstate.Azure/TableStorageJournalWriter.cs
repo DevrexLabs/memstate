@@ -13,9 +13,10 @@ namespace Memstate.Azure
 
         private readonly ISerializer _serializer;
         
-        public TableStorageJournalWriter(Stream stream)
+        public TableStorageJournalWriter(Config config, Stream stream)
+            :base(config.GetSettings<EngineSettings>())
         {
-            _serializer = Config.Current.CreateSerializer();
+            _serializer = config.CreateSerializer();
             _head = stream;
         }
 

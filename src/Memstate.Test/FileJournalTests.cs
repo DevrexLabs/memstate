@@ -18,7 +18,7 @@ namespace Memstate.Test
             const string Stream = "test";
             const string FileName = Stream + ".journal";
 
-            var cfg = Config.Reset();
+            var cfg = Config.CreateDefault();
             cfg.UseInMemoryFileSystem();
             var settings = cfg.GetSettings<EngineSettings>();
             cfg.SerializerName = "newtonsoft.json";

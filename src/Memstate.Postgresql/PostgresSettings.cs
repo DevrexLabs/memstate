@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Memstate.Configuration;
 using Npgsql;
 
 namespace Memstate.Postgres
@@ -10,17 +9,11 @@ namespace Memstate.Postgres
     {
         public const string DefaultConnectionString = "Host=localhost;Database=postgres;User ID=postgres;Password=postgres;";
 
-        public const string InitSqlResourceName = "Memstate.Postgres.init_sql";
-
+        private const string InitSqlResourceName = "Memstate.Postgres.init_sql";
 
         private string _connectionStringTemplate = DefaultConnectionString;
 
-        private readonly EngineSettings _memstateSettings;
-
-        public PostgresSettings() : base("Memstate.Postgres")
-        {
-            _memstateSettings = Config.Current.GetSettings<EngineSettings>();
-        }
+        public PostgresSettings() : base("Memstate.Postgres") { }
 
         /// <summary>
         /// Password to connect to the database, overrides value in ConnectionString if set
@@ -56,13 +49,15 @@ namespace Memstate.Postgres
             set => _connectionStringTemplate = value;
         }
 
-        public string TableSuffix { get; set; } = "_commands";
+        /// <summary>
+        /// String.Format(EngineSettings.StreamName) will be applied to
+        /// obtain the table name
+        /// </summary>
+        public string TableNameTemplate { get; set; } = "{0}_journal";
 
-        public string SubscriptionStreamSuffix { get; set; } = "_notifications";
 
-        public string Table => _memstateSettings.StreamName + TableSuffix;
-
-        public string SubscriptionStream => _memstateSettings.StreamName + SubscriptionStreamSuffix;
+        public string RenderTableNameTemplate(string streamName)
+            => String.Format(TableNameTemplate, streamName);
 
         /// <summary>
         /// Number of records to read per SELECT statement
@@ -70,15 +65,9 @@ namespace Memstate.Postgres
         /// <value>The size of the read batch.</value>
         public int ReadBatchSize { get; set; } = 1024;
 
-        public Lazy<string> InitSql => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
-
-        public void Validate()
-        {
-            Ensure.NotNullOrEmpty(ConnectionString, nameof(ConnectionString));
-            Ensure.NotNullOrEmpty(Table, nameof(Table));
-            Ensure.NotNullOrEmpty(SubscriptionStream, nameof(SubscriptionStream));
-        }
-
+        public Lazy<string> InitSql
+            => new Lazy<string>(() => GetEmbeddedResource(InitSqlResourceName));
+        
         private string GetEmbeddedResource(string resourceName)
         {
             var asm = Assembly.GetExecutingAssembly();

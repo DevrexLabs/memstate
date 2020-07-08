@@ -45,23 +45,11 @@ namespace Memstate.Postgres.Tests
             string key = "MEMSTATE_POSTGRES_PASSWORD";
             string value = "Password12!";
             Environment.SetEnvironmentVariable(key, value);
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             var settings = config.GetSettings<PostgresSettings>();
             Assert.AreEqual(value, settings.Password);
         }
-
-        [Test]
-        public void TableNameEndsWithSuffix()
-        {
-            Assert.True(_settings.Table.EndsWith(_settings.TableSuffix));
-        }
-
-        [Test]
-        public void TableNameStartsWithStreamName()
-        {
-            Assert.True(_settings.Table.StartsWith(_memstateSettings.StreamName));
-        }
-
+        
         [Test]
         public void HostOverridesConnectionString()
         {

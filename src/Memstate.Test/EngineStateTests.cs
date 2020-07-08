@@ -14,8 +14,8 @@ namespace Memstate.Test
         [SetUp]
         public void Init()
         {
-            Config.Reset().UseInMemoryFileSystem();
-            _engine = Engine.Build<RedisModel>();
+            var config = Config.CreateDefault().UseInMemoryFileSystem();
+            _engine = Engine.Build<RedisModel>(config);
         }
 
         [TearDown]

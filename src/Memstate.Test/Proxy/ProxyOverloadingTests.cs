@@ -15,10 +15,10 @@ namespace Memstate.Test.DispatchProxy
         [SetUp]
         public async Task Setup()
         {
-            var cfg = Config.Reset();
+            var cfg = Config.CreateDefault();
             cfg.UseInMemoryFileSystem();
 
-            _engine = Engine.Build<IModelWithOverloads>();
+            _engine = Engine.Build<IModelWithOverloads>(cfg);
             await _engine.Start(waitUntilReady: true);
             var client = new LocalClient<IModelWithOverloads>(_engine);
             _db = client.GetDispatchProxy();

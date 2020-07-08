@@ -1,23 +1,9 @@
-﻿CREATE OR REPLACE FUNCTION {1}_notify_command() RETURNS TRIGGER AS $$
-    BEGIN
-        PERFORM pg_notify('{0}', 'Data available');
-
-        RETURN NULL;
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE TABLE IF NOT EXISTS "{1}" (
+﻿CREATE TABLE IF NOT EXISTS "{0}" (
     "id" BIGINT NOT NULL PRIMARY KEY,
     "written" TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
     "command" VARCHAR NOT NULL
 );
 
-CREATE SEQUENCE IF NOT EXISTS "{1}_id_seq" MINVALUE 0 OWNED BY "{1}"."id";
+CREATE SEQUENCE IF NOT EXISTS "{0}_id_seq" MINVALUE 0 OWNED BY "{0}"."id";
 
-ALTER TABLE "{1}" ALTER "id" SET DEFAULT nextval('{1}_id_seq');
-
-DROP TRIGGER IF EXISTS "{1}_notify_command" ON "{1}";
-
-CREATE TRIGGER "{1}_notify_command"
-    AFTER INSERT ON "{1}"
-    FOR EACH STATEMENT EXECUTE PROCEDURE {1}_notify_command();
+ALTER TABLE "{0}" ALTER "id" SET DEFAULT nextval('{0}_id_seq');

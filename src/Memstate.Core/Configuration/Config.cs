@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using TinyIoC;
-using System.Text;
 using Fig;
 using Memstate.Logging;
 using Memstate.Logging.LogProviders;
@@ -10,31 +9,15 @@ using Memstate.Logging.LogProviders;
 namespace Memstate.Configuration
 {
 
-    public sealed class Config
+    public class Config
     {
         /// <summary>
         /// Underlying Fig settings
         /// </summary>
         public Fig.Settings ConfigurationData { get; }
 
-        /// <summary>
-        /// Rebuilds the <see cref="Current"/> config from inputs,
-        /// discarding any modifications or cached settings objects.
-        /// </summary> 
-        /// <returns>The newly reset Current config</returns>
-        internal static Config Reset()
-        {
-            Current = null;
-            return Current;
-        }
-
         internal TinyIoCContainer Container { get; }
-
-        /// <summary>
-        /// Backing field of the Config.Current property
-        /// </summary>
-        private static Config _current;
-
+        
         private IStorageProvider _storageProvider;
 
         /// <summary>
@@ -42,33 +25,7 @@ namespace Memstate.Configuration
         /// </summary>
         private readonly Dictionary<Type, object> _singletonCache
             = new Dictionary<Type, object>();
-
-
-        /// <summary>
-        /// Synchronization object for the Config.Current field
-        /// </summary>
-        private static readonly object _lock = new object();
-
-        public static Config Current
-        {
-            get
-            {
-                if (_current == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_current == null) _current = BuildDefault();
-                    }
-                }
-                
-                return _current;
-            }
-            internal set
-            {
-                lock(_lock) _current = value;
-            }
-        }
-
+        
         /// <summary>
         /// Helper method to set the <see cref="Config.FileSystem"/> 
         /// property with a new instance of <see cref="InMemoryFileSystem"/>
@@ -97,7 +54,7 @@ namespace Memstate.Configuration
         public ISerializer CreateSerializer(string serializer = null) 
             => Serializers.Resolve(serializer ?? SerializerName);
 
-        public static Config BuildDefault(string[] args = null)
+        public static Config CreateDefault(string[] args = null)
         { 
             LogProvider.SetCurrentLogProvider(new ColoredConsoleLogProvider());
             args = args ?? Environment.GetCommandLineArgs();
@@ -117,7 +74,8 @@ namespace Memstate.Configuration
             ConfigurationData = settings;
             ConfigurationData.Bind(this, requireAll:false, prefix:"Memstate");
             Container = new TinyIoCContainer();
-            Container.Register(this);
+            //Container.Register(this);
+            StorageProviders = new StorageProviders(this);
         }
 
         /// <summary>
@@ -165,7 +123,6 @@ namespace Memstate.Configuration
         }
 
         internal StorageProviders StorageProviders { get; set; }
-            = new StorageProviders();
 
         internal Serializers Serializers { get; set; }
             = new Serializers();
@@ -178,23 +135,7 @@ namespace Memstate.Configuration
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.AppendLine("-- CONFIG --");
-            builder.AppendLine(nameof(SerializerName) + "=" + SerializerName);
-            builder.AppendLine(nameof(StorageProviderName) + "=" + StorageProviderName);
-            builder.AppendLine(nameof(FileSystem) + "=" + FileSystem);
-            builder.AppendLine(nameof(Version) + "=" + Version);
-
-            builder.AppendLine("-- DATA --");
-            try
-            {
-                builder.Append(ConfigurationData);
-            }
-            catch (Exception)
-            {
-                builder.Append("No data");
-            }
-            return builder.ToString();
+            return "TODO";
         }
     }    
 }

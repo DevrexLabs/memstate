@@ -28,11 +28,11 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
         {
             Print("GIVEN I start a new Memstate engine for a graph model using default settings");
             Print("   (using Wire format & local filesystem storage)");
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             config.SerializerName = JournalSerializer;
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = JournalFile;
-            var engine = await Engine.Start<GraphModel>();
+            var engine = await Engine.Start<GraphModel>(config);
 
             Print("THEN a journal file should now exist on the filesystem");
             Assert.True(File.Exists(JournalFilename));
@@ -77,7 +77,7 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             Assert.True(File.Exists(JournalFilename));
 
             Print("WHEN I start up another engine the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            engine = await Engine.Start<GraphModel>();
+            engine = await Engine.Start<GraphModel>(config);
 
             Print("THEN there should still be three nodes");
             var nodes2 = await engine.Execute(new GetNodes());

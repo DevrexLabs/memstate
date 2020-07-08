@@ -31,9 +31,12 @@ namespace Memstate.Tcp
 
         private Task _listenerTask;
 
-        public MemstateServer(Engine<T> engine)
+        private readonly Config _config;
+
+        public MemstateServer(Config config, Engine<T> engine)
         {
-            var settings = Config.Current.GetSettings<ServerSettings>();
+            _config = config;
+            var settings = config.GetSettings<ServerSettings>();
             settings.EnsureValid(); 
             _engine = engine;
             var ip = IPAddress.Parse(settings.Ip);
@@ -78,7 +81,7 @@ namespace Memstate.Tcp
         }
         private async Task HandleConnection(TcpClient tcpClient)
         {
-            var serializer = Config.Current.CreateSerializer();
+            var serializer = _config.CreateSerializer();
             var stream = tcpClient.GetStream();
 
             var outgoingMessages = new BlockingCollection<Message>();
@@ -101,7 +104,7 @@ namespace Memstate.Tcp
         private async Task SendMessages(BlockingCollection<Message> messages, Stream stream)
         {
             // TODO: Consider using MessageProcessor.
-            var serializer = Config.Current.CreateSerializer();
+            var serializer = _config.CreateSerializer();
             var cancellationToken = _cancellationSource.Token;
             var messageId = 0;
 
@@ -114,7 +117,7 @@ namespace Memstate.Tcp
                 var bytes = serializer.Serialize(message);
                 var packet = Packet.Create(bytes, ++messageId);
                 await packet.WriteTo(stream);
-                await stream.FlushAsync();
+                await stream.FlushAsync(cancellationToken);
             }
         } 
 

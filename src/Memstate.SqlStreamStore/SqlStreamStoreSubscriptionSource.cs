@@ -42,7 +42,7 @@ namespace Memstate.SqlStreamStore
             _log = LogProvider.For<SqlStreamStoreSubscriptionSource>();
         }
 
-        public IJournalSubscription Subscribe(long @from, Action<JournalRecord> handler)
+        public SqlStreamStoreSubscription Subscribe(long @from, Action<JournalRecord> handler)
         {
             async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
                 CancellationToken cancellationToken)

@@ -1,7 +1,9 @@
-﻿namespace Memstate
+﻿using System.Threading.Tasks;
+
+namespace Memstate
 {
     public interface IJournalWriter : IAsyncDisposable
     {
-        void Send(Command command);
+        Task Write(Command command);
     }
 }

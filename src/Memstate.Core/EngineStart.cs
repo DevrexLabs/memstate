@@ -9,9 +9,12 @@ namespace Memstate
         /// Load an existing or create a new engine
         /// </summary>
         /// <returns>A task that completes when the engine is ready to process messages</returns>
-        public static Task<Engine<T>> Start<T>() where T : class
+        public static async Task<Engine<T>> Start<T>() where T : class
         {
-            return new EngineBuilder().Build<T>();
+            //todo: polish the API
+            var engine = new EngineBuilder().Build<T>();
+            await engine.Start();
+            return engine;
         }
 
         public static async Task<Engine<T>> For<T>() where T : class

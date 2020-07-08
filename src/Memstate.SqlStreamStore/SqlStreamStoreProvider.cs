@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using Npgsql;
 using SqlStreamStore;
@@ -6,7 +7,7 @@ using SqlStreamStore.Streams;
 
 namespace Memstate.SqlStreamStore
 {
-    public class SqlStreamStoreProvider: StorageProvider
+    public class SqlStreamStoreProvider: IStorageProvider
     {
         private readonly StreamId _streamId;
         private readonly ISerializer _serializer;
@@ -34,8 +35,10 @@ namespace Memstate.SqlStreamStore
             _streamStore = streamStore;
         }
 
+        public Task Provision() => Task.CompletedTask;
+
         /// <inheritdoc/>
-        public override IJournalReader CreateJournalReader()
+        public IJournalReader CreateJournalReader()
         {
             return UseSubscriptionBasedReader ? (IJournalReader)
                 new SqlSteamStoreSubscriptionJournalReader(
@@ -49,15 +52,9 @@ namespace Memstate.SqlStreamStore
         }
 
         /// <inheritdoc/>
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
             return new SqlStreamStoreJournalWriter(_streamStore, _streamId, _serializer);
-        }
-
-        /// <inheritdoc/>
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            return new SqlStreamStoreSubscriptionSource(_streamStore, _streamId, _serializer);
         }
         
         /// <summary>

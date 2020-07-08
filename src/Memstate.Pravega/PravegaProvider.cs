@@ -4,7 +4,7 @@ using Memstate.Configuration;
 
 namespace Memstate.Pravega
 {
-    public class PravegaProvider : StorageProvider
+    public class PravegaProvider : IStorageProvider
     {
         private readonly PravegaGateway.PravegaGatewayClient _client;
 

@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Memstate.Configuration;
 
 namespace Memstate
@@ -7,17 +6,17 @@ namespace Memstate
     public class EngineBuilder
     {
         private readonly EngineSettings _settings;
-        private readonly StorageProvider _storageProvider;
+        private readonly IStorageProvider _storageProvider;
 
         public EngineBuilder()
         {
             var config = Config.Current;
             _settings = config.GetSettings<EngineSettings>();
             _storageProvider = config.GetStorageProvider();
-            _storageProvider.Initialize();
+            _storageProvider.Provision().GetAwaiter().GetResult();
         }
 
-        public Task<Engine<T>> Build<T>() where T : class
+        public Engine<T> Build<T>() where T : class
         {
             Type modelType = typeof(T); 
             if (modelType.IsInterface)
@@ -41,34 +40,9 @@ namespace Memstate
             return type;
         }
 
-        public async Task<Engine<T>> Build<T>(T initialState) where T : class
+        public Engine<T> Build<T>(T initialState) where T : class
         {
-            var reader = _storageProvider.CreateJournalReader();
-            var model = Load(reader, initialState, out long lastRecordNumber);
-            var nextRecordNumber = lastRecordNumber + 1;
-            await reader.DisposeAsync().ConfigureAwait(false);                                                                     
-
-            var writer = _storageProvider.CreateJournalWriter(nextRecordNumber);
-            var subscriptionSource = _storageProvider.CreateJournalSubscriptionSource();
-            return new Engine<T>(_settings, model, subscriptionSource, writer, nextRecordNumber);
-        }
-
-        internal static TState Load<TState>(IJournalReader reader, TState initial, out long lastRecordNumber)
-        {
-            lastRecordNumber = -1;
-            foreach (var journalRecord in reader.GetRecords())
-            {
-                try
-                {
-                    journalRecord.Command.ExecuteImpl(initial);
-                    lastRecordNumber = journalRecord.RecordNumber;
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
-            return initial;
+            return new Engine<T>(initialState, _settings, _storageProvider);
         }
     }
 }

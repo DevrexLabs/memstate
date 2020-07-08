@@ -10,8 +10,8 @@ namespace Memstate.Test
         [Test]
         public async Task Batcher_terminates_when_disposed()
         {
-            var batcher = new Batcher<int>(batch => { }, 10, 10);
-            await batcher.DisposeAsync().ConfigureAwait(false);
+            var batcher = new Batcher<int>(batch => Task.CompletedTask, 10, 10);
+            await batcher.DisposeAsync().NotOnCapturedContext();
         }
 
         [Test]
@@ -19,7 +19,7 @@ namespace Memstate.Test
         {
             var blockingCollection = new BlockingCollection<int>();
             blockingCollection.CompleteAdding();
-            var actual = blockingCollection.TryTake(out var item);
+            var actual = blockingCollection.TryTake(out var _);
             Assert.False(actual);
         }
     }

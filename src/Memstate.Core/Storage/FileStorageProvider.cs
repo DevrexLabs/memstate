@@ -4,7 +4,7 @@ using Memstate.Configuration;
 
 namespace Memstate
 {
-    public class FileStorageProvider : StorageProvider
+    public class FileStorageProvider : IStorageProvider
     {
         private readonly FileStorageSettings _fileStorageSettings;
         private readonly EngineSettings _settings;
@@ -20,37 +20,26 @@ namespace Memstate
             _fileSystem = cfg.FileSystem;
         }
 
-        public override IJournalReader CreateJournalReader()
+        public Task Provision()
+        {
+            return Task.CompletedTask;
+        }
+
+        public IJournalReader CreateJournalReader()
         {
             var fileName = _fileStorageSettings.FileName;
-
-            if (!_fileSystem.Exists(fileName))
-            {
-                return new NullJournalReader();
-            }
-
             return new FileJournalReader(fileName);
         }
 
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
+            //todo: figure out a way to initialize
+            var nextRecordNumber = 0;
             var fileName = _fileStorageSettings.FileName;
             _currentWriter = new FileJournalWriter(fileName, nextRecordNumber);
             return _currentWriter;
         }
 
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            if (_currentWriter == null)
-            {
-                throw new InvalidOperationException("Cannot create subscriptionsource");
-            }
-
-            return new FileJournalSubscriptionSource(_currentWriter);
-        }
-
         public Task DisposeAsync() => Task.CompletedTask;
-
-        public override bool SupportsCatchupSubscriptions() => false;
     }
 }

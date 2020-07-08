@@ -9,8 +9,6 @@ namespace Memstate.Test
     [TestFixture]
     public class EngineTests
     {
-        private IJournalSubscriptionSource _fakeSubscriptionSource;
-        private IJournalSubscription _fakeSubscription;
         private IJournalWriter _fakeJournalWriter;
         private Engine<Object> _engine;
         private int _nextRecordNumber;
@@ -18,9 +16,8 @@ namespace Memstate.Test
         [SetUp]
         public void Setup()
         {
-            _fakeSubscriptionSource = A.Fake<IJournalSubscriptionSource>();
-            _fakeSubscription = A.Fake<IJournalSubscription>();
-            _fakeJournalWriter = A.Fake<IJournalWriter>();
+             /*
+             _fakeJournalWriter = A.Fake<IJournalWriter>();
 
             _nextRecordNumber = DateTime.Now.Millisecond;
 
@@ -29,14 +26,16 @@ namespace Memstate.Test
 
             var settings = Config.Current.GetSettings<EngineSettings>();
             _engine = new Engine<Object>(settings, new Object(), _fakeSubscriptionSource, _fakeJournalWriter, _nextRecordNumber);
+        */
         }
 
         [Test]
         public void Constructor_subscribes_to_journal_records_from_correct_recordNumber()
         {
-            A.CallTo(() => _fakeSubscriptionSource
-                    .Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
-                .MustHaveHappenedOnceExactly();
+            //A.CallTo(() => _fakeSubscriptionSource
+            //        .Subscribe(_nextRecordNumber, A<Action<JournalRecord>>._))
+            //    .MustHaveHappenedOnceExactly();
+            Assert.Fail("Fix after redesign");
         }
 
         [Test]
@@ -44,14 +43,15 @@ namespace Memstate.Test
         {
             await _engine.DisposeAsync().ConfigureAwait(false);
 
-            A.CallTo(() => _fakeSubscription.Dispose())
-                .MustHaveHappenedOnceExactly();
+            //A.CallTo(() => _fakeSubscription.Dispose())
+            //    .MustHaveHappenedOnceExactly();
+            Assert.Fail("Fix after redesign");
         }
 
         [Test]
         public async Task Writer_is_disposed_when_engine_is_disposed()
         {
-            await _engine.DisposeAsync().ConfigureAwait(false);
+            await _engine.DisposeAsync().NotOnCapturedContext();
             A.CallTo(() => _fakeJournalWriter.DisposeAsync())
                 .MustHaveHappenedOnceExactly();
         }

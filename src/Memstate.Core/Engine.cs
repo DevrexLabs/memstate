@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Memstate.Logging;
@@ -9,6 +10,8 @@ namespace Memstate
 {
     public class Engine<TModel> where TModel : class
     {
+        public EngineState State { get; set; } = EngineState.NotStarted;
+
         private readonly ILog _logger;
 
         private readonly Kernel _kernel;
@@ -17,44 +20,61 @@ namespace Memstate
 
         private readonly IJournalWriter _journalWriter;
 
+        private Task _readerTask;
+
         /// <summary>
         /// Commands that have been sent to the journal but not yet received 
         /// and processed on the subscription
         /// </summary>
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
 
-        private readonly IDisposable _commandSubscription;
-
         private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
 
         private readonly IEngineMetrics _metrics;
 
-        private volatile bool _stopped;
 
         /// <summary>
         /// Last record number applied to the model, -1 if initial model
         /// Numbering starts from 0!
         /// </summary>
-        private long _lastRecordNumber;
+        private long _lastRecordNumber = -1;
 
+        /// <summary>
+        /// Unique identifier of this running engine
+        /// </summary>
+        public readonly Guid EngineId = Guid.NewGuid();
+
+        private readonly IJournalReader _journalReader;
+        private CancellationTokenSource _readerCancellationTokenSource;
+        private TaskCompletionSource<object> _readyTask;
         public event CommandExecuted CommandExecuted = delegate { };
 
+        public event StateTransitioned StateChanged = delegate { };
+
         public Engine(
-            EngineSettings settings,
             TModel model,
-            IJournalSubscriptionSource subscriptionSource,
-            IJournalWriter journalWriter,
-            long nextRecord)
+            EngineSettings settings,
+            IStorageProvider storageProvider)
         {
-            _lastRecordNumber = nextRecord - 1;
             _logger = LogProvider.GetCurrentClassLogger();
             _kernel = new Kernel(settings, model);
             _settings = settings;
-            _journalWriter = journalWriter;
+            _journalWriter = storageProvider.CreateJournalWriter();
+            _journalReader = storageProvider.CreateJournalReader();
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
-            _commandSubscription = subscriptionSource.Subscribe(nextRecord, OnRecordReceived);
             _metrics = Metrics.Provider.GetEngineMetrics();
-            ExecutionContext.Current = new ExecutionContext(nextRecord);
+        }
+
+        public Task Start(bool waitUntilReady = false)
+        {
+            if (State == EngineState.Running || State == EngineState.Loading) 
+                throw new InvalidOperationException("Already started");
+
+            _readyTask = new TaskCompletionSource<object>();
+            _readerCancellationTokenSource = new CancellationTokenSource();
+            var token = _readerCancellationTokenSource.Token;
+            _readerTask = _journalReader.Subscribe(_lastRecordNumber, OnRecordReceived, token);
+            return waitUntilReady ? _readyTask.Task : _readerTask;
         }
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
@@ -71,25 +91,27 @@ namespace Memstate
 
         public Task<TResult> Execute<TResult>(Query<TModel, TResult> query)
         {
-            EnsureOperational();
             var result = (TResult)ExecuteUntyped(query);
             return Task.FromResult(result);
         }
 
         public async Task DisposeAsync()
         {
-            _logger.Debug("Begin Dispose");
+            if (State == EngineState.Disposed || State == EngineState.Disposing) return;
+            
+            _logger.Debug("Disposing...");
 
-            await _journalWriter.DisposeAsync().ConfigureAwait(false);
+            _logger.Info("Stopping JournalWriter");
+            await _journalWriter.DisposeAsync().NotOnCapturedContext();
+            
+            _logger.Info("Waiting for pending commands");
+            while (!_pendingLocalCommands.IsEmpty) _pendingCommandsChanged.WaitOne();
 
-            while (!_pendingLocalCommands.IsEmpty)
-            {
-                _pendingCommandsChanged.WaitOne();
-            }
+            _logger.Info("Stopping JournalReader");
+            _readerCancellationTokenSource.Cancel();
+            await _readerTask;
 
-            _commandSubscription.Dispose();
-
-            _logger.Debug("End Dispose");
+            _logger.Debug("Dispose completed");
         }
 
         /// <summary>
@@ -99,17 +121,17 @@ namespace Memstate
         /// <returns></returns>
         public async Task EnsureVersion(long recordNumber)
         {
-            EnsureOperational();
+            EnsureState("EnsureVersion()", EngineState.Loading, EngineState.Running);
 
             while (LastRecordNumber < recordNumber)
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(10)).NotOnCapturedContext();
             }
         }
 
         internal object ExecuteUntyped(Query query)
         {
-            EnsureOperational();
+            EnsureState("Execute(Query)", EngineState.Running, EngineState.Stopped);
 
             using (_metrics.MeasureQueryExecution())
             {
@@ -127,38 +149,53 @@ namespace Memstate
             }
         }
 
+        internal void SetStateAndNotify(EngineState newState)
+        {
+            var oldState = State;
+            State = newState;
+            StateChanged(oldState, newState);
+        }
+
         /// <summary>
         /// Execute non-generically typed command
         /// </summary>
-        internal Task<object> ExecuteUntyped(Command command)
+        internal async Task<object> ExecuteUntyped(Command command)
         {
-            EnsureOperational();
+            EnsureState("Execute(Command)", EngineState.Loading, EngineState.Running);
 
             var completionSource = new TaskCompletionSource<object>();
-            _pendingLocalCommands[command.Id] = completionSource;
+            _pendingLocalCommands[command.CommandId] = completionSource;
 
             _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
 
             using (_metrics.MeasureCommandExecution())
             {
-                _journalWriter.Send(command);
+                await _journalWriter.Write(command);
                 return completionSource.Task;
             }
         }
 
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+        private void EnsureState(string operation, params EngineState[] states)
+        {
+            // ReSharper disable once SimplifyLinqExpression
+            if (!states.Contains(State)) 
+                throw new InvalidOperationException($"{operation} invalid in the {State} state");
+        }
+
         /// <summary>
-        /// Handler for records obtained through the subscription
+        /// Handler for records obtained from the reader
         /// </summary>
         private void OnRecordReceived(JournalRecord record)
         {
 
-            if (_stopped) return;
+            if (State == EngineState.Faulted) return;
             TaskCompletionSource<object> completion = null;
 
             try
             {
                 var command = record.Command;
-                var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
+                var isLocalCommand = _pendingLocalCommands.TryRemove(command.CommandId, out completion);
 
                 if (isLocalCommand)
                 {
@@ -173,7 +210,10 @@ namespace Memstate
                 var ctx = ExecutionContext.Current;
                 ctx.Reset(record.RecordNumber);
 
-                var result = _kernel.Execute(record.Command);
+                object result = null;
+                if (record.Command is ControlCommand<TModel> cc) cc.Execute(this);
+                else result = _kernel.Execute(record.Command);
+
                 Interlocked.Exchange(ref _lastRecordNumber, record.RecordNumber);
                 NotifyCommandExecuted(record, isLocalCommand, ctx.Events);
 
@@ -195,7 +235,7 @@ namespace Memstate
             {
                 if (!_settings.AllowBrokenSequence)
                 {
-                    _stopped = true;
+                    State = EngineState.Faulted;
                     throw new Exception($"Broken sequence, expected {expected}, got {actualRecordNumber}");
                 }
 
@@ -205,15 +245,7 @@ namespace Memstate
                     actualRecordNumber);
             }
         }
-
-        private void EnsureOperational()
-        {
-            if (_stopped)
-            {
-                throw new Exception("Engine has stopped due to a failure condition");
-            }
-        }
-
+        
         private void NotifyCommandExecuted(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
         {
             try

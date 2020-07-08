@@ -18,17 +18,17 @@ namespace Memstate.Postgres.Tests
         private  ISerializer _serializer;
 
         [SetUp]
-        public void Setup()
+        public async System.Threading.Tasks.Task Setup()
         {
             var cfg = Config.Reset();
             cfg.GetSettings<EngineSettings>()
                .WithRandomSuffixAppendedToStreamName();
 
             _provider = new PostgresProvider();
-            _provider.Initialize();
+            await _provider.Provision();
 
             _journalReader = _provider.CreateJournalReader();
-            _journalWriter = _provider.CreateJournalWriter(0);
+            _journalWriter = _provider.CreateJournalWriter();
 
             _serializer = Config.Current.CreateSerializer();
         }
@@ -40,7 +40,7 @@ namespace Memstate.Postgres.Tests
 
             InsertCommand(_serializer.Serialize(create));
 
-            var journalRecords = _journalReader.GetRecords();
+            var journalRecords = _journalReader.ReadRecords();
 
             Assert.AreEqual(1, journalRecords.Count());
         }
@@ -50,7 +50,7 @@ namespace Memstate.Postgres.Tests
         {
             var create = new Create(Guid.NewGuid(), "Resolve a Postgresql driver for Memstate");
 
-            _journalWriter.Send(create);
+            _journalWriter.Write(create);
 
             Thread.Sleep(500);
 

@@ -50,7 +50,7 @@ namespace Memstate.Test.DispatchProxy
             var settings = Config.Current.GetSettings<EngineSettings>();
             var storageProvider = cfg.GetStorageProvider();
             var builder = new EngineBuilder();
-            var engine = builder.Build<ITestModel>().Result;
+            var engine = builder.Build<ITestModel>();
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();
 
@@ -59,7 +59,10 @@ namespace Memstate.Test.DispatchProxy
 
             //release the lock on the journal
             await engine.DisposeAsync();
-            var journalEntry = storageProvider.CreateJournalReader().GetRecords().FirstOrDefault();
+            var journalEntry = storageProvider
+                .CreateJournalReader()
+                .ReadRecords()
+                .FirstOrDefault();
 
             // If MapTo is correct, a SetCustomerCommand will be written to the journal
             // if not, then a ProxyCommand will be written

@@ -15,12 +15,12 @@ namespace Memstate.Test.Proxy
         private Engine<ITestModel> _engine;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
             ITestModel model = new TestModel();
-            _engine = await new EngineBuilder().Build<ITestModel>();
+            _engine = new EngineBuilder().Build<ITestModel>();
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 

@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Memstate.Postgres
 {
-    public class PostgresProvider : StorageProvider
+    public class PostgresProvider : IStorageProvider
     {
         private readonly ILog _log;
         private bool _initialized;
@@ -32,7 +32,7 @@ namespace Memstate.Postgres
 
         public PostgresSettings Settings { get; }
 
-        public override void Initialize()
+        public async Task Provision()
         {
             if (_initialized) return;
             _log.Debug("Initializing...");
@@ -42,30 +42,24 @@ namespace Memstate.Postgres
             using (var connection = new NpgsqlConnection(Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
-                connection.Open();
+                await connection.OpenAsync();
                 command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
             _initialized = true;
         }
 
-        public override IJournalReader CreateJournalReader()
+        public IJournalReader CreateJournalReader()
         {
             return new PostgresJournalReader(Settings);
         }
 
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
-            // todo: nextRecordNumber unused
             var serializer = Config.Current.CreateSerializer();
             return new PostgresJournalWriter(serializer, Settings);
         }
-
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            return new PostgresSubscriptionSource(Settings);
-        }
-
+        
         public Task DisposeAsync() => Task.CompletedTask;
     }
 }

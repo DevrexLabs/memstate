@@ -27,19 +27,19 @@ namespace Memstate.Test
             var provider = cfg.GetStorageProvider();
             
             //Write NumRecords entries 
-            var writer = provider.CreateJournalWriter(0);
+            var writer = provider.CreateJournalWriter();
             foreach (var i in Enumerable.Range(1, NumRecords))
             {
-                writer.Send(new Set<int>("key" + i, i));
+                await writer.Write(new Set<int>("key" + i, i));
             }
 
             //wait for the writes to complete
-            await writer.DisposeAsync().ConfigureAwait(false);
+            await writer.DisposeAsync().NotOnCapturedContext();
 
             //Get back all the entries, should be NumRecords
             var reader = provider.CreateJournalReader();
-            Assert.AreEqual(NumRecords, reader.GetRecords().Count());
-            await reader.DisposeAsync().ConfigureAwait(false);
+            Assert.AreEqual(NumRecords, reader.ReadRecords().Count());
+            await reader.DisposeAsync().NotOnCapturedContext();
 
             //Count the actual lines in the file
             Assert.IsTrue(cfg.FileSystem.Exists(FileName));
@@ -47,7 +47,7 @@ namespace Memstate.Test
             var lines = 0;
             while (true)
             {
-                var line = streamReader.ReadLine();
+                var line = await streamReader.ReadLineAsync();
                 if (line == null) break;
                 Console.WriteLine("> " + line);
                 lines++;

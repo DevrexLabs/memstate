@@ -48,12 +48,10 @@ namespace Memstate
             {
                 var message = _messageQueue.TakeOrDefault(_cancellationToken);
 
-                if (message == null)
-                {
-                    break;
-                }
+                //Only happens as a result of cancellation 
+                if (message == null) break;
 
-                await _handler.Invoke(message).ConfigureAwait(false);
+                await _handler.Invoke(message).NotOnCapturedContext();
             }
 
             _resetEvent.Set();

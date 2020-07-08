@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using Npgsql;
+using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate.Postgres
 {
-    using System.Threading.Tasks;
-    using Memstate.Configuration;
 
-    public class PostgresJournalReader : IJournalReader
+    public class PostgresJournalReader : JournalReader
     {
         private const string SelectSql = @"SELECT id, written, command FROM {0}
                                            WHERE id >= @id
@@ -26,7 +26,7 @@ namespace Memstate.Postgres
             _serializer = Config.Current.CreateSerializer();
         }
 
-        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)
         {
             using (var connection = OpenConnection())
             {
@@ -35,9 +35,7 @@ namespace Memstate.Postgres
                     using (var command = connection.CreateCommand())
                     {
                         var recordsRead = 0;
-
                         command.CommandText = string.Format(SelectSql, _settings.Table);
-
                         command.Parameters.AddWithValue("id", fromRecord);
 
                         using (var reader = command.ExecuteReader())
@@ -45,29 +43,20 @@ namespace Memstate.Postgres
                             while (reader.Read())
                             {
                                 recordsRead++;
-
                                 var record = ReadRecord(reader);
-
                                 fromRecord++;
-
                                 yield return record;
                             }
                         }
 
-                        if (recordsRead == 0)
-                        {
-                            break;
-                        }
+                        if (recordsRead == 0) break;
                     }
                 }
                 while (true);
             }
         }
 
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        public Task DisposeAsync() => Task.CompletedTask;
 
         private JournalRecord ReadRecord(IDataRecord reader)
         {
@@ -82,9 +71,7 @@ namespace Memstate.Postgres
         private NpgsqlConnection OpenConnection()
         {
             var connection = new NpgsqlConnection(_settings.ConnectionString);
-
             connection.Open();
-
             return connection;
         }
     }

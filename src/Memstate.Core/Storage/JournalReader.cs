@@ -28,7 +28,7 @@ namespace Memstate
         /// <param name="recordHandler"></param>
         /// <param name="cancellationToken">token to stop the task </param>
         /// <returns>A task that completes after the last record or on cancellation </returns>
-        public Task Subscribe(long first, long last,
+        public virtual Task Subscribe(long first, long last,
             Action<JournalRecord> recordHandler, CancellationToken cancellationToken)
         {
             bool isLast = false;

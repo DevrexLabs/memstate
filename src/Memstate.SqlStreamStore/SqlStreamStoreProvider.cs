@@ -41,7 +41,7 @@ namespace Memstate.SqlStreamStore
         public IJournalReader CreateJournalReader()
         {
             return UseSubscriptionBasedReader ? (IJournalReader)
-                new SqlSteamStoreSubscriptionJournalReader(
+                new SqlStreamStoreSubscriptionJournalReader(
                     _streamStore,
                     _streamId,
                     _serializer) :

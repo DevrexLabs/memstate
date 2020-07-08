@@ -187,7 +187,7 @@ namespace Memstate.Configuration
             {
                 builder.Append(ConfigurationData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 builder.Append("No data");
             }

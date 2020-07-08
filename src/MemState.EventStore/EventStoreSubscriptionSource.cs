@@ -5,7 +5,7 @@ using Memstate.Logging;
 
 namespace Memstate.EventStore
 {
-    public class EventStoreSubscriptionSource : IJournalSubscriptionSource
+    public class EventStoreSubscriptionSource
     {
         private readonly IEventStoreConnection _connection;
         private readonly ISerializer _serializer;
@@ -23,32 +23,10 @@ namespace Memstate.EventStore
             _streamName = _settings.StreamName;
         }
 
-        public IJournalSubscription Subscribe(long from, Action<JournalRecord> handler)
+        public void Subscribe(long from, Action<JournalRecord> handler)
         {
-            long? checkPoint = null;
 
-            if (from > 0)
-            {
-                checkPoint = from - 1;
-            }
-
-            var ready = false;
-
-            var sub = _connection.SubscribeToStreamFrom(
-                stream: _streamName,
-                lastCheckpoint: checkPoint,
-                settings: new CatchUpSubscriptionSettings(10000, 4096, false, false),
-                eventAppeared: (s, re) =>
-                {
-                    _logger.Debug("eventAppeared, recordNumber {0}", re.OriginalEventNumber);
-                    handler.Invoke(re.Event.ToJournalRecord(_serializer));
-                },
-                liveProcessingStarted: s =>
-                {
-                    ready = true;
-                    _logger.Info("liveProcessingStarted");
-                });
-            return new EventStoreSubscriptionAdapter(_settings, sub, () => ready);
+            //return new EventStoreSubscriptionAdapter(_settings, sub, () => ready);
         }
     }
 }

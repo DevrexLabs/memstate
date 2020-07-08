@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using NUnit.Framework;
 
@@ -11,14 +12,12 @@ namespace Memstate.Test.DispatchProxy
 
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
 
-            var model = new ModelWithOverloads();
-            var engine = new EngineBuilder()
-                .Build<IModelWithOverloads>(model);
+            var engine = await Engine.Start<IModelWithOverloads>();
             var client = new LocalClient<IModelWithOverloads>(engine);
             _db = client.GetDispatchProxy();
         }

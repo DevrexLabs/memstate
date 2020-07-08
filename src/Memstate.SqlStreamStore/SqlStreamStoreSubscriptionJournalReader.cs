@@ -11,7 +11,7 @@ using SqlStreamStore.Subscriptions;
 
 namespace Memstate.SqlStreamStore
 {
-    public class SqlSteamStoreSubscriptionJournalReader : IJournalReader
+    public class SqlStreamStoreSubscriptionJournalReader : JournalReader
     {
         private readonly IStreamStore _streamStore;
         private readonly StreamId _streamId;
@@ -19,20 +19,17 @@ namespace Memstate.SqlStreamStore
 
         private readonly ILog _log;
 
-        public SqlSteamStoreSubscriptionJournalReader(IStreamStore streamStore, StreamId streamId, ISerializer serializer)
+        public SqlStreamStoreSubscriptionJournalReader(IStreamStore streamStore, StreamId streamId, ISerializer serializer)
         {
             _serializer = serializer;
             _streamId = streamId;
             _streamStore = streamStore;
-            _log = LogProvider.For<SqlStreamStoreSubscriptionSource>();
+            _log = LogProvider.GetLogger(nameof(SqlStreamStoreSubscriptionJournalReader));
         }
 
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+        public override Task DisposeAsync() => Task.CompletedTask;
 
-        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)
         {
             using (var queue = new BlockingCollection<JournalRecord>())
             {
@@ -42,7 +39,7 @@ namespace Memstate.SqlStreamStore
                     var json = await message.GetJsonData(cancellationToken);
                     var command = (Command)_serializer.FromString(json);
                     var journalRecord = new JournalRecord(message.StreamVersion, message.CreatedUtc, command);
-                    queue.Add(journalRecord);
+                    queue.Add(journalRecord, cancellationToken);
                 }
 
                 // pass null to subscribe from the beginning

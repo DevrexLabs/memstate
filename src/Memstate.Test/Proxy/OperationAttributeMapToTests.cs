@@ -1,14 +1,14 @@
-using Memstate.Configuration;
-using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
+using Memstate.Configuration;
+using NUnit.Framework;
 
-namespace Memstate.Test.DispatchProxy
+namespace Memstate.Test.Proxy
 {
     [TestFixture]
     public class OperationAttributeMapToTests
     {
-        internal class SetCustomerCommand : Command<ITestModel>
+        private class SetCustomerCommand : Command<ITestModel>
         {
             public Customer Customer { get; }
 
@@ -49,8 +49,7 @@ namespace Memstate.Test.DispatchProxy
             cfg.UseInMemoryFileSystem();
             var settings = Config.Current.GetSettings<EngineSettings>();
             var storageProvider = cfg.GetStorageProvider();
-            var builder = new EngineBuilder();
-            var engine = builder.Build<ITestModel>();
+            var engine = await Engine.Start<ITestModel>();
             var client = new LocalClient<ITestModel>(engine);
             var proxy = client.GetDispatchProxy();
 

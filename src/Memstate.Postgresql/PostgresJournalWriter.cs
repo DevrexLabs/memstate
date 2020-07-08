@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Npgsql;
 using Memstate.Logging;
 
@@ -26,11 +27,11 @@ namespace Memstate.Postgres
             _logger = LogProvider.GetCurrentClassLogger();
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             using (var connection = new NpgsqlConnection(_settings.ConnectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
 
                 commands = commands.ToList();
 
@@ -48,7 +49,7 @@ namespace Memstate.Postgres
                         .ToList()
                         .ForEach(item => sqlCommand.Parameters.AddWithValue($"@{item.Index}", item.Value));
 
-                    sqlCommand.ExecuteNonQuery();
+                    await sqlCommand.ExecuteNonQueryAsync();
                 }
             }
         }

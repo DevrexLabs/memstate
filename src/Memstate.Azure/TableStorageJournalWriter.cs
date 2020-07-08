@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using Streamstone;
 
@@ -18,7 +19,7 @@ namespace Memstate.Azure
             _head = stream;
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = ToEventData(commands).ToArray();
             
@@ -26,17 +27,14 @@ namespace Memstate.Azure
             {
                 try
                 {
-                    var result = Stream
-                        .WriteAsync(_head, events)
-                        .GetAwaiter()
-                        .GetResult();
+                    var result = await Stream.WriteAsync(_head, events);
                     _head = result.Stream;
                     break;
 
                 }
                 catch (ConcurrencyConflictException cce)
                 {
-                    _head = Stream.OpenAsync(cce.Partition).GetAwaiter().GetResult();
+                    _head = await Stream.OpenAsync(cce.Partition);
                 }
             }
         }

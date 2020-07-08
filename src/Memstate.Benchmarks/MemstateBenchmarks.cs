@@ -26,7 +26,7 @@ namespace Memstate.Benchmarks
         public Type StorageProviderTypes { get; set; }
 
         [GlobalSetup]
-        public void Setup()
+        public async Task Setup()
         {
             var config = Config.Current;
             var settings = config.GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
@@ -37,14 +37,13 @@ namespace Memstate.Benchmarks
             */
             config.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
             config.SerializerName = "newtonsoft.json";
-            var engineBuilder = new EngineBuilder();
-            _engine = engineBuilder.Build<KeyValueStore<int>>();
+            _engine = await Engine.Start<KeyValueStore<int>>();
         }
 
         [GlobalCleanup]
-        public void Cleanup()
+        public Task Cleanup()
         {
-            //_engine.DisposeAsync().Wait();
+            return _engine.DisposeAsync();
         }
         
         [Benchmark(OperationsPerInvoke = Iterations)]

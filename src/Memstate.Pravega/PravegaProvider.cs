@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Grpc.Net.Client;
 using Memstate.Configuration;
 
@@ -11,7 +12,7 @@ namespace Memstate.Pravega
         private string _scope;
         private string _stream;
 
-        public override void Initialize()
+        public async Task Provision()
         {
             var config = Config.Current;
             var settings = config.GetSettings<EngineSettings>();
@@ -24,9 +25,9 @@ namespace Memstate.Pravega
             (_scope, _stream) = (parts[0], parts[1]);
 
             var request = new CreateScopeRequest { Scope = _scope };
-            _client.CreateScope(request);
+            await _client.CreateScopeAsync(request);
 
-            _client.CreateStream(new CreateStreamRequest
+            await _client.CreateStreamAsync(new CreateStreamRequest
             {
                 Scope = _scope,
                 Stream = _stream,
@@ -38,23 +39,18 @@ namespace Memstate.Pravega
             });
         }
 
-        public override IJournalReader CreateJournalReader()
+        public IJournalReader CreateJournalReader()
         {
             var serializer = Config.Current.CreateSerializer();
             return new PravegaJournalReader(_client, serializer, _scope, _stream, null);
         }
 
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
             var serializer = Config.Current.CreateSerializer();
             return new PravegaJournalWriter(_client, serializer, _scope, _stream);
         }
-
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            return new PravegaSubscriptionSource(_client);
-        }
-
+        
         public PravegaProvider()
         {
             // https://github.com/grpc/grpc-java/issues/6193#issuecomment-537745226

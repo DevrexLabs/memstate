@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using Memstate.Models.Redis;
 using NUnit.Framework;
@@ -73,14 +74,14 @@ namespace Memstate.Test.Models.Redis
 
         [Test]
         [Ignore("Expiration not implemented")]
-        public void PurgeTimer()
+        public async Task PurgeTimer()
         {
             var cfg = Config.Current;
             cfg.FileSystem = new InMemoryFileSystem();
             var settings = cfg.GetSettings<EngineSettings>();
 
 
-            var engine = new EngineBuilder().Build<IRedisModel>(new RedisModel());
+            var engine = await Engine.Start<IRedisModel>();
             var redis = new LocalClient<IRedisModel>(engine).GetDispatchProxy();
 
             var mre = new ManualResetEvent(false);
@@ -103,12 +104,12 @@ namespace Memstate.Test.Models.Redis
             Assert.IsTrue(signaled, "No PurgeExpiredKeysCommand within time limit 5s");
 
             Assert.AreEqual(redis.KeyCount(), 1);
-            engine.DisposeAsync().GetAwaiter().GetResult();
+            await engine.DisposeAsync();
 
-            engine = new EngineBuilder().Build<IRedisModel>(new RedisModel());
+            engine = await Engine.Start<IRedisModel>();
             redis = new LocalClient<IRedisModel>(engine).GetDispatchProxy();
             Assert.AreEqual(redis.KeyCount(), 1);
-            engine.DisposeAsync().GetAwaiter().GetResult();
+            await engine.DisposeAsync();
         }
     }
 }

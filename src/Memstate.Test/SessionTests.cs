@@ -17,12 +17,13 @@ namespace Memstate.Test
         private List<Message> _messagesEmitted;
 
         [SetUp]
-        public void PerTestSetup()
+        public async Task PerTestSetup()
         {
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
-            var engine = new EngineBuilder().Build(_testModel);
+            var engine = Engine.Build(_testModel);
+            await engine.Start(); //todo: add an overload taking an initial state
             _session = new Session<KeyValueStore<int>>(engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;

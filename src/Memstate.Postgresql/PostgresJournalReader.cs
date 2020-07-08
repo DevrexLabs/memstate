@@ -56,7 +56,7 @@ namespace Memstate.Postgres
             }
         }
 
-        public Task DisposeAsync() => Task.CompletedTask;
+        public override Task DisposeAsync() => Task.CompletedTask;
 
         private JournalRecord ReadRecord(IDataRecord reader)
         {

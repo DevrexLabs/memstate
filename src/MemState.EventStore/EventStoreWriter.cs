@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using Memstate.Configuration;
 using Memstate.Logging;
@@ -23,11 +24,11 @@ namespace Memstate.EventStore
             _streamName = settings.StreamName;
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var events = commands.Select(ToEventData).ToArray();
             _logger.Debug("Writing {0} events", events.Length);
-            var writeResult = _connection.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events).Result;
+            var writeResult = await _connection.AppendToStreamAsync(_streamName, ExpectedVersion.Any, events);
             _logger.Debug("Write async completed, lastRecord: {0}", writeResult.NextExpectedVersion);
         }
 

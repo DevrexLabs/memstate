@@ -16,7 +16,7 @@ namespace Memstate.Runner.Commands
 
         internal ILog Logger { get; private set; }
 
-        protected Engine<KeyValueStore<int>> Engine { get; private set; }
+        protected Engine<KeyValueStore<int>> TheEngine { get; private set; }
 
         protected abstract int Runs { get; }
 
@@ -27,7 +27,8 @@ namespace Memstate.Runner.Commands
 
             Logger = LogProvider.GetCurrentClassLogger();
 
-            Engine = await new EngineBuilder().Build<KeyValueStore<int>>();
+            TheEngine = await Engine.Start<KeyValueStore<int>>(); 
+            
 
             var totals = new List<TimeSpan>(Runs);
 
@@ -46,7 +47,7 @@ namespace Memstate.Runner.Commands
                 await Total(stopwatch.Elapsed);
             }
 
-            await Engine.DisposeAsync();
+            await TheEngine.DisposeAsync();
 
             await Totals(totals);
             

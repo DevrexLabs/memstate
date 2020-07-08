@@ -6,7 +6,7 @@ using PravegaClient = PravegaGateway.PravegaGatewayClient;
 
 namespace Memstate.Pravega
 {
-    public class PravegaJournalReader : IJournalReader
+    public class PravegaJournalReader : JournalReader
     {
         private readonly CancellationToken _cancellationToken;
         private readonly CancellationTokenSource _cts;
@@ -17,7 +17,7 @@ namespace Memstate.Pravega
         private readonly string _scope;
         private readonly string _stream = "mystream";
 
-        private Action<StreamCut> _lastEventReadHandler;
+        private readonly Action<StreamCut> _lastEventReadHandler;
 
         public PravegaJournalReader(PravegaClient client, ISerializer serializer, string scope, string stream, Action<StreamCut> lastEventRead)
         {
@@ -30,14 +30,14 @@ namespace Memstate.Pravega
             _lastEventReadHandler = lastEventRead;
         }
 
-        public Task DisposeAsync()
+        public override Task DisposeAsync()
         {
             _cts.Cancel();
             _cts.Token.WaitHandle.WaitOne();
             return Task.CompletedTask;
         }
 
-        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)
         {
 
             var endStreamCut = GetEndStreamCut();

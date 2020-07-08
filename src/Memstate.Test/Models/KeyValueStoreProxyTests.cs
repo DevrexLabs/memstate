@@ -16,9 +16,7 @@ namespace Memstate.Test.Models
         {
             var config = Config.Reset();
             config.UseInMemoryFileSystem();
-            IKeyValueStore<int> model = new KeyValueStore<int>();
-            var engine = new EngineBuilder().Build(model);
-            await engine.Start();
+            var engine = await Engine.Start<IKeyValueStore<int>>();
             var client = new LocalClient<IKeyValueStore<int>>(engine);
             _keyValueStore = client.GetDispatchProxy();
         }

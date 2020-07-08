@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Memstate.Configuration;
 using Microsoft.Azure.Cosmos.Table;
 using Streamstone;
@@ -11,12 +12,11 @@ namespace Memstate.Azure
 
         public TableStorageProvider()
         {
-            CloudTable cloudTable;
             try
             {
                 var config = Config.Current;
                 var engineSettings = config.GetSettings<EngineSettings>();
-                if (!config.Container.TryResolve(out cloudTable)) throw new Exception("No CloudTable configured, did you forget to call Config.Current.UseAzureTableStorage()?");
+                if (!config.Container.TryResolve(out CloudTable cloudTable)) throw new Exception("No CloudTable configured, did you forget to call Config.Current.UseAzureTableStorage()?");
                 _partition = new Partition(cloudTable, engineSettings.StreamName);
                 cloudTable.CreateIfNotExists();
             }
@@ -25,21 +25,22 @@ namespace Memstate.Azure
                 throw new Exception("Unable to initialize Azure TableStorageProvider, see inner exception for details", e);
             }
         }
-        
-        public override IJournalReader CreateJournalReader()
+
+        public Task Provision()
+        {
+            //todo: Move cloudTable.CreateIfNotExists here
+            return Task.CompletedTask;
+        }
+
+        public IJournalReader CreateJournalReader()
         {
             return new TableStorageJournalReader(_partition);
         }
 
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
             var head = Stream.OpenAsync(_partition).GetAwaiter().GetResult();
             return new TableStorageJournalWriter(head);
-        }
-
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            return new TableStorageSubscriptionSource();
         }
     }
 }

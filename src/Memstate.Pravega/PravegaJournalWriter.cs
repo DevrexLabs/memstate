@@ -23,14 +23,14 @@ namespace Memstate.Pravega
             _writer = _client.WriteEvents();
         }
 
-        public override async Task DisposeAsync()
+        public override Task DisposeAsync()
         {
-            await base.DisposeAsync();
             _writer.Dispose();
+            return Task.CompletedTask;
         }
 
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
             foreach(var command in commands)
             {
@@ -44,10 +44,10 @@ namespace Memstate.Pravega
                     Scope = _scope
                 };
 
-                _writer.RequestStream.WriteAsync(request).GetAwaiter().GetResult();
+                await _writer.RequestStream.WriteAsync(request).NotOnCapturedContext();
             }
 
-            _writer.RequestStream.CompleteAsync().GetAwaiter().GetResult();
+            await _writer.RequestStream.CompleteAsync().NotOnCapturedContext();
         }
     }
 }

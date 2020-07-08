@@ -15,11 +15,11 @@ namespace Memstate.Runner.Commands
 
         protected override async Task Run()
         {
-            await Engine.Execute(new Set<int>("key-0", 0));
+            await TheEngine.Execute(new Set<int>("key-0", 0));
             
             for (var i = 0; i < Reads; i++)
             {
-                await Engine.Execute(new Get<int>("key-0"));
+                await TheEngine.Execute(new Get<int>("key-0"));
             }
         }
 

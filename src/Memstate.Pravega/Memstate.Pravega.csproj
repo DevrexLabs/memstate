@@ -11,4 +11,9 @@
     <ItemGroup>
       <PackageReference Include="PravegaSharp.Grpc" Version="0.7.4" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Remove="PravegaJournalSubscription.cs" />
+      <Compile Remove="PravegaSubscriptionSource.cs" />
+    </ItemGroup>
 </Project>

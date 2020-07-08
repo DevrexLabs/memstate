@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Memstate.Configuration;
-using Microsoft.Azure.Cosmos.Table;
 using Streamstone;
 
 namespace Memstate.Azure
 {
-    public class TableStorageJournalReader : IJournalReader
+    public class TableStorageJournalReader : JournalReader
     {
         private readonly Partition _partition;
         private readonly ISerializer _serializer;
@@ -21,9 +18,7 @@ namespace Memstate.Azure
             _serializer = Config.Current.CreateSerializer();
         }
 
-        public Task DisposeAsync() => Task.CompletedTask;
-
-        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)
         {
             //StreamStone starts numbering from 1
             var version = (int)fromRecord + 1;
@@ -40,6 +35,8 @@ namespace Memstate.Azure
                 version = slice.Stream.Version + 1;
             }
         }
+
+        public override Task DisposeAsync() => Task.CompletedTask;
 
         private JournalRecord FromProperties(long recordNumber, EventProperties props)
         {

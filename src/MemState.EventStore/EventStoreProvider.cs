@@ -16,29 +16,29 @@ namespace Memstate.EventStore
         {
             var config = Config.Current;
             _eventStoreSettings = config.GetSettings<EventStoreSettings>();
-            //todo: consider opening the connection from Initialize
             _connection = EventStoreConnection.Create(_eventStoreSettings.ConnectionString);
-            _connection.ConnectAsync().Wait();
         }
 
-        public override IJournalReader CreateJournalReader()
+        public Task Provision()
+        {
+            return _connection.ConnectAsync();
+        }
+
+        public IJournalReader CreateJournalReader()
         {
             return new EventStoreReader(_connection);
         }
 
-        public override IJournalWriter CreateJournalWriter(long nextRecordNumber)
+        public IJournalWriter CreateJournalWriter()
         {
             return new EventStoreWriter(_connection);
         }
 
-        public override IJournalSubscriptionSource CreateJournalSubscriptionSource()
-        {
-            return new EventStoreSubscriptionSource(_connection);
-        }
 
         public Task DisposeAsync()
         {
-            return Task.Run((Action)_connection.Close);
+            _connection.Close();
+            return Task.CompletedTask;
         }
     }
 }

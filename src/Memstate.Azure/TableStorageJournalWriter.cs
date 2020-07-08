@@ -47,13 +47,13 @@ namespace Memstate.Azure
             {
                 var properties = new
                 {
-                    Id = command.Id,
+                    Id = command.CommandId,
                     Type = command.GetType().Name,
                     Command = _serializer.ToString(command),
                     Written = new DateTimeOffset()
                 };
 
-                var eventId = EventId.From(command.Id);
+                var eventId = EventId.From(command.CommandId);
                 yield return new EventData(eventId, EventProperties.From(properties));
             }
         }

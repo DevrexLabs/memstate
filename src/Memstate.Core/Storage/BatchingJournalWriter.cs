@@ -17,10 +17,14 @@ namespace Memstate
             _batcher = new Batcher<Command>(OnCommandBatch, maxBatchSize, maxBatchQueueLength);
         }
 
-        public void Send(Command command) => _batcher.Add(command);
+        public Task Write(Command command)
+        {
+            _batcher.Add(command);
+            return Task.CompletedTask;
+        }
 
         public virtual Task DisposeAsync() => _batcher.DisposeAsync();
 
-        protected abstract void OnCommandBatch(IEnumerable<Command> commands);
+        protected abstract Task OnCommandBatch(IEnumerable<Command> commands);
     }
 }

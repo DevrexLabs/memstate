@@ -5,7 +5,7 @@ using Streamstone;
 
 namespace Memstate.Azure
 {
-    public class TableStorageProvider : StorageProvider
+    public class TableStorageProvider : IStorageProvider
     {
         private readonly Partition _partition;
 

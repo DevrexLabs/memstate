@@ -37,7 +37,7 @@ namespace Memstate.Test
         {
             var command = new Create("dummy");
             var clone = serializer.Clone(command);
-            Assert.AreEqual(command.Id, clone.Id);
+            Assert.AreEqual(command.CommandId, clone.CommandId);
         }
 
         [Test, TestCaseSource(nameof(Serializers))]

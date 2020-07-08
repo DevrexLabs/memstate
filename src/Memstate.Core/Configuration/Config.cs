@@ -33,7 +33,7 @@ namespace Memstate.Configuration
         /// </summary>
         private static Config _current;
 
-        private StorageProvider _storageProvider;
+        private IStorageProvider _storageProvider;
 
         /// <summary>
         /// We want everything to be singleton by default unless explicitly requested/registered 
@@ -140,7 +140,7 @@ namespace Memstate.Configuration
         /// Assign a storage provider instance or leave null and it will
         /// be assigned automatically based on the value of StorageProviderName
         /// </summary>
-        public void SetStorageProvider(StorageProvider storageProvider)
+        public void SetStorageProvider(IStorageProvider storageProvider)
         {
             _storageProvider = storageProvider;
         }
@@ -151,12 +151,12 @@ namespace Memstate.Configuration
         /// </summary>
         public string StorageProviderName { get; set; } = StorageProviders.File;
 
-        public StorageProvider GetStorageProvider()
+        public IStorageProvider GetStorageProvider()
         {
             if (_storageProvider == null)
             {
                 _storageProvider = StorageProviders.Resolve(StorageProviderName);
-                _storageProvider.Initialize();
+                _storageProvider.Provision().GetAwaiter().GetResult();
             }
             return _storageProvider;
         }

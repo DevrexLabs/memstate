@@ -37,7 +37,7 @@ namespace Memstate.EventStore
             var bytes = _serializer.Serialize(cmd);
 
             return new EventData(
-                eventId: cmd.Id,
+                eventId: cmd.CommandId,
                 type: typeName,
                 isJson: false,
                 data: bytes,

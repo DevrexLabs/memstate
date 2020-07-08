@@ -38,7 +38,7 @@ namespace Memstate.Benchmarks
             config.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
             config.SerializerName = "newtonsoft.json";
             var engineBuilder = new EngineBuilder();
-            _engine = engineBuilder.Build<KeyValueStore<int>>().Result;
+            _engine = engineBuilder.Build<KeyValueStore<int>>();
         }
 
         [GlobalCleanup]

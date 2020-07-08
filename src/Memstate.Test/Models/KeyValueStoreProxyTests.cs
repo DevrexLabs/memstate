@@ -15,10 +15,10 @@ namespace Memstate.Test.Models
         public async Task Setup()
         {
             var config = Config.Reset();
-            var settings = config.GetSettings<EngineSettings>();
             config.UseInMemoryFileSystem();
             IKeyValueStore<int> model = new KeyValueStore<int>();
-            var engine = await new EngineBuilder().Build(model);
+            var engine = new EngineBuilder().Build(model);
+            await engine.Start();
             var client = new LocalClient<IKeyValueStore<int>>(engine);
             _keyValueStore = client.GetDispatchProxy();
         }

@@ -14,41 +14,40 @@ namespace Memstate
 
         private readonly Task _batchTask;
 
-        private readonly Action<IEnumerable<T>> _batchHandler;
+        private readonly Func<IEnumerable<T>, Task> _batchHandler;
 
         private readonly ILog _logger;
 
-        public Batcher(Action<IEnumerable<T>> batchHandler, int maxBatchSize, int maxQueueLength)
+        public Batcher(Func<IEnumerable<T>, Task> batchHandler, int maxBatchSize, int maxQueueLength)
         {
             _logger = LogProvider.GetCurrentClassLogger();
             _batchHandler = batchHandler;
             _maxBatchSize = maxBatchSize;
             _items = new BlockingCollection<T>(maxQueueLength);
-            _batchTask = new Task(ProcessItems, TaskCreationOptions.LongRunning);
-            _batchTask.Start();
+            _batchTask = Task.Run(ProcessItems);
         }
 
-        public void Add(T item)
-        {
-            _items.Add(item);
-        }
+        public void Add(T item) => _items.Add(item);
 
         public async Task DisposeAsync()
         {
             _logger.Debug("Begin Dispose");
             _items.CompleteAdding();
-            await _batchTask.ConfigureAwait(false);
+            await _batchTask.NotOnCapturedContext();
             _logger.Debug("End Dispose");
         }
 
-        private void ProcessItems()
+        private async Task ProcessItems()
         {
             var buffer = new List<T>(_maxBatchSize);
 
             while (!_items.IsCompleted)
             {
+                //This will only effect the time it takes to Dispose
+                const int waitTimeInMillis = 1000;
+
                 //Wait for an item to arrive
-                if (_items.TryTake(out var firstItem, 1000))
+                if (_items.TryTake(out var firstItem, waitTimeInMillis))
                 {
                     buffer.Add(firstItem);
 
@@ -58,7 +57,7 @@ namespace Memstate
                         buffer.Add(item);
                     }
 
-                    _batchHandler.Invoke(buffer);
+                    await _batchHandler.Invoke(buffer);
                     buffer.Clear();
                 }
             }

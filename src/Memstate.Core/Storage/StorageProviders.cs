@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Memstate
 {
-    internal class StorageProviders : Providers<StorageProvider>
+    internal class StorageProviders : Providers<IStorageProvider>
     {
         //well known storage provider names
         public const string EventStore = nameof(EventStore);

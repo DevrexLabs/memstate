@@ -6,7 +6,7 @@ using Memstate.Configuration;
 
 namespace Memstate
 {
-    public class FileJournalReader : IJournalReader
+    public class FileJournalReader : JournalReader
     {
         private readonly Stream _journalStream;
 
@@ -20,20 +20,14 @@ namespace Memstate
             _serializer = cfg.CreateSerializer();
         }
 
-        public Task DisposeAsync()
+        public override Task DisposeAsync()
         {
             return Task.Run((Action) _journalStream.Dispose);
         }
 
-        public IEnumerable<JournalRecord> GetRecords(long fromRecord = 0)
+        public override IEnumerable<JournalRecord> ReadRecords(long from)
         {
-            foreach (var record in _serializer.ReadObjects<JournalRecord>(_journalStream))
-            {
-                if (record.RecordNumber >= fromRecord)
-                {
-                    yield return record;
-                }
-            }
+            throw new NotImplementedException();
         }
     }
 }

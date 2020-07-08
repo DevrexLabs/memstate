@@ -2,15 +2,41 @@
 
 namespace Memstate
 {
+
+    /// <summary>
+    /// Control commands are used by the engine for 
+    /// </summary>
+    [Serializable]
+    internal abstract class ControlCommand<T> : Command<Engine<T>> where T : class
+    {
+        /// <summary>
+        /// The engine that issued this command
+        /// </summary>
+        public Guid EngineId { get; set; }    
+    }
+
+    internal class SetStateToRunning<T> : ControlCommand<T> where T: class
+    {
+        public override void Execute(Engine<T> engine)
+        {
+            if (engine.EngineId == EngineId)
+            {
+                engine.SetStateAndNotify(EngineState.Running);
+            }
+        }
+    }
+    
+    
+
     [Serializable]
     public abstract class Command
     {
         protected Command()
         {
-            Id = Guid.NewGuid();
+            CommandId = Guid.NewGuid();
         }
 
-        public Guid Id { get; internal set; }
+        public Guid CommandId { get; internal set; }
 
         internal abstract object ExecuteImpl(object model);
 

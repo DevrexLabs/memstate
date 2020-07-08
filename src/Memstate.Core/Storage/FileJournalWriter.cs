@@ -32,14 +32,14 @@ namespace Memstate
 
         public override async Task DisposeAsync()
         {
-            await base.DisposeAsync().ConfigureAwait(false);
+            await base.DisposeAsync().NotOnCapturedContext();
 
-            await _journalStream.FlushAsync().ConfigureAwait(false);
+            await _journalStream.FlushAsync().NotOnCapturedContext();
 
             _journalStream.Dispose();
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var records = commands.Select(ToJournalRecord).ToArray();
 
@@ -47,6 +47,7 @@ namespace Memstate
             _journalStream.Flush();
 
             RecordsWritten.Invoke(records);
+            return Task.CompletedTask;
         }
 
         private JournalRecord ToJournalRecord(Command command)

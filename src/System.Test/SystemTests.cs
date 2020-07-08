@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Memstate;
 using Memstate.Configuration;
@@ -22,14 +23,14 @@ namespace System.Test
             Console.WriteLine(config);
             
             var provider = config.GetStorageProvider();
-            provider.Initialize();
-            var writer = provider.CreateJournalWriter(0);
+            await provider.Provision();
+            var writer = provider.CreateJournalWriter();
 
-            writer.Send(new AddStringCommand("hello"));
+            await writer.Write(new AddStringCommand("hello"));
             await writer.DisposeAsync().ConfigureAwait(false);
 
             var reader = provider.CreateJournalReader();
-            var records = reader.GetRecords().ToArray();
+            var records = reader.ReadRecords().ToArray();
             await reader.DisposeAsync().ConfigureAwait(false);
             Assert.AreEqual(1, records.Length);
         }
@@ -41,18 +42,18 @@ namespace System.Test
             Console.WriteLine(config);
 
             var provider = config.GetStorageProvider();
-            provider.Initialize();
+            await provider.Provision();
 
-            var journalWriter = provider.CreateJournalWriter(0);
+            var journalWriter = provider.CreateJournalWriter();
 
             for (var i = 0; i < 10000; i++)
             {
-                journalWriter.Send(new AddStringCommand(i.ToString()));
+                await journalWriter.Write(new AddStringCommand(i.ToString()));
             }
 
             await journalWriter.DisposeAsync().ConfigureAwait(false);
             var journalReader = provider.CreateJournalReader();
-            var records = journalReader.GetRecords().ToArray();
+            var records = journalReader.ReadRecords().ToArray();
             await journalReader.DisposeAsync().ConfigureAwait(false);
             Assert.AreEqual(10000, records.Length);
         }
@@ -64,58 +65,52 @@ namespace System.Test
             Console.WriteLine(config);
 
             var provider = config.GetStorageProvider();
-            const int NumRecords = 50;
-            var journalWriter = provider.CreateJournalWriter(0);
-            for (var i = 0; i < NumRecords; i++)
+            const int numRecords = 50;
+            var journalWriter = provider.CreateJournalWriter();
+            for (var i = 0; i < numRecords; i++)
             {
-                journalWriter.Send(new AddStringCommand(i.ToString()));
+                await journalWriter.Write(new AddStringCommand(i.ToString()));
             }
 
-            await journalWriter.DisposeAsync().ConfigureAwait(false);
+            await journalWriter.DisposeAsync().NotOnCapturedContext();
 
             var records = new List<JournalRecord>();
-            var subSource = provider.CreateJournalSubscriptionSource();
 
-            if (!provider.SupportsCatchupSubscriptions())
+            var reader = provider.CreateJournalReader();
+            var token = new CancellationToken();
             {
-                Assert.Throws<NotSupportedException>(() => subSource.Subscribe(0, records.Add));
-            }
-            else
-            {
-                subSource.Subscribe(0, r =>
+                await reader.Subscribe(0, records.Count - 1, r =>
                 {
                     records.Add(r);
                     Console.WriteLine("record received # " + r.RecordNumber);
-                });
-                await WaitForConditionOrThrow(() => records.Count == NumRecords).ConfigureAwait(false);
-                Assert.AreEqual(Enumerable.Range(0, NumRecords), records.Select(r => (int)r.RecordNumber));
+                }, token);
+                Assert.AreEqual(Enumerable.Range(0, numRecords), records.Select(r => (int)r.RecordNumber));
             }
         }
 
         [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversFutureCommands(Config config)
         {
-            const int NumRecords = 5;
+            const int numRecords = 5;
             Config.Current = config;
             Console.WriteLine(config);
 
             var provider = config.GetStorageProvider();
             var records = new List<JournalRecord>();
-            var writer = provider.CreateJournalWriter(0);
+            var writer = provider.CreateJournalWriter();
 
-            var subSource = provider.CreateJournalSubscriptionSource();
-            var sub = subSource.Subscribe(0, records.Add);
+            var reader = provider.CreateJournalReader();
+            var subTask = reader.Subscribe(0, 4, records.Add, CancellationToken.None);
 
-            for (var i = 0; i < NumRecords; i++)
+            for (var i = 0; i < numRecords; i++)
             {
-                writer.Send(new AddStringCommand(i.ToString()));
+                await writer.Write(new AddStringCommand(i.ToString()));
             }
 
-            await writer.DisposeAsync().ConfigureAwait(false);
-            await WaitForConditionOrThrow(() => records.Count == 5).ConfigureAwait(false);
-            sub.Dispose();
+            await writer.DisposeAsync().NotOnCapturedContext();
+            await subTask;
 
-            Assert.AreEqual(NumRecords, records.Count);
+            Assert.AreEqual(numRecords, records.Count);
         }
 
         [TestCaseSource(nameof(Configurations))]

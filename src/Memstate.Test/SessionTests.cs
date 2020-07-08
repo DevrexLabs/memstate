@@ -1,16 +1,15 @@
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Memstate.Configuration;
+using Memstate.Models;
+using Memstate.Models.KeyValue;
+using Memstate.Tcp;
 
 namespace Memstate.Test
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Memstate.Configuration;
-    using Memstate.Models;
-    using Memstate.Models.KeyValue;
-    using Memstate.Tcp;
-
     public class SessionTests
     {
         private  Session<KeyValueStore<int>> _session;
@@ -18,12 +17,12 @@ namespace Memstate.Test
         private List<Message> _messagesEmitted;
 
         [SetUp]
-        public async Task PerTestSetup()
+        public void PerTestSetup()
         {
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
-            var engine = await new EngineBuilder().Build(_testModel);
+            var engine = new EngineBuilder().Build(_testModel);
             _session = new Session<KeyValueStore<int>>(engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;

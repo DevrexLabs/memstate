@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SqlStreamStore;
 using SqlStreamStore.Streams;
 
@@ -19,18 +20,16 @@ namespace Memstate.SqlStreamStore
             _serializer = serializer;
         }
 
-        protected override void OnCommandBatch(IEnumerable<Command> commands)
+        protected override Task OnCommandBatch(IEnumerable<Command> commands)
         {
             var messages = commands.Select(ToNewStreamMessage).ToArray();
-            var result =  _streamStore.AppendToStream(_streamId, ExpectedVersion.Any, messages )
-               .GetAwaiter()
-               .GetResult();
+            return _streamStore.AppendToStream(_streamId, ExpectedVersion.Any, messages );
         }
 
         private NewStreamMessage ToNewStreamMessage(Command command)
         {
             var commandAsString = _serializer.ToString(command);
-            var id = command.Id;
+            var id = command.CommandId;
             return new NewStreamMessage(id, command.GetType().Name, commandAsString);
         }
     }

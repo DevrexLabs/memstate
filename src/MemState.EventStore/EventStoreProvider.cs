@@ -6,7 +6,7 @@ using Memstate.Configuration;
 
 namespace Memstate.EventStore
 {
-    public class EventStoreProvider : StorageProvider, IAsyncDisposable
+    public class EventStoreProvider : IStorageProvider, IAsyncDisposable
     {
         private readonly IEventStoreConnection _connection;
 

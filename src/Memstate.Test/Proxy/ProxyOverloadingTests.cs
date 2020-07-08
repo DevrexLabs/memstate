@@ -18,7 +18,7 @@ namespace Memstate.Test.DispatchProxy
 
             var model = new ModelWithOverloads();
             var engine = new EngineBuilder()
-                .Build<IModelWithOverloads>(model).Result;
+                .Build<IModelWithOverloads>(model);
             var client = new LocalClient<IModelWithOverloads>(engine);
             _db = client.GetDispatchProxy();
         }

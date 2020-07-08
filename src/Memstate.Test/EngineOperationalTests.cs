@@ -17,7 +17,7 @@ namespace Memstate.Test
         [SetUp]
         public void Setup()
         {
-            var cfg = Config.Current;
+            var cfg = Config.CreateDefault();
             _settings = cfg.GetSettings<EngineSettings>();
             cfg.FileSystem = new InMemoryFileSystem();
         }

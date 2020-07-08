@@ -36,7 +36,7 @@ namespace System.Test
             {
                 foreach (var providerName in ProviderNames())
                 {
-                    var cfg = Config.Reset();
+                    var cfg = Config.CreateDefault();
                     cfg.SerializerName = serializerName;
                     cfg.UseInMemoryFileSystem();
                     var settings = cfg.GetSettings<EngineSettings>();

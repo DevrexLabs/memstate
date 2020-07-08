@@ -7,23 +7,22 @@ using Memstate.Configuration;
 
 namespace Memstate.Postgres
 {
-
     public class PostgresJournalReader : JournalReader
     {
-        private const string SelectSql = @"SELECT id, written, command FROM {0}
-                                           WHERE id >= @id
-                                           ORDER BY id ASC";
+        private const string SelectSql = 
+            @"SELECT id, written, command FROM {0}
+              WHERE id >= @id ORDER BY id ASC";
 
         private readonly ISerializer _serializer;
         
         private readonly PostgresSettings _settings;
+        private readonly string _tableName;
 
-        public PostgresJournalReader(PostgresSettings settings)
+        public PostgresJournalReader(Config config, string tableName)
         {
-            Ensure.NotNull(settings, nameof(settings));
-
-            _settings = settings;
-            _serializer = Config.Current.CreateSerializer();
+            _tableName = tableName;
+            _settings = config.GetSettings<PostgresSettings>();
+            _serializer = config.CreateSerializer();
         }
 
         public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)
@@ -35,7 +34,7 @@ namespace Memstate.Postgres
                     using (var command = connection.CreateCommand())
                     {
                         var recordsRead = 0;
-                        command.CommandText = string.Format(SelectSql, _settings.Table);
+                        command.CommandText = string.Format(SelectSql, _tableName);
                         command.Parameters.AddWithValue("id", fromRecord);
 
                         using (var reader = command.ExecuteReader())

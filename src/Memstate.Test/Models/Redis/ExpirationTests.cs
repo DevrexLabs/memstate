@@ -76,12 +76,10 @@ namespace Memstate.Test.Models.Redis
         [Ignore("Expiration not implemented")]
         public async Task PurgeTimer()
         {
-            var cfg = Config.Current;
-            cfg.FileSystem = new InMemoryFileSystem();
-            var settings = cfg.GetSettings<EngineSettings>();
+            var config = Config.CreateDefault();
+            config.FileSystem = new InMemoryFileSystem();
 
-
-            var engine = await Engine.Start<IRedisModel>();
+            var engine = await Engine.Start<IRedisModel>(config);
             var redis = new LocalClient<IRedisModel>(engine).GetDispatchProxy();
 
             var mre = new ManualResetEvent(false);

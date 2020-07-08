@@ -10,12 +10,12 @@ namespace Memstate.Azure
         private readonly Partition _partition;
         private readonly ISerializer _serializer;
 
-        public TableStorageJournalReader(Partition partition)
+        public TableStorageJournalReader(ISerializer serializer, Partition partition)
         {
             Ensure.NotNull(partition, nameof(partition));
 
             _partition = partition;
-            _serializer = Config.Current.CreateSerializer();
+            _serializer = serializer;
         }
 
         public override IEnumerable<JournalRecord> ReadRecords(long fromRecord)

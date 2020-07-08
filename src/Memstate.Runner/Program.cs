@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Host;
 using Memstate.Runner.Commands;
 
@@ -14,6 +15,8 @@ namespace Memstate.Runner
     /// </summary>
     class Program
     {
+        internal static Config Config = Config.CreateDefault();
+        
         private static readonly Dictionary<string, Type> Commands = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
         {
             {"redis", typeof(RedisServerCommand)},

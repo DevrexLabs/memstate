@@ -16,11 +16,11 @@ namespace Memstate.Test
         [SetUp]
         public async Task SetUp()
         {
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             config.FileSystem = new InMemoryFileSystem();
             _settings = config.GetSettings<EngineSettings>();
             _settings.WithRandomSuffixAppendedToStreamName();
-            _engine = await Engine.Start<UsersModel>();
+            _engine = await Engine.Start<UsersModel>(config);
             _client = new LocalClient<UsersModel>(_engine);
         }
 

@@ -22,7 +22,7 @@ namespace Memstate.Runner.Commands
 
         public async Task Start(string[] arguments)
         {
-            Settings = Config.Current.GetSettings<EngineSettings>();
+            Settings = Program.Config.GetSettings<EngineSettings>();
             Settings.WithRandomSuffixAppendedToStreamName();
 
             Logger = LogProvider.GetCurrentClassLogger();

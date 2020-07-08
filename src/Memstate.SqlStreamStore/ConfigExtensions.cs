@@ -19,18 +19,14 @@ namespace Memstate.SqlStreamStore
         /// <param name="maxRecordsPerRead">The number of  to fetch</param>
         /// <returns></returns>
         public static Config UseSqlStreamStore(this Config config, 
-            IStreamStore streamStore = null,
+            IStreamStore streamStore,
             bool useSubscriptionBasedReader = false,
             int maxRecordsPerRead = 100)
         {
-            //TODO: Fix this, we need a way to inject 
             var settings = config.GetSettings<SqlStreamStoreSettings>();
             settings.UseSubscriptionBasedReader = useSubscriptionBasedReader;
             settings.MaxRecordsPerRead = maxRecordsPerRead;
-            
-            //config.Data["SqlStreamStore.UseSubscriptionBasedReader"] = useSubscriptionBasedReader.ToString();
-            //config.Data["SqlStreamStore.MaxRecordsPerRead"] = maxRecordsPerRead.ToString();
-            
+  
             config.StorageProviderName = StorageProviders.SqlStreamStore;
             config.Container.Register(streamStore);
             return config;

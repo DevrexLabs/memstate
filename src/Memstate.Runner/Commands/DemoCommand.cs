@@ -31,11 +31,10 @@ namespace Memstate.Runner.Commands
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
-            var cfg = Config.Current;
-            var settings = cfg.GetSettings<EngineSettings>();
+            var cfg = Program.Config;
             cfg.FileSystem = new InMemoryFileSystem();
 
-            var host = new HostBuilder<KeyValueStore<int>>()
+            var host = new HostBuilder<KeyValueStore<int>>(cfg)
                 .UseWebConsole()
                 .Build();
 

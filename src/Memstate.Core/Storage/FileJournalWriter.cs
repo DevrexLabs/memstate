@@ -18,12 +18,12 @@ namespace Memstate
         /// </summary>
         private long _nextRecord;
 
-        public FileJournalWriter(string fileName, long nextRecord)
+        public FileJournalWriter(Config config,  string fileName, long nextRecord)
+            :base(config.GetSettings<EngineSettings>())
         {
-            var cfg = Config.Current;
             _nextRecord = nextRecord;
-            _journalStream = cfg.FileSystem.OpenAppend(fileName);
-            _serializer = cfg.CreateSerializer();
+            _journalStream = config.FileSystem.OpenAppend(fileName);
+            _serializer = config.CreateSerializer();
         }
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };

@@ -9,12 +9,13 @@ namespace Memstate.Azure
     public class TableStorageProvider : IStorageProvider
     {
         private readonly Partition _partition;
+        private readonly Config _config;
 
-        public TableStorageProvider()
+        public TableStorageProvider(Config config)
         {
+            _config = config;
             try
             {
-                var config = Config.Current;
                 var engineSettings = config.GetSettings<EngineSettings>();
                 if (!config.Container.TryResolve(out CloudTable cloudTable)) throw new Exception("No CloudTable configured, did you forget to call Config.Current.UseAzureTableStorage()?");
                 _partition = new Partition(cloudTable, engineSettings.StreamName);
@@ -34,13 +35,14 @@ namespace Memstate.Azure
 
         public IJournalReader CreateJournalReader()
         {
-            return new TableStorageJournalReader(_partition);
+            var serializer = _config.CreateSerializer();
+            return new TableStorageJournalReader(serializer, _partition);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
             var head = Stream.OpenAsync(_partition).GetAwaiter().GetResult();
-            return new TableStorageJournalWriter(head);
+            return new TableStorageJournalWriter(_config, head);
         }
     }
 }

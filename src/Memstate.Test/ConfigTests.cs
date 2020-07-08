@@ -10,7 +10,7 @@ namespace Memstate.Test
         [Test]
         public void BinarySerializerIsDefault()
         {
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             var serializer = config.CreateSerializer();
             Assert.IsInstanceOf<BinarySerializer>(serializer);
         }
@@ -21,7 +21,7 @@ namespace Memstate.Test
             int expected = 123;
             var key = "MEMSTATE_ENGINE_MAXBATCHSIZE";
             Environment.SetEnvironmentVariable(key, expected.ToString());
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             var engineSettings = config.GetSettings<EngineSettings>();
             Assert.AreEqual(expected, engineSettings.MaxBatchSize);
         }
@@ -33,7 +33,7 @@ namespace Memstate.Test
             string varName = "Memstate_Postgres_Password";
             string value = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(varName, value);
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             Console.WriteLine(config.ConfigurationData.ToString());
             Assert.DoesNotThrow(() => config.ConfigurationData.Get(key));
         }
@@ -45,7 +45,7 @@ namespace Memstate.Test
             string varName = "MEMSTATE_POSTGRES_PASSWORD";
             string value = Guid.NewGuid().ToString();
             Environment.SetEnvironmentVariable(varName, value);
-            var config = Config.Reset();
+            var config = Config.CreateDefault();
             Console.WriteLine(config.ConfigurationData.ToString());
             Assert.DoesNotThrow(() => config.ConfigurationData.Get(key));
         }

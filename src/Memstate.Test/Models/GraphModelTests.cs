@@ -24,7 +24,6 @@ namespace Memstate.Test.Models
         {
             if (File.Exists(WireJournalFile)) File.Delete(WireJournalFile);
             if (File.Exists(JsonJournalFile)) File.Delete(JsonJournalFile);
-            Config.Reset();
         }
 
         [SetUp]

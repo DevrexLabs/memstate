@@ -19,9 +19,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteOne(Config config)
         {
-            Config.Current = config;
-            Console.WriteLine(config);
-            
             var provider = config.GetStorageProvider();
             await provider.Provision();
             var writer = provider.CreateJournalWriter();
@@ -38,9 +35,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task WriteAndReadCommands(Config config)
         {
-            Config.Current = config;
-            Console.WriteLine(config);
-
             var provider = config.GetStorageProvider();
             await provider.Provision();
 
@@ -61,7 +55,6 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task SubscriptionDeliversPreExistingCommands(Config config)
         {
-            Config.Current = config;
             Console.WriteLine(config);
 
             var provider = config.GetStorageProvider();
@@ -92,7 +85,6 @@ namespace System.Test
         public async Task SubscriptionDeliversFutureCommands(Config config)
         {
             const int numRecords = 5;
-            Config.Current = config;
             Console.WriteLine(config);
 
             var provider = config.GetStorageProvider();
@@ -116,49 +108,34 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task Can_execute_void_commands(Config config)
         {
-            Config.Current = config;
             Console.WriteLine(config);
-            var engine = await Engine.Start<List<string>>().ConfigureAwait(false);
-            await engine.Execute(new Reverse()).ConfigureAwait(false);
-            await engine.DisposeAsync().ConfigureAwait(false);
+            var engine = await Engine.Start<List<string>>(config);
+            await engine.Execute(new Reverse());
+            await engine.DisposeAsync();
         }
 
         [TestCaseSource(nameof(Configurations))]
         public async Task Smoke(Config config)
         {
             const int NumRecords = 100;
-
-            Config.Current = config;
+            
             Console.WriteLine(config);
 
-            var engine = await Engine.Start<List<string>>().ConfigureAwait(false);
+            var engine = await Engine.Start<List<string>>(config).ConfigureAwait(false);
 
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
                 var command = new AddStringCommand(number.ToString());
-                var count = await engine.Execute(command).ConfigureAwait(false);
+                var count = await engine.Execute(command);
                 Assert.AreEqual(number, count);
             }
 
-            await engine.DisposeAsync().ConfigureAwait(false);
+            await engine.DisposeAsync();
 
-            engine = await Engine.Start<List<string>>().ConfigureAwait(false);
+            engine = await Engine.Start<List<string>>(config).ConfigureAwait(false);
             var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
             Assert.AreEqual(NumRecords, strings.Count);
-            await engine.DisposeAsync().ConfigureAwait(false);
-        }
-
-        private async Task WaitForConditionOrThrow(Func<bool> condition, TimeSpan? checkInterval = null, int numberOfTries = 25)
-        {
-            checkInterval = checkInterval ?? TimeSpan.FromMilliseconds(50);
-            while (!condition.Invoke())
-            {
-                await Task.Delay(checkInterval.Value).ConfigureAwait(false);
-                if (numberOfTries-- == 0)
-                {
-                    throw new TimeoutException();
-                }
-            }
+            await engine.DisposeAsync();
         }
     }
 }

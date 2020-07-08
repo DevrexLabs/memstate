@@ -19,10 +19,10 @@ namespace Memstate.Test.Proxy
         [SetUp]
         public async Task Setup()
         {
-            var cfg = Config.Reset();
-            cfg.UseInMemoryFileSystem();
-            cfg.GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
-            _engine = await Engine.Start<ITestModel>();
+            var config = Config.CreateDefault();
+            config.UseInMemoryFileSystem();
+            config.GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
+            _engine = await Engine.Start<ITestModel>(config);
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 

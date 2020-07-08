@@ -5,14 +5,14 @@ using static Memstate.Models.Graph.GraphModel;
 
 namespace Memstate.Docs.GettingStarted.QuickStartGraph.Queries
 {
-    public class GetUsersWithTweets : Query<GraphModel, IEnumerable<Node>>
+    public class GetUsersWithTweets : Query<GraphModel, List<Node>>
     {
-        public override IEnumerable<Node> Execute(GraphModel db)
+        public override List<Node> Execute(GraphModel db)
         {
             var users = db.Nodes.Where(n => n.Label == "user");
             var tweetEdges = users.SelectMany(e => e.Out.Where(r => r.Label == "tweeted"));
             var tweets = tweetEdges.Select(e => e.To);
-            return tweets;
+            return tweets.ToList();
         }
     }
 }

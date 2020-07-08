@@ -20,10 +20,10 @@ namespace Memstate.Test
         [SetUp]
         public async Task PerTestSetup()
         {
-            var cfg = Config.Reset();
+            var cfg = Config.CreateDefault();
             cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
-            _engine = Engine.Build(_testModel);
+            _engine = Engine.Build(_testModel,cfg);
             await _engine.Start(waitUntilReady:true); 
             _session = new Session<KeyValueStore<int>>(_engine);
             _messagesEmitted = new List<Message>();

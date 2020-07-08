@@ -10,21 +10,25 @@ namespace Memstate
         /// <summary>
         /// Load an existing or create a new engine
         /// </summary>
+        /// <param name="config"></param>
         /// <param name="waitUntilReady"></param>
         /// <returns>A task that completes when the engine is ready to process messages</returns>
-        public static async Task<Engine<T>> Start<T>(bool waitUntilReady = true) where T : class
+        public static async Task<Engine<T>> Start<T>(Config config = null, bool waitUntilReady = true) where T : class
         {
-            var engine = Build<T>();
+            config = config ?? Config.CreateDefault();
+            var engine = Build<T>(config);
             await engine.Start(waitUntilReady);
             return engine;
         }
 
-        public static async Task<Engine<T>> For<T>(bool waitUntilReady = true) where T : class
+        public static async Task<Engine<T>> For<T>(Config config = null, bool waitUntilReady = true) where T : class
         {
-            var container = Config.Current.Container;
+            config = config ?? Config.CreateDefault();
+
+            var container = config.Container;
             if (!container.CanResolve<Engine<T>>())
             {
-                var engine = await Start<T>(waitUntilReady);
+                var engine = await Start<T>(config, waitUntilReady);
                 container.Register(engine);
             }
             return container.Resolve<Engine<T>>();
@@ -35,14 +39,16 @@ namespace Memstate
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Engine<T> Build<T>() where T : class
+        public static Engine<T> Build<T>(Config config = null) where T : class
         {
-            Type modelType = typeof(T); 
+            config = config ?? Config.CreateDefault();
+
+            var modelType = typeof(T); 
             if (modelType.IsInterface)
                 modelType = DeriveClassFromInterface(modelType);
 
             var initialState = (T) Activator.CreateInstance(modelType);
-            return Build(initialState);
+            return Build(initialState, config);
         }
 
         [SuppressMessage("ReSharper", "StringLastIndexOfIsCultureSpecific.1")]
@@ -61,27 +67,25 @@ namespace Memstate
             return type;
         }
 
-        
+
         /// <summary>
         /// Build but do not start
         /// </summary>
         /// <param name="initialState"></param>
+        /// <param name="config"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Engine<T> Build<T>(T initialState) where T : class
+        public static Engine<T> Build<T>(T initialState, Config config = null) where T : class
         {
-            var config = Config.Current;
-            var engineSettings = config.GetSettings<EngineSettings>();
-            var storageProvider = config.GetStorageProvider();
-            //todo: push this whole method into into Engine class
-            storageProvider.Provision().GetAwaiter().GetResult();
-            return new Engine<T>(initialState, engineSettings, storageProvider);
+            config = config ?? Config.CreateDefault();
+            return new Engine<T>(initialState, config);
         }
 
-        public static async Task<Engine<T>> Start<T>(T model) where T : class
+        public static async Task<Engine<T>> Start<T>(T model, Config config = null, bool waitUntilReady = true) where T : class
         {
-            var engine = Build(model);
-            await engine.Start();
+            config = config ?? Config.CreateDefault();
+            var engine = new Engine<T>(model, config);
+            await engine.Start(waitUntilReady);
             return engine;
         }
     }

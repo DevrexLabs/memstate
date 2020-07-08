@@ -28,7 +28,7 @@ namespace Memstate.Benchmarks
         [GlobalSetup]
         public async Task Setup()
         {
-            var config = Config.Current;
+            var config = Config.CreateDefault();
             var settings = config.GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
 
             /* 
@@ -37,7 +37,7 @@ namespace Memstate.Benchmarks
             */
             config.StorageProviderName = StorageProviderTypes.AssemblyQualifiedName;
             config.SerializerName = "newtonsoft.json";
-            _engine = await Engine.Start<KeyValueStore<int>>();
+            _engine = await Engine.Start<KeyValueStore<int>>(config);
         }
 
         [GlobalCleanup]

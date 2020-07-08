@@ -12,10 +12,16 @@ namespace Memstate.Postgres
         private readonly ILog _log;
         private bool _initialized;
 
-        public PostgresProvider()
+        private readonly string _tableName;
+        private readonly Config _config;
+
+        public PostgresProvider(Config config)
         {
-            _log = LogProvider.GetCurrentClassLogger();
-            Settings = Config.Current.GetSettings<PostgresSettings>();
+            _config = config;
+            _log = LogProvider.GetLogger(nameof(PostgresProvider));
+            Settings = config.GetSettings<PostgresSettings>();
+            var engineSettings = config.GetSettings<EngineSettings>();
+            _tableName = Settings.RenderTableNameTemplate(engineSettings.StreamName);
         }
 
         static PostgresProvider()
@@ -37,27 +43,30 @@ namespace Memstate.Postgres
             if (_initialized) return;
             _log.Debug("Initializing...");
 
-            var sql = Settings.InitSql.Value;
-            
             using (var connection = new NpgsqlConnection(Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
                 await connection.OpenAsync();
-                command.CommandText = string.Format(sql, Settings.SubscriptionStream, Settings.Table);
+                command.CommandText = GetSql();
                 await command.ExecuteNonQueryAsync();
             }
             _initialized = true;
         }
 
+        private string GetSql()
+        {
+            var sql = Settings.InitSql.Value;
+            return string.Format(sql, _tableName);
+        }
+
         public IJournalReader CreateJournalReader()
         {
-            return new PostgresJournalReader(Settings);
+            return new PostgresJournalReader(_config, _tableName);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
-            var serializer = Config.Current.CreateSerializer();
-            return new PostgresJournalWriter(serializer, Settings);
+            return new PostgresJournalWriter(_config, _tableName);
         }
         
         public Task DisposeAsync() => Task.CompletedTask;

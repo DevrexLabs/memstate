@@ -11,11 +11,11 @@ namespace Memstate.Pravega
 
         private string _scope;
         private string _stream;
+        private readonly Config _config;
 
         public async Task Provision()
         {
-            var config = Config.Current;
-            var settings = config.GetSettings<EngineSettings>();
+            var settings = _config.GetSettings<EngineSettings>();
             var streamName = settings.StreamName;
 
             if (!streamName.Contains("/")) streamName += "/stream";
@@ -41,18 +41,19 @@ namespace Memstate.Pravega
 
         public IJournalReader CreateJournalReader()
         {
-            var serializer = Config.Current.CreateSerializer();
+            var serializer = _config.CreateSerializer();
             return new PravegaJournalReader(_client, serializer, _scope, _stream, null);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
-            var serializer = Config.Current.CreateSerializer();
-            return new PravegaJournalWriter(_client, serializer, _scope, _stream);
+            var serializer = _config.CreateSerializer();
+            return new PravegaJournalWriter(_config, _client, _scope, _stream);
         }
         
-        public PravegaProvider()
+        public PravegaProvider(Config config)
         {
+            _config = config;
             // https://github.com/grpc/grpc-java/issues/6193#issuecomment-537745226
             // https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-3.0#call-insecure-grpc-services-with-net-core-client
             AppContext.SetSwitch(

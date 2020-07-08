@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
+using Memstate.Configuration;
 
 namespace Memstate.Pravega
 {
@@ -14,9 +15,10 @@ namespace Memstate.Pravega
         private readonly string _scope;
         private readonly string _stream;
 
-        public PravegaJournalWriter(PravegaGateway.PravegaGatewayClient client, ISerializer serializer, string scope, string stream)
+        public PravegaJournalWriter(Config config, PravegaGateway.PravegaGatewayClient client, string scope, string stream)
+            :base(config.GetSettings<EngineSettings>())
         {
-            _serializer = serializer;
+            _serializer = config.CreateSerializer();
             _client = client;
             _scope = scope;
             _stream = stream;

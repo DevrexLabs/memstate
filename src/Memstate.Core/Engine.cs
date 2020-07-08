@@ -4,15 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Logging;
 
 namespace Memstate
 {
     public class Engine<TModel> where TModel : class
     {
-        public EngineState State { get; internal set; } = EngineState.NotStarted;
+        public EngineState State { get; private set; } 
+            = EngineState.NotStarted;
 
-        private readonly ILog _logger;
+        // ReSharper disable once StaticMemberInGenericType
+        private readonly ILog _log = LogProvider.GetLogger(nameof(Engine));
 
         private readonly Kernel _kernel;
 
@@ -51,19 +54,19 @@ namespace Memstate
         public event CommandExecuted CommandExecuted = delegate { };
         public event StateTransitioned StateChanged = delegate { };
 
-        public Engine(
-            TModel model,
-            EngineSettings settings,
-            IStorageProvider storageProvider)
+        public Engine(TModel model, Config config)
         {
-            _logger = LogProvider.GetCurrentClassLogger();
-            _kernel = new Kernel(settings, model);
-            _settings = settings;
+            _settings = config.GetSettings<EngineSettings>();
+            _kernel = new Kernel(_settings, model);
+            
+            var storageProvider = config.GetStorageProvider();
             _journalWriter = storageProvider.CreateJournalWriter();
             _journalReader = storageProvider.CreateJournalReader();
+            
             _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
             _metrics = Metrics.Provider.GetEngineMetrics();
         }
+
 
         public async Task Start(bool waitUntilReady = false)
         {
@@ -128,13 +131,13 @@ namespace Memstate
             }
 
             SetStateAndNotify(EngineState.Disposing);
-            _logger.Info("Stopping JournalWriter");
+            _log.Info("Stopping JournalWriter");
             await _journalWriter.DisposeAsync().NotOnCapturedContext();
             
-            _logger.Info("Waiting for pending commands");
+            _log.Info("Waiting for pending commands");
             while (!_pendingLocalCommands.IsEmpty) _pendingCommandsChanged.WaitOne();
 
-            _logger.Info("Stopping JournalReader");
+            _log.Info("Stopping JournalReader");
             _subscriptionCancellation.Cancel();
             await _subscription;
             SetStateAndNotify(EngineState.Disposed);
@@ -180,7 +183,7 @@ namespace Memstate
             var oldState = State;
             State = newState;
             StateChanged(oldState, newState);
-            _logger.Info($"State changed from {oldState} to {newState}");
+            _log.Info($"State changed from {oldState} to {newState}");
         }
 
         /// <summary>
@@ -229,7 +232,7 @@ namespace Memstate
                     _pendingCommandsChanged.Set();
                 }
 
-                _logger.Debug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
+                _log.Debug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
 
                 VerifyRecordSequence(record.RecordNumber);
 
@@ -250,7 +253,7 @@ namespace Memstate
             catch (Exception ex)
             {
                 _metrics.CommandFailed();
-                _logger.Error(ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
+                _log.Error(ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
                 completion?.SetException(ex);
             }
         }
@@ -266,7 +269,7 @@ namespace Memstate
                     throw new Exception($"Broken sequence, expected {expected}, got {actualRecordNumber}");
                 }
 
-                _logger.Warn(
+                _log.Warn(
                     "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
                     expected,
                     actualRecordNumber);
@@ -281,7 +284,7 @@ namespace Memstate
             }
             catch (Exception exception)
             {
-                _logger.Error(exception, "Exception thrown in CommandExecuted handler.");
+                _log.Error(exception, "Exception thrown in CommandExecuted handler.");
             }
         }
     }

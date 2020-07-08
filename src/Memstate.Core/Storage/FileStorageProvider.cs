@@ -6,37 +6,33 @@ namespace Memstate
 {
     public class FileStorageProvider : IStorageProvider
     {
-        private readonly FileStorageSettings _fileStorageSettings;
-        private readonly EngineSettings _settings;
         private FileJournalWriter _currentWriter;
-        private readonly IFileSystem _fileSystem;
+
+        private readonly Config _config;
+        private readonly string _fileName;
 
 
-        public FileStorageProvider()
+        public FileStorageProvider(Config config)
         {
-            var cfg = Config.Current;
-            _settings = cfg.GetSettings<EngineSettings>();
-            _fileStorageSettings = cfg.GetSettings<FileStorageSettings>();
-            _fileSystem = cfg.FileSystem;
+            _config = config;
+            var settings = config.GetSettings<EngineSettings>();
+            var fileStorageSettings = config.GetSettings<FileStorageSettings>();
+            _fileName = (fileStorageSettings.FileNameWithoutSuffix ?? settings.StreamName) +
+                        fileStorageSettings.FileNameSuffix;
         }
 
-        public Task Provision()
-        {
-            return Task.CompletedTask;
-        }
+        public Task Provision() => Task.CompletedTask;
 
         public IJournalReader CreateJournalReader()
         {
-            var fileName = _fileStorageSettings.FileName;
-            return new FileJournalReader(fileName, _currentWriter);
+            return new FileJournalReader(_config, _fileName, _currentWriter);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
             //todo: figure out a way to initialize
             var nextRecordNumber = 0;
-            var fileName = _fileStorageSettings.FileName;
-            _currentWriter = new FileJournalWriter(fileName, nextRecordNumber);
+            _currentWriter = new FileJournalWriter(_config, _fileName, nextRecordNumber);
             return _currentWriter;
         }
 

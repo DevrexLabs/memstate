@@ -12,13 +12,14 @@ namespace Memstate
         private readonly string _fileName;
         private readonly ISerializer _serializer;
         private readonly FileJournalWriter _writer;
+        private readonly IFileSystem _fileSystem;
 
-        public FileJournalReader(string fileName, FileJournalWriter writer)
+        public FileJournalReader(Config config, string fileName, FileJournalWriter writer)
         {
             _writer = writer;
             _fileName = fileName;
-            var config = Config.Current;
             _serializer = config.CreateSerializer();
+            _fileSystem = config.FileSystem;
         }
 
         public override Task DisposeAsync() => Task.CompletedTask;
@@ -47,8 +48,7 @@ namespace Memstate
 
         public override IEnumerable<JournalRecord> ReadRecords(long from)
         {
-            var fs = Config.Current.FileSystem;
-            using (var stream = fs.OpenRead(_fileName))
+            using (var stream = _fileSystem.OpenRead(_fileName))
             {
                 foreach (var record in _serializer.ReadObjects<JournalRecord>(stream))
                 {

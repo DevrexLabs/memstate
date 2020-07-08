@@ -20,17 +20,15 @@ namespace Memstate.Postgres.Tests
         [SetUp]
         public async System.Threading.Tasks.Task Setup()
         {
-            var cfg = Config.Reset();
-            cfg.GetSettings<EngineSettings>()
-               .WithRandomSuffixAppendedToStreamName();
+            var config = Config.CreateDefault();
 
-            _provider = new PostgresProvider();
+            _provider = new PostgresProvider(config);
             await _provider.Provision();
 
             _journalReader = _provider.CreateJournalReader();
             _journalWriter = _provider.CreateJournalWriter();
 
-            _serializer = Config.Current.CreateSerializer();
+            _serializer = config.CreateSerializer();
         }
 
         [Test]
@@ -67,7 +65,7 @@ namespace Memstate.Postgres.Tests
                 connection.Open();
 
                 command.CommandText = string.Format("INSERT INTO {0} (command) VALUES(@command);",
-                    _provider.Settings.Table);
+                    "memstate_journal");
 
                 command.Parameters.AddWithValue("@command", Convert.ToBase64String(data));
 
@@ -86,7 +84,7 @@ namespace Memstate.Postgres.Tests
 
                 command.CommandText = string.Format(
                     "SELECT id, written FROM {0} ORDER BY id ASC;",
-                    _provider.Settings.Table);
+                    "memstate_journal");
 
                 using (var reader = command.ExecuteReader())
                 {

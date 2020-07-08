@@ -16,34 +16,32 @@ namespace System.Test
         {
             const int records = 100;
 
-            Config.Current = config;
-
-            var writer = await Engine.Start<List<string>>().ConfigureAwait(false);
+            var writer = await Engine.Start<List<string>>(config).NotOnCapturedContext();
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
+            readers[1] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
+            readers[2] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
 
             foreach (var number in Enumerable.Range(1, records))
             {
                 var command = new AddStringCommand($"{number}");
-                var count = await writer.Execute(command).ConfigureAwait(false);
+                var count = await writer.Execute(command).NotOnCapturedContext();
                 Assert.AreEqual(number, count);
             }
 
-            await writer.DisposeAsync().ConfigureAwait(false);
+            await writer.DisposeAsync().NotOnCapturedContext();
 
             foreach (var reader in readers)
             {
                 await reader.EnsureVersion(writer.LastRecordNumber);
                 
-                var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
+                var strings = await reader.Execute(new GetStringsQuery()).NotOnCapturedContext();
 
                 Assert.AreEqual(records, strings.Count);
 
-                await reader.DisposeAsync().ConfigureAwait(false);
+                await reader.DisposeAsync().NotOnCapturedContext();
             }
         }
 
@@ -53,15 +51,13 @@ namespace System.Test
         {
             const int records = 100;
 
-            Config.Current = config;
-
-            var reader = await Engine.Start<List<string>>().ConfigureAwait(false);
+            var reader = await Engine.Start<List<string>>(config).NotOnCapturedContext();
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            writers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            writers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>(config);
+            writers[1] = await Engine.Start<List<string>>(config);
+            writers[2] = await Engine.Start<List<string>>(config);
 
             var totalCount = 0;
 
@@ -74,14 +70,14 @@ namespace System.Test
                     Assert.AreEqual(++totalCount, count);
                 }
 
-                await writer.DisposeAsync().ConfigureAwait(false);
+                await writer.DisposeAsync();
             }
 
-            var strings = await reader.Execute(new GetStringsQuery()).ConfigureAwait(false);
+            var strings = await reader.Execute(new GetStringsQuery()).NotOnCapturedContext();
 
             Assert.AreEqual(records * writers.Length, strings.Count);
 
-            await reader.DisposeAsync().ConfigureAwait(false);
+            await reader.DisposeAsync().NotOnCapturedContext();
         }
 
         // Multiple writers, multiple readers
@@ -89,21 +85,18 @@ namespace System.Test
         public async Task CanWriteManyAndReadFromMany(Config config)
         {
             const int records = 100;
-
-            Config.Current = config;
-
-
+            
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            writers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            writers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            writers[0] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            writers[1] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            writers[2] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
 
             var totalCount = 0;
 
@@ -116,7 +109,7 @@ namespace System.Test
                     Assert.AreEqual(++totalCount, count);
                 }
 
-                await writer.DisposeAsync().ConfigureAwait(false);
+                await writer.DisposeAsync().NotOnCapturedContext();
             }
 
             for(var i = 0; i < readers.Length; i++)
@@ -137,17 +130,14 @@ namespace System.Test
         [TestCaseSource(nameof(Configurations))]
         public async Task CanWriteManyAndReadFromManyInParallel(Config config)
         {
-            Config.Current = config;
-
             const int Records = 100;
-
 
             Console.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[1] = await Engine.Start<List<string>>().ConfigureAwait(false);
-            readers[2] = await Engine.Start<List<string>>().ConfigureAwait(false);
+            readers[0] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            readers[1] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            readers[2] = await Engine.Start<List<string>>(config).ConfigureAwait(false);
             Console.WriteLine("Readers created");
 
             Console.WriteLine("Creating writers");

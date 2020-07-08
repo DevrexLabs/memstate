@@ -11,17 +11,22 @@ namespace Memstate.Test
     {
         private EngineSettings _settings;
         private LocalClient<UsersModel> _client;
+        private Engine<UsersModel> _engine;
 
         [SetUp]
         public async Task SetUp()
         {
-            var cfg = Config.Reset();
-            cfg.FileSystem = new InMemoryFileSystem();
-            _settings = cfg.GetSettings<EngineSettings>();
-            var engine = await Engine.Start<UsersModel>();
-            _client = new LocalClient<UsersModel>(engine);
+            var config = Config.Reset();
+            config.FileSystem = new InMemoryFileSystem();
+            _settings = config.GetSettings<EngineSettings>();
+            _settings.WithRandomSuffixAppendedToStreamName();
+            _engine = await Engine.Start<UsersModel>();
+            _client = new LocalClient<UsersModel>(_engine);
         }
-        
+
+        [TearDown]
+        public Task TearDown() => _engine.DisposeAsync();
+
         [Test]
         public async Task Subscribe_with_filter()
         {

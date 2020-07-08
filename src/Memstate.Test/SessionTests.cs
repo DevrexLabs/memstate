@@ -15,6 +15,7 @@ namespace Memstate.Test
         private  Session<KeyValueStore<int>> _session;
         private KeyValueStore<int> _testModel;
         private List<Message> _messagesEmitted;
+        private Engine<KeyValueStore<int>> _engine;
 
         [SetUp]
         public async Task PerTestSetup()
@@ -22,12 +23,15 @@ namespace Memstate.Test
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
-            var engine = Engine.Build(_testModel);
-            await engine.Start(); //todo: add an overload taking an initial state
-            _session = new Session<KeyValueStore<int>>(engine);
+            _engine = Engine.Build(_testModel);
+            await _engine.Start(waitUntilReady:true); 
+            _session = new Session<KeyValueStore<int>>(_engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;
         }
+
+        [TearDown]
+        public Task TearDown() => _engine.DisposeAsync();
 
         [Test]
         public async Task Incompatible_command_emits_ExceptionResponse()

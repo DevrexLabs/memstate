@@ -1,4 +1,3 @@
-using Memstate.Models.KeyValue;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -10,16 +9,20 @@ namespace Memstate.Test.Models
     public class KeyValueStoreProxyTests
     {
         private IKeyValueStore<int> _keyValueStore;
+        private Client<IKeyValueStore<int>> _client;
 
         [SetUp]
         public async Task Setup()
         {
             var config = Config.Reset();
             config.UseInMemoryFileSystem();
-            var engine = await Engine.Start<IKeyValueStore<int>>();
-            var client = new LocalClient<IKeyValueStore<int>>(engine);
-            _keyValueStore = client.GetDispatchProxy();
+            var engine = await Engine.Start<IKeyValueStore<int>>(new KeyValueStore<int>());
+            _client = new LocalClient<IKeyValueStore<int>>(engine);
+            _keyValueStore = _client.GetDispatchProxy();
         }
+
+        [TearDown]
+        public Task Teardown() => _client.DisposeAsync();
 
         [Test]
         public void Set_stores_value()

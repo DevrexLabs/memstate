@@ -7,7 +7,7 @@ using Memstate.Configuration;
 
 namespace Memstate
 {
-    internal class FileJournalWriter : BatchingJournalWriter
+    public class FileJournalWriter : BatchingJournalWriter
     {
         private readonly Stream _journalStream;
 

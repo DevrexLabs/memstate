@@ -10,6 +10,7 @@ namespace Memstate.Test.DispatchProxy
     {
         private IModelWithOverloads _db;
 
+        private Engine<IModelWithOverloads> _engine;
 
         [SetUp]
         public async Task Setup()
@@ -17,13 +18,17 @@ namespace Memstate.Test.DispatchProxy
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
 
-            var engine = await Engine.Start<IModelWithOverloads>();
-            var client = new LocalClient<IModelWithOverloads>(engine);
+            _engine = Engine.Build<IModelWithOverloads>();
+            await _engine.Start(waitUntilReady: true);
+            var client = new LocalClient<IModelWithOverloads>(_engine);
             _db = client.GetDispatchProxy();
         }
 
+        [TearDown]
+        public Task TearDown() => _engine.DisposeAsync();
+
         [Test]
-        public void CanCallNoArgMethod()
+        public void  CanCallNoArgMethod()
         {
             _db.Meth();
            Assert.AreEqual(1, _db.GetCalls());
@@ -82,6 +87,7 @@ namespace Memstate.Test.DispatchProxy
             Assert.Throws<Exception>(() =>
             {
                 Client<IModelWithRefArg> client = null;
+                // ReSharper disable once ExpressionIsAlwaysNull
                 client.GetDispatchProxy();
             });
         }
@@ -92,6 +98,8 @@ namespace Memstate.Test.DispatchProxy
             Assert.Throws<Exception>(() =>
                 {
                     Client<IModelWithOutArg> client = null;
+                    
+                    // ReSharper disable once ExpressionIsAlwaysNull
                     client.GetDispatchProxy();
                 });
         }

@@ -4,6 +4,8 @@ using System.Reflection;
 using TinyIoC;
 using System.Text;
 using Fig;
+using Memstate.Logging;
+using Memstate.Logging.LogProviders;
 
 namespace Memstate.Configuration
 {
@@ -97,6 +99,7 @@ namespace Memstate.Configuration
 
         public static Config BuildDefault(string[] args = null)
         { 
+            LogProvider.SetCurrentLogProvider(new ColoredConsoleLogProvider());
             args = args ?? Environment.GetCommandLineArgs();
 
             var settings = new SettingsBuilder()

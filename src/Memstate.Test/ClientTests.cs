@@ -33,9 +33,7 @@ namespace Memstate.Test
             Assert.AreEqual(record2.Value, record.Value);
             Assert.AreEqual(record2.Version, record.Version);
 
-            //TODO: Need a shutdown/dispose on the client.
-            //Local client will disconnect from engine.
-            //Remote client will disconnect from server
+            await client.DisposeAsync();
         }
     }
 }

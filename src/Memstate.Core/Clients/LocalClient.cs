@@ -4,6 +4,11 @@ using System.Threading.Tasks;
 namespace Memstate
 {
 
+    /// <summary>
+    /// LocalClient has a direct reference to an Engine running in
+    /// the current process.
+    /// </summary>
+    /// <typeparam name="TModel"></typeparam>
     public class LocalClient<TModel> : Client<TModel> where TModel : class
     {
         private readonly Engine<TModel> _engine;
@@ -39,6 +44,8 @@ namespace Memstate
             _eventHandlers.ClearHandler<T>();
             return Task.CompletedTask;
         }
+
+        public override Task DisposeAsync() => _engine.DisposeAsync();
 
         public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
         {

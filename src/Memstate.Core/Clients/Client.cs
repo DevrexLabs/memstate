@@ -30,7 +30,7 @@ namespace Memstate
         }
     }
 
-    public abstract class Client<TModel>
+    public abstract class Client<TModel> : IAsyncDisposable
     {
 
         public abstract Task Execute(Command<TModel> command);
@@ -57,5 +57,7 @@ namespace Memstate
         /// <returns>A task which completes when the unsubscribe has been acknowledged</returns>
         /// <typeparam name="T">The 1st type parameter</typeparam>
         public abstract Task Unsubscribe<T>() where T : Event;
+
+        public abstract Task DisposeAsync();
     }
 }

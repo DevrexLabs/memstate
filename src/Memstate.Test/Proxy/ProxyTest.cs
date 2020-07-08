@@ -3,11 +3,13 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Memstate.Test.Proxy
 {
 
+    //Ignore("Race condition, not awaiting command execution properly")
     [TestFixture]
     public class ProxyTest
     {
@@ -19,9 +21,13 @@ namespace Memstate.Test.Proxy
         {
             var cfg = Config.Reset();
             cfg.UseInMemoryFileSystem();
+            cfg.GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
             _engine = await Engine.Start<ITestModel>();
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
+
+        [TearDown]
+        public Task TearDown() => _engine.DisposeAsync();
 
         [Test]
         public void CanSetProperty()
@@ -117,6 +123,7 @@ namespace Memstate.Test.Proxy
         public void Indexer()
         {
             _proxy.AddCustomer("Homer");
+            Thread.Sleep(1000);
             Assert.AreEqual(1, _proxy.CommandsExecuted);
 
             var customer = _proxy[0];

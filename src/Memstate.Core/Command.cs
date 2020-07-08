@@ -17,11 +17,16 @@ namespace Memstate
 
     internal class SetStateToRunning<T> : ControlCommand<T> where T: class
     {
+        public SetStateToRunning(Guid engineId)
+        {
+            EngineId = engineId;
+        }
+
         public override void Execute(Engine<T> engine)
         {
             if (engine.EngineId == EngineId)
             {
-                engine.SetStateAndNotify(EngineState.Running);
+                engine.OnSubscriptionCaughtUp();
             }
         }
     }

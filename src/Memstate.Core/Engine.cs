@@ -10,7 +10,7 @@ namespace Memstate
 {
     public class Engine<TModel> where TModel : class
     {
-        public EngineState State { get; set; } = EngineState.NotStarted;
+        public EngineState State { get; internal set; } = EngineState.NotStarted;
 
         private readonly ILog _logger;
 
@@ -19,9 +19,11 @@ namespace Memstate
         private readonly EngineSettings _settings;
 
         private readonly IJournalWriter _journalWriter;
-
-        private Task _readerTask;
-
+        
+        private Task _subscription;
+        private CancellationTokenSource _subscriptionCancellation;
+        private TaskCompletionSource<object> _subscriptionCaughtUp;
+        
         /// <summary>
         /// Commands that have been sent to the journal but not yet received 
         /// and processed on the subscription
@@ -45,10 +47,8 @@ namespace Memstate
         public readonly Guid EngineId = Guid.NewGuid();
 
         private readonly IJournalReader _journalReader;
-        private CancellationTokenSource _readerCancellationTokenSource;
-        private TaskCompletionSource<object> _readyTask;
+        
         public event CommandExecuted CommandExecuted = delegate { };
-
         public event StateTransitioned StateChanged = delegate { };
 
         public Engine(
@@ -65,16 +65,39 @@ namespace Memstate
             _metrics = Metrics.Provider.GetEngineMetrics();
         }
 
-        public Task Start(bool waitUntilReady = false)
+        public async Task Start(bool waitUntilReady = false)
         {
-            if (State == EngineState.Running || State == EngineState.Loading) 
-                throw new InvalidOperationException("Already started");
+            EnsureState("Start()", EngineState.Stopped, EngineState.NotStarted);
+            SetStateAndNotify(EngineState.Loading);
 
-            _readyTask = new TaskCompletionSource<object>();
-            _readerCancellationTokenSource = new CancellationTokenSource();
-            var token = _readerCancellationTokenSource.Token;
-            _readerTask = _journalReader.Subscribe(_lastRecordNumber, OnRecordReceived, token);
-            return waitUntilReady ? _readyTask.Task : _readerTask;
+            _subscriptionCaughtUp = new TaskCompletionSource<object>();
+            _subscriptionCancellation = new CancellationTokenSource();
+            var token = _subscriptionCancellation.Token;
+
+            _subscription = _journalReader.Subscribe(_lastRecordNumber, OnRecordReceived, token);
+
+            // Issue a control command which when it arrives on the
+            // subscription we know we are caught up. This will cause
+            // a state transition from Loading to Running
+            var command = new SetStateToRunning<TModel>(EngineId);
+            await _journalWriter.Write(command).NotOnCapturedContext();
+
+            if (waitUntilReady) await _subscriptionCaughtUp.Task.NotOnCapturedContext();
+        }
+
+        public async Task Stop()
+        {
+            EnsureState("Stop()", EngineState.Running, EngineState.Loading);
+            SetStateAndNotify(EngineState.Stopping);
+            _subscriptionCancellation.Cancel();
+            await _subscription;
+            SetStateAndNotify(EngineState.Stopped);
+        }
+
+        internal void OnSubscriptionCaughtUp()
+        {
+            SetStateAndNotify(EngineState.Running);
+            _subscriptionCaughtUp.SetResult(0);
         }
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
@@ -98,9 +121,13 @@ namespace Memstate
         public async Task DisposeAsync()
         {
             if (State == EngineState.Disposed || State == EngineState.Disposing) return;
-            
-            _logger.Debug("Disposing...");
+            if (State == EngineState.NotStarted)
+            {
+                SetStateAndNotify(EngineState.Disposed);
+                return;
+            }
 
+            SetStateAndNotify(EngineState.Disposing);
             _logger.Info("Stopping JournalWriter");
             await _journalWriter.DisposeAsync().NotOnCapturedContext();
             
@@ -108,14 +135,13 @@ namespace Memstate
             while (!_pendingLocalCommands.IsEmpty) _pendingCommandsChanged.WaitOne();
 
             _logger.Info("Stopping JournalReader");
-            _readerCancellationTokenSource.Cancel();
-            await _readerTask;
-
-            _logger.Debug("Dispose completed");
+            _subscriptionCancellation.Cancel();
+            await _subscription;
+            SetStateAndNotify(EngineState.Disposed);
         }
 
         /// <summary>
-        /// Wait until a specific record has beed executed
+        /// Wait until a specific record has been executed
         /// </summary>
         /// <param name="recordNumber">The version </param>
         /// <returns></returns>
@@ -154,6 +180,7 @@ namespace Memstate
             var oldState = State;
             State = newState;
             StateChanged(oldState, newState);
+            _logger.Info($"State changed from {oldState} to {newState}");
         }
 
         /// <summary>
@@ -171,7 +198,7 @@ namespace Memstate
             using (_metrics.MeasureCommandExecution())
             {
                 await _journalWriter.Write(command);
-                return completionSource.Task;
+                return await completionSource.Task;
             }
         }
 
@@ -188,7 +215,6 @@ namespace Memstate
         /// </summary>
         private void OnRecordReceived(JournalRecord record)
         {
-
             if (State == EngineState.Faulted) return;
             TaskCompletionSource<object> completion = null;
 

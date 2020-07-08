@@ -28,7 +28,7 @@ namespace Memstate
         public IJournalReader CreateJournalReader()
         {
             var fileName = _fileStorageSettings.FileName;
-            return new FileJournalReader(fileName);
+            return new FileJournalReader(fileName, _currentWriter);
         }
 
         public IJournalWriter CreateJournalWriter()

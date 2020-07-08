@@ -8,5 +8,7 @@
 
         [Command]
         int Set(string key, T value, int? expectedVersion = null);
+
+        int Count();
     }
 }

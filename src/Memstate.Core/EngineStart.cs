@@ -10,20 +10,21 @@ namespace Memstate
         /// <summary>
         /// Load an existing or create a new engine
         /// </summary>
+        /// <param name="waitUntilReady"></param>
         /// <returns>A task that completes when the engine is ready to process messages</returns>
-        public static async Task<Engine<T>> Start<T>() where T : class
+        public static async Task<Engine<T>> Start<T>(bool waitUntilReady = true) where T : class
         {
             var engine = Build<T>();
-            await engine.Start();
+            await engine.Start(waitUntilReady);
             return engine;
         }
 
-        public static async Task<Engine<T>> For<T>() where T : class
+        public static async Task<Engine<T>> For<T>(bool waitUntilReady = true) where T : class
         {
             var container = Config.Current.Container;
             if (!container.CanResolve<Engine<T>>())
             {
-                var engine = await Start<T>();
+                var engine = await Start<T>(waitUntilReady);
                 container.Register(engine);
             }
             return container.Resolve<Engine<T>>();
@@ -75,6 +76,13 @@ namespace Memstate
             //todo: push this whole method into into Engine class
             storageProvider.Provision().GetAwaiter().GetResult();
             return new Engine<T>(initialState, engineSettings, storageProvider);
+        }
+
+        public static async Task<Engine<T>> Start<T>(T model) where T : class
+        {
+            var engine = Build(model);
+            await engine.Start();
+            return engine;
         }
     }
 }

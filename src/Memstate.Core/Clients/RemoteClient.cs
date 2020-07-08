@@ -217,15 +217,16 @@ namespace Memstate
             return SendAndReceive(new UnsubscribeRequest(typeof(T)));
         }
 
-        public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
-        {
-            return SendAndReceive(new SubscribeRequest(typeof(T), filter));
-        }
-
-        public void Dispose()
+        public override Task DisposeAsync()
         {
             _messageDispatcher.Dispose();
             _tcpClient.Dispose();
+            return Task.CompletedTask;
+        }
+
+        public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)
+        {
+            return SendAndReceive(new SubscribeRequest(typeof(T), filter));
         }
     }
 }

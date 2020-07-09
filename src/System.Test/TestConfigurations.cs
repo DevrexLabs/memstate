@@ -42,7 +42,7 @@ namespace System.Test
                     var settings = cfg.GetSettings<EngineSettings>();
                     settings.WithRandomSuffixAppendedToStreamName();
                     cfg.StorageProviderName = providerName;
-                    if (providerName == "sqlstreamsource")
+                    if (providerName == "sqlstreamstore")
                         ConfigurePgSqlStreamStore(cfg);
                     yield return cfg;
                 }

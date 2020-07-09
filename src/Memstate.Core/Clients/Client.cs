@@ -18,13 +18,13 @@ namespace Memstate
 
             if(settings.IsLocal)
             {
-                var engine = await Engine.For<TModel>(config, waitUntilReady);
+                var engine = await Engine.For<TModel>(config, waitUntilReady).NotOnCapturedContext();
                 return new LocalClient<TModel>(engine);
             }
             else
             {
                 var client = new RemoteClient<TModel>(config);
-                await client.Connect();
+                await client.Connect().NotOnCapturedContext();
                 return client;
             }
         }

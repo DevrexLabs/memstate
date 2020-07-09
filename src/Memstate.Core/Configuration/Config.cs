@@ -74,7 +74,7 @@ namespace Memstate.Configuration
             ConfigurationData = settings;
             ConfigurationData.Bind(this, requireAll:false, prefix:"Memstate");
             Container = new TinyIoCContainer();
-            //Container.Register(this);
+            GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
             StorageProviders = new StorageProviders(this);
         }
 
@@ -135,7 +135,7 @@ namespace Memstate.Configuration
 
         public override string ToString()
         {
-            return "TODO";
+            return SerializerName + "," + StorageProviderName;
         }
     }    
 }

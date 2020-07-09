@@ -42,7 +42,7 @@ namespace Memstate.AppMetrics
 
             using (var stream = new MemoryStream())
             {
-                await formatter.WriteAsync(stream, snapshot);
+                await formatter.WriteAsync(stream, snapshot).NotOnCapturedContext();
                 var result = Encoding.UTF8.GetString(stream.ToArray());
                 return result;
             }

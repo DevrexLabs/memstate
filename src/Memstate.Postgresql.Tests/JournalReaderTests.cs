@@ -23,7 +23,7 @@ namespace Memstate.Postgres.Tests
             var config = Config.CreateDefault();
 
             _provider = new PostgresProvider(config);
-            await _provider.Provision();
+            await _provider.Provision().NotOnCapturedContext();
 
             _journalReader = _provider.CreateJournalReader();
             _journalWriter = _provider.CreateJournalWriter();

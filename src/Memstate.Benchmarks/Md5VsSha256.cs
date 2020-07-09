@@ -37,7 +37,7 @@ namespace Memstate.Benchmarks
         public async Task<byte[]> Md5Async()
         {
             return await Task.Run(() => _md5.ComputeHash(_data))
-                .ConfigureAwait(false);
+                .NotOnCapturedContext();
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Memstate.Runner.Commands
 
             Logger = LogProvider.GetCurrentClassLogger();
 
-            TheEngine = await Engine.Start<KeyValueStore<int>>(); 
+            TheEngine = await Engine.Start<KeyValueStore<int>>().NotOnCapturedContext(); 
             
 
             var totals = new List<TimeSpan>(Runs);
@@ -38,7 +38,7 @@ namespace Memstate.Runner.Commands
 
                 var stopwatch = Stopwatch.StartNew();
 
-                await Run();
+                await Run().NotOnCapturedContext();
 
                 stopwatch.Stop();
 

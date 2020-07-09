@@ -21,7 +21,8 @@ namespace Memstate.EventStore
             _connection = connection;
             _logger = LogProvider.GetCurrentClassLogger();
             _serializer = config.CreateSerializer(settings.SerializerName);
-            _streamName = settings.StreamName;
+            _streamName = settings.StreamName 
+                          ?? config.GetSettings<EngineSettings>().StreamName;
         }
 
         protected override async Task OnCommandBatch(IEnumerable<Command> commands)

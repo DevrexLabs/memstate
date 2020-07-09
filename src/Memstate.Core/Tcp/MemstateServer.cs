@@ -58,7 +58,7 @@ namespace Memstate.Tcp
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var (ok, tcpClient) = await TryAcceptTcpClientAsync(_tcpListener);
+                var (ok, tcpClient) = await TryAcceptTcpClientAsync(_tcpListener).NotOnCapturedContext();
                 if (ok)
                 {
                     _connections.Add(Task.Run(() => HandleConnection(tcpClient)));
@@ -71,7 +71,7 @@ namespace Memstate.Tcp
         {
             try
             {
-                var tcpClient = await listener.AcceptTcpClientAsync();
+                var tcpClient = await listener.AcceptTcpClientAsync().NotOnCapturedContext();
                 return (true, tcpClient);
             }
             catch (Exception)
@@ -92,13 +92,13 @@ namespace Memstate.Tcp
             while (!_cancellationSource.Token.IsCancellationRequested)
             {
                 _log.Debug("Waiting for message");
-                var message = await Message.Read(stream, serializer, _cancellationSource.Token);
+                var message = await Message.Read(stream, serializer, _cancellationSource.Token).NotOnCapturedContext();
                 _log.Debug("Received {0} from {1}", message, tcpClient.Client.RemoteEndPoint);
-                await session.Handle(message);
+                await session.Handle(message).NotOnCapturedContext();
             }
 
             outgoingMessages.CompleteAdding();
-            await writerTask;
+            await writerTask.NotOnCapturedContext();
         }
 
         private async Task SendMessages(BlockingCollection<Message> messages, Stream stream)
@@ -116,7 +116,7 @@ namespace Memstate.Tcp
 
                 var bytes = serializer.Serialize(message);
                 var packet = Packet.Create(bytes, ++messageId);
-                await packet.WriteTo(stream);
+                await packet.WriteTo(stream).NotOnCapturedContext();
                 await stream.FlushAsync(cancellationToken);
             }
         } 
@@ -126,7 +126,7 @@ namespace Memstate.Tcp
             _log.Info("Closing");
             _tcpListener.Stop();
             _cancellationSource.Cancel();
-            await _listenerTask;
+            await _listenerTask.NotOnCapturedContext();
             _log.Debug("Closed");
         }
     }

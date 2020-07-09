@@ -19,11 +19,11 @@ namespace Memstate.Docs.GettingStarted.Configuration
         [Test]
         public async Task Most_compact_start_using_all_default_configurations()
         {
-            var engine = await Engine.Start<LoyaltyDB>();
-            Print(await engine.Execute(new InitCustomer(10, 10)));
-            Print(await engine.Execute(new InitCustomer(20, 20)));
-            Print(await engine.Execute(new TransferPoints(10, 20, 5)));
-            await engine.DisposeAsync();
+            var engine = await Engine.Start<LoyaltyDB>().NotOnCapturedContext();
+            Print(await engine.Execute(new InitCustomer(10, 10)).NotOnCapturedContext());
+            Print(await engine.Execute(new InitCustomer(20, 20)).NotOnCapturedContext());
+            Print(await engine.Execute(new TransferPoints(10, 20, 5)).NotOnCapturedContext());
+            await engine.DisposeAsync().NotOnCapturedContext();
 
             // Produces the following output :)
 

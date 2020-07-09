@@ -8,7 +8,7 @@ namespace Memstate.Host.Web.Controllers
         [HttpGet("metrics")]
         public async Task<IActionResult> GetMetrics()
         {
-            var report = await Metrics.Report();
+            var report = await Metrics.Report().NotOnCapturedContext();
             return Content(report, "text/plain");
         }
     }

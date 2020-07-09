@@ -93,7 +93,7 @@ namespace Memstate
             EnsureState("Stop()", EngineState.Running, EngineState.Loading);
             SetStateAndNotify(EngineState.Stopping);
             _subscriptionCancellation.Cancel();
-            await _subscription;
+            await _subscription.NotOnCapturedContext();
             SetStateAndNotify(EngineState.Stopped);
         }
 
@@ -107,7 +107,7 @@ namespace Memstate
 
         public async Task<TResult> Execute<TResult>(Command<TModel, TResult> command)
         {
-            return (TResult) await ExecuteUntyped(command);
+            return (TResult) await ExecuteUntyped(command).NotOnCapturedContext();
         }
 
         public Task Execute(Command<TModel> command)
@@ -139,7 +139,7 @@ namespace Memstate
 
             _log.Info("Stopping JournalReader");
             _subscriptionCancellation.Cancel();
-            await _subscription;
+            await _subscription.NotOnCapturedContext();
             SetStateAndNotify(EngineState.Disposed);
         }
 
@@ -200,8 +200,8 @@ namespace Memstate
 
             using (_metrics.MeasureCommandExecution())
             {
-                await _journalWriter.Write(command);
-                return await completionSource.Task;
+                await _journalWriter.Write(command).NotOnCapturedContext();
+                return await completionSource.Task.NotOnCapturedContext();
             }
         }
 

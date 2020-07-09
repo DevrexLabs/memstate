@@ -32,10 +32,10 @@ namespace Memstate.Host
         /// </summary>
         public async Task Start()
         {
-            TheEngine = await Engine.Start<TModel>();
+            TheEngine = await Engine.Start<TModel>().NotOnCapturedContext();
             _server = new MemstateServer<TModel>(_config, TheEngine);
             _server.Start();
-            await StartWebConsole();
+            await StartWebConsole().NotOnCapturedContext();
         }
 
         public Task Stop()

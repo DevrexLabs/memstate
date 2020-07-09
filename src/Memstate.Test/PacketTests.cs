@@ -36,7 +36,7 @@ namespace Memstate.Test
             Packet packet = Packet.Create(new byte[payloadSize], 1);
 
             var memoryStream = new MemoryStream();
-            await packet.WriteTo(memoryStream);
+            await packet.WriteTo(memoryStream).NotOnCapturedContext();
             Assert.AreEqual(memoryStream.Length, packet.Size);
         }
 
@@ -46,7 +46,7 @@ namespace Memstate.Test
             //Arrange
             Packet packet = Packet.Create(new byte[payloadSize], 1);
             var stream = new MemoryStream();
-            await packet.WriteTo(stream);
+            await packet.WriteTo(stream).NotOnCapturedContext();
             stream.Position = 0;
             var token = new CancellationToken();
 

@@ -68,7 +68,7 @@ namespace Memstate
         }
 
 
-        public async Task Start(bool waitUntilReady = false)
+        public async Task Start(bool waitUntilReady = true)
         {
             EnsureState("Start()", EngineState.Stopped, EngineState.NotStarted);
             SetStateAndNotify(EngineState.Loading);

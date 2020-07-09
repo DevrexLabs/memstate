@@ -28,7 +28,8 @@ namespace Memstate.EventStore
             _logger = LogProvider.GetCurrentClassLogger();
             _connection = connection;
             _serializer = config.Serializers.Resolve(eventStoreSettings.SerializerName);
-            _streamName = eventStoreSettings.StreamName;
+            _streamName = eventStoreSettings.StreamName
+                          ?? config.GetSettings<EngineSettings>().StreamName;
             _eventsPerSlice = eventStoreSettings.EventsPerSlice;
         }
 

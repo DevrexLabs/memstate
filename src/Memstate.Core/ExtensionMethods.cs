@@ -23,7 +23,7 @@ namespace Memstate
 
         public static EngineSettings WithRandomSuffixAppendedToStreamName(this EngineSettings settings)
         {
-            var randomPart = Guid.NewGuid().ToString("N").Substring(0, 10);
+            var randomPart = Guid.NewGuid().ToString("N").Substring(0, 5);
 
             settings.StreamName += randomPart;
 
@@ -35,7 +35,7 @@ namespace Memstate
             using (stream)
             using (var reader = new StreamReader(stream))
             {
-                return await reader.ReadToEndAsync().ConfigureAwait(false);
+                return await reader.ReadToEndAsync().NotOnCapturedContext();
             }
         }
     }

@@ -27,7 +27,7 @@ namespace Memstate.Test
         {
             // Arrange
             _settings.AllowBrokenSequence = false;
-            await Initialize();
+            await Initialize().NotOnCapturedContext();
 
             // apply records with a gap in the sequence
             //_fakeSource.RecordHandler.Invoke(new JournalRecord(0, _now, new Set<int>("key",42)));
@@ -43,14 +43,14 @@ namespace Memstate.Test
         {
             // Arrange
             _settings.AllowBrokenSequence = true;
-            await Initialize();
+            await Initialize().NotOnCapturedContext();
 
             // apply records with a sequence in the gap
             //_fakeSource.RecordHandler.Invoke(new JournalRecord(0, _now, new Set<int>("c", 200)));
             //_fakeSource.RecordHandler.Invoke(new JournalRecord(2, _now, new Set<int>("d",300)));
 
             //Wait for the second record to be applied
-            await _engine.EnsureVersion(2).ConfigureAwait(false);
+            await _engine.EnsureVersion(2).NotOnCapturedContext();
 
             //we should be able to execute a query
             var numKeys = await _engine.Execute(new Count<int>()).NotOnCapturedContext();
@@ -63,7 +63,9 @@ namespace Memstate.Test
         private async Task Initialize()
         {
             _now = DateTime.Now;
-            _engine = await Engine.Start<IKeyValueStore<int>>(new KeyValueStore<int>()); 
+            _engine = await Engine
+                .Start<IKeyValueStore<int>>(new KeyValueStore<int>())
+                .NotOnCapturedContext();
         }
     }
 }

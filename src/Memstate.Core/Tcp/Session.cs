@@ -58,7 +58,7 @@ namespace Memstate.Tcp
                         break;
 
                     case CommandRequest request:
-                        await HandleImpl(request);
+                        await HandleImpl(request).NotOnCapturedContext();
                         break;
 
                     case Ping ping:
@@ -92,7 +92,7 @@ namespace Memstate.Tcp
 
         private async Task HandleImpl(CommandRequest request)
         {
-            var result = await _engine.ExecuteUntyped(request.Command);
+            var result = await _engine.ExecuteUntyped(request.Command).NotOnCapturedContext();
             var response = new CommandResponse(result, request.Id);
             OnMessage.Invoke(response);
         }

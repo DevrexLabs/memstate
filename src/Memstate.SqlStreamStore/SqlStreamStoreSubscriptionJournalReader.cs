@@ -36,7 +36,7 @@ namespace Memstate.SqlStreamStore
                 async Task MessageReceived(IStreamSubscription subscription, StreamMessage message,
                     CancellationToken cancellationToken)
                 {
-                    var json = await message.GetJsonData(cancellationToken);
+                    var json = await message.GetJsonData(cancellationToken).NotOnCapturedContext();
                     var command = (Command)_serializer.FromString(json);
                     var journalRecord = new JournalRecord(message.StreamVersion, message.CreatedUtc, command);
                     queue.Add(journalRecord, cancellationToken);

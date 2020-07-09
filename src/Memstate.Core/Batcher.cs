@@ -57,7 +57,7 @@ namespace Memstate
                         buffer.Add(item);
                     }
 
-                    await _batchHandler.Invoke(buffer);
+                    await _batchHandler.Invoke(buffer).NotOnCapturedContext();
                     buffer.Clear();
                 }
             }

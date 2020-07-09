@@ -30,7 +30,7 @@ namespace Memstate.Postgres
         {
             using (var connection = new NpgsqlConnection(_settings.ConnectionString))
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().NotOnCapturedContext();
 
                 commands = commands.ToList();
 
@@ -48,7 +48,7 @@ namespace Memstate.Postgres
                         .ToList()
                         .ForEach(item => sqlCommand.Parameters.AddWithValue($"@{item.Index}", item.Value));
 
-                    await sqlCommand.ExecuteNonQueryAsync();
+                    await sqlCommand.ExecuteNonQueryAsync().NotOnCapturedContext();
                 }
             }
         }

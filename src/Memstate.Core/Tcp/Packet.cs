@@ -54,7 +54,7 @@ namespace Memstate.Tcp
         {
             var buf = new byte[HeaderSize];
 
-            await FillBuffer(stream, buf, cancellation);
+            await FillBuffer(stream, buf, cancellation).NotOnCapturedContext();
 
             var reader = new BinaryReader(new MemoryStream(buf, writable: false));
 
@@ -69,7 +69,7 @@ namespace Memstate.Tcp
 
             packet.Payload = new byte[payloadSize];
 
-            await FillBuffer(stream, packet.Payload, cancellation);
+            await FillBuffer(stream, packet.Payload, cancellation).NotOnCapturedContext();
 
             return packet;
         }
@@ -87,7 +87,7 @@ namespace Memstate.Tcp
 
             while (totalBytesRead < buffer.Length)
             {
-                var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, buffer.Length - totalBytesRead, cancellation);
+                var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, buffer.Length - totalBytesRead, cancellation).NotOnCapturedContext();
 
                 totalBytesRead += bytesRead;
 

@@ -17,7 +17,7 @@ namespace Memstate.Test
             config.UseInMemoryFileSystem();
 
             // Create LocalClient wrapping a newly started engine
-            var client = await Client.For<KeyValueStore<int>>(config);
+            var client = await Client.For<KeyValueStore<int>>(config).NotOnCapturedContext();
 
             // execute commands
             await client.Execute(new Set<int>("a", 42));
@@ -35,7 +35,7 @@ namespace Memstate.Test
             Assert.AreEqual(record2.Value, record.Value);
             Assert.AreEqual(record2.Version, record.Version);
 
-            await client.DisposeAsync();
+            await client.DisposeAsync().NotOnCapturedContext();
         }
     }
 }

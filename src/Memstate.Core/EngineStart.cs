@@ -17,7 +17,7 @@ namespace Memstate
         {
             config = config ?? Config.CreateDefault();
             var engine = Build<T>(config);
-            await engine.Start(waitUntilReady);
+            await engine.Start(waitUntilReady).NotOnCapturedContext();
             return engine;
         }
 
@@ -28,7 +28,7 @@ namespace Memstate
             var container = config.Container;
             if (!container.CanResolve<Engine<T>>())
             {
-                var engine = await Start<T>(config, waitUntilReady);
+                var engine = await Start<T>(config, waitUntilReady).NotOnCapturedContext();
                 container.Register(engine);
             }
             return container.Resolve<Engine<T>>();
@@ -85,7 +85,7 @@ namespace Memstate
         {
             config = config ?? Config.CreateDefault();
             var engine = new Engine<T>(model, config);
-            await engine.Start(waitUntilReady);
+            await engine.Start(waitUntilReady).NotOnCapturedContext();
             return engine;
         }
     }

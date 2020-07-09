@@ -28,14 +28,14 @@ namespace Memstate.Azure
             {
                 try
                 {
-                    var result = await Stream.WriteAsync(_head, events);
+                    var result = await Stream.WriteAsync(_head, events).NotOnCapturedContext();
                     _head = result.Stream;
                     break;
 
                 }
                 catch (ConcurrencyConflictException cce)
                 {
-                    _head = await Stream.OpenAsync(cce.Partition);
+                    _head = await Stream.OpenAsync(cce.Partition).NotOnCapturedContext();
                 }
             }
         }

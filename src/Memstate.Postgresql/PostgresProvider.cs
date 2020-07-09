@@ -46,9 +46,9 @@ namespace Memstate.Postgres
             using (var connection = new NpgsqlConnection(Settings.ConnectionString))
             using (var command = connection.CreateCommand())
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().NotOnCapturedContext();
                 command.CommandText = GetSql();
-                await command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync().NotOnCapturedContext();
             }
             _initialized = true;
         }

@@ -68,7 +68,7 @@ namespace Memstate
         public async Task Connect(string host = "localhost", int port = 3001)
         {
             _tcpClient = new TcpClient();
-            await _tcpClient.ConnectAsync(host, port);
+            await _tcpClient.ConnectAsync(host, port).NotOnCapturedContext();
             _stream = _tcpClient.GetStream();
             _logger.Info($"Connected to {host}:{port}");
             _messageDispatcher = new MessageProcessor<Message>(WriteMessage);
@@ -148,7 +148,7 @@ namespace Memstate
             while (!cancellationToken.IsCancellationRequested)
             {
                 _logger.Trace("awaiting NetworkMessage");
-                var message = await Message.Read(_stream, _deserializer, cancellationToken);
+                var message = await Message.Read(_stream, _deserializer, cancellationToken).NotOnCapturedContext();
                 _logger.Debug("message received " + message);
                 if (message == null) break;
                 Handle(message);
@@ -169,9 +169,9 @@ namespace Memstate
             var messageId = _counter.Next();
             var packet = Packet.Create(bytes, messageId);
 
-            await packet.WriteTo(_stream);
+            await packet.WriteTo(_stream).NotOnCapturedContext();
             _logger.Trace("Packet written");
-            await _stream.FlushAsync();
+            await _stream.FlushAsync().NotOnCapturedContext();
         }
 
         private Task<Message> SendAndReceive(Request request)
@@ -186,7 +186,7 @@ namespace Memstate
         internal async override Task<object> ExecuteUntyped(Query query)
         {
             var request = new QueryRequest(query);
-            var response = (QueryResponse)await SendAndReceive(request);
+            var response = (QueryResponse)await SendAndReceive(request).NotOnCapturedContext();
             return response.Result;
         }
 
@@ -200,14 +200,14 @@ namespace Memstate
         public override async Task<TResult> Execute<TResult>(Command<TModel, TResult> command)
         {
             var request = new CommandRequest(command);
-            var response = (CommandResponse) await SendAndReceive(request);
+            var response = (CommandResponse) await SendAndReceive(request).NotOnCapturedContext();
             return (TResult) response.Result;
         }
 
         public override async Task<TResult> Execute<TResult>(Query<TModel, TResult> query)
         {
             var request = new QueryRequest(query);
-            var response = (QueryResponse) await SendAndReceive(request);
+            var response = (QueryResponse) await SendAndReceive(request).NotOnCapturedContext();
             return (TResult) response.Result;
         }
 

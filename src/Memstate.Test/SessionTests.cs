@@ -24,7 +24,7 @@ namespace Memstate.Test
             cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
             _engine = Engine.Build(_testModel,cfg);
-            await _engine.Start(waitUntilReady:true); 
+            await _engine.Start().NotOnCapturedContext(); 
             _session = new Session<KeyValueStore<int>>(_engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;
@@ -38,7 +38,7 @@ namespace Memstate.Test
         {
             var command = new ProxyCommand<string>("dummy", null, null);
             var request = new CommandRequest(command);
-            await _session.Handle(request);
+            await _session.Handle(request).NotOnCapturedContext();
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
             Assert.IsAssignableFrom<InvalidCastException>(response.Exception);
@@ -50,7 +50,7 @@ namespace Memstate.Test
             var query = new FailingQuery();
             var request = new QueryRequest(query);
 
-            await _session.Handle(request);
+            await _session.Handle(request).NotOnCapturedContext();
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
@@ -62,7 +62,7 @@ namespace Memstate.Test
             var command = new Remove<int>("NON_EXISTING_KEY");
             var request = new CommandRequest(command);
 
-            await _session.Handle(request);
+            await _session.Handle(request).NotOnCapturedContext();
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.AreEqual(request.Id, response.ResponseTo);
@@ -75,7 +75,7 @@ namespace Memstate.Test
             var query = new Get<int>("KEY");
             var queryRequest = new QueryRequest(query);
 
-            await _session.Handle(queryRequest);
+            await _session.Handle(queryRequest).NotOnCapturedContext();
 
             Assert.IsTrue(_messagesEmitted.Count == 1);
             var response = (QueryResponse)_messagesEmitted.Single();
@@ -88,7 +88,7 @@ namespace Memstate.Test
         public async Task Command_with_result_happy_path()
         {
             var commandRequest = new CommandRequest(new Set<int>("KEY", 42));
-            await _session.Handle(commandRequest);
+            await _session.Handle(commandRequest).NotOnCapturedContext();
             var response = AssertAndGetSingle<CommandResponse>();
             Assert.AreEqual(commandRequest.Id, response.ResponseTo);
             Assert.AreEqual(1, (int)response.Result);
@@ -100,7 +100,7 @@ namespace Memstate.Test
             _testModel.Set("KEY", 100);
             var request = new CommandRequest(new Remove<int>("KEY"));
 
-            await _session.Handle(request);
+            await _session.Handle(request).NotOnCapturedContext();
 
             Assert.AreEqual(0, _testModel.Count());
 
@@ -113,7 +113,7 @@ namespace Memstate.Test
         public async Task PingPong()
         {
             var request  = new Ping();
-            await _session.Handle(request);
+            await _session.Handle(request).NotOnCapturedContext();
             var pong = AssertAndGetSingle<Pong>();
             Assert.AreEqual(request.Id, pong.ResponseTo);
         }
@@ -122,7 +122,7 @@ namespace Memstate.Test
         public async Task UnhandledMessageException()
         {
             var message = new UnknownMessage();
-            await _session.Handle(message);
+            await _session.Handle(message).NotOnCapturedContext();
 
             var response = AssertAndGetSingle<ExceptionResponse>();
             Assert.IsAssignableFrom<Exception>(response.Exception);

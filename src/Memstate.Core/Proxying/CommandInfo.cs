@@ -46,7 +46,7 @@ namespace Memstate
             {
                 return engine.Execute((Command<T, object>) mappedCommand);
             }
-            await engine.Execute((Command<T>) mappedCommand);
+            await engine.Execute((Command<T>) mappedCommand).NotOnCapturedContext();
             return Task.FromResult<object>(null);
         }
     }

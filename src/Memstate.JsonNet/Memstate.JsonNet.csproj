@@ -17,6 +17,8 @@
     <Title>Memstate.JsonNet</Title>
     <PackageId>Memstate.JsonNet</PackageId>
     <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <Configurations>Debug;Release;Test</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="JsonObjectToIntegerConverter.cs" />

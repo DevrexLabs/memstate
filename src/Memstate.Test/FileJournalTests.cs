@@ -1,10 +1,13 @@
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate.Configuration;
 using Memstate.Models.KeyValue;
+using Memstate.Wire;
 
 namespace Memstate.Test
 {
@@ -19,7 +22,6 @@ namespace Memstate.Test
             const string FileName = Stream + ".journal";
 
             var cfg = Config.CreateDefault();
-            cfg.UseInMemoryFileSystem();
             var settings = cfg.GetSettings<EngineSettings>();
             cfg.SerializerName = "newtonsoft.json";
 
@@ -34,7 +36,7 @@ namespace Memstate.Test
             }
 
             //wait for the writes to complete
-            await writer.DisposeAsync().NotOnCapturedContext();
+            await writer.DisposeAsync();
 
             //Get back all the entries, should be NumRecords
             var reader = provider.CreateJournalReader();

@@ -12,6 +12,8 @@ Devrex Labs</Owners>
         <Summary>Storage provider for Memstate based on SqlStreamStore targeting any sql database supported by SqlStreamStore</Summary>
         <Title>Memstate.SqlStreamStore</Title>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Configurations>Debug;Release;Test</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

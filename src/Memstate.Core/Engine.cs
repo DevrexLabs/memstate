@@ -73,15 +73,15 @@ namespace Memstate
             EnsureState("Start()", EngineState.Stopped, EngineState.NotStarted);
             SetStateAndNotify(EngineState.Loading);
 
-            _subscriptionCaughtUp = new TaskCompletionSource<object>();
+            //Start the journal subscription task
             _subscriptionCancellation = new CancellationTokenSource();
             var token = _subscriptionCancellation.Token;
-
             _subscription = _journalReader.Subscribe(_lastRecordNumber, OnRecordReceived, token);
 
             // Issue a control command which when it arrives on the
             // subscription we know we are caught up. This will cause
             // a state transition from Loading to Running
+            _subscriptionCaughtUp = new TaskCompletionSource<object>();
             var command = new SetStateToRunning<TModel>(EngineId);
             await _journalWriter.Write(command).NotOnCapturedContext();
 

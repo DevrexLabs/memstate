@@ -17,6 +17,8 @@
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <Configurations>Debug;Release;Test</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

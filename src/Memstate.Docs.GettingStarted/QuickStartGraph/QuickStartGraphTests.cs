@@ -35,7 +35,7 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             var engine = await Engine.Start<GraphModel>(config);
 
             Print("THEN a journal file should now exist on the filesystem");
-            Assert.True(File.Exists(JournalFilename));
+            Assert.True(config.FileSystem.Exists(JournalFilename));
 
             Print("WHEN I add some graph data");
             var user1 = await engine.Execute(new CreateNode("user"));
@@ -74,7 +74,7 @@ namespace Memstate.Docs.GettingStarted.QuickStartGraph
             //////// Replay
 
             Print("THEN a journal file should still exist with all the commands I've played up to now");
-            Assert.True(File.Exists(JournalFilename));
+            Assert.True(config.FileSystem.Exists(JournalFilename));
 
             Print("WHEN I start up another engine the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
             engine = await Engine.Start<GraphModel>(config);

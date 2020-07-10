@@ -33,43 +33,42 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             config.SerializerName = Serializers.Wire;
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = WireFileName;
-            var engine = await Engine.Start<LoyaltyDB>(config).NotOnCapturedContext();
+            var engine = await Engine.Start<LoyaltyDB>(config);
             
             Print("AND I initialize the database with 20 customers, each with 10 loyalty points");
             for (int i = 0; i < 20; i++)
             {
-                await engine.Execute(new InitCustomer(i + 1, 10)).NotOnCapturedContext();
+                await engine.Execute(new InitCustomer(i + 1, 10));
             }
 
             Print("THEN a journal file should now exist on the filesystem");
-            Assert.True(File.Exists(WireJournalFile));
+            Assert.True(config.FileSystem.Exists(WireJournalFile));
 
             Print("WHEN customer 5 and customer 12 each earn 190 and 290 loyalty points respectively");
-            var c1 = await engine.Execute(new EarnPoints(5, 190)).NotOnCapturedContext();
-            var c2 = await engine.Execute(new EarnPoints(12, 290)).NotOnCapturedContext();
+            var c1 = await engine.Execute(new EarnPoints(5, 190));
+            var c2 = await engine.Execute(new EarnPoints(12, 290));
 
             Print("THEN the balance for them will have increased to 200 and 300 loyalty points for customer 5 and 12 respectively");
             Assert.AreEqual(200, c1.LoyaltyPointBalance);
             Assert.AreEqual(300, c2.LoyaltyPointBalance);
 
             Print("WHEN I dispose of the memstate engine");
-            await engine.DisposeAsync().NotOnCapturedContext();
+            await engine.DisposeAsync();
 
             Print("THEN a journal file should still exist with all the commands I've played up to now");
-            Assert.True(File.Exists(WireJournalFile));
-
+            Assert.True(config.FileSystem.Exists(WireJournalFile));
             Print("WHEN I start up another engine");
-            engine = await Engine.Start<LoyaltyDB>(config).NotOnCapturedContext();
+            engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            var allCustomers = await engine.Execute(new GetCustomers()).NotOnCapturedContext();
+            var allCustomers = await engine.Execute(new GetCustomers());
 
             Print("AND the database should be restored to the exact same state it was after the last command was executed");
             Assert.AreEqual(20, allCustomers.Count);
             Assert.AreEqual(200, allCustomers[5].LoyaltyPointBalance);
             Assert.AreEqual(300, allCustomers[12].LoyaltyPointBalance);
 
-            await engine.DisposeAsync().NotOnCapturedContext();
+            await engine.DisposeAsync();
         }
 
         // rules for Command using Json serialisation
@@ -81,7 +80,6 @@ namespace Memstate.Docs.GettingStarted.QuickStart
         [Test]
         public async Task Simple_end_to_end_getting_started_configure_to_use_json_serializer_with_filesytem_storage()
         {
-
             Print("GIVEN I start a new Memstate engine for a LoyaltyDB using default settings");
             Print($"   (using Json format & local filesystem storage)");
 
@@ -89,40 +87,40 @@ namespace Memstate.Docs.GettingStarted.QuickStart
             config.SerializerName = "NewtonSoft.Json";
             var settings = config.GetSettings<EngineSettings>();
             settings.StreamName = JsonFileName;
-            var engine = await Engine.Start<LoyaltyDB>(config).NotOnCapturedContext();
+            var engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("AND I initialise the database with 2 customers, each with 10, and 20 loyalty points");
-            await engine.Execute(new InitCustomer(10, 10)).NotOnCapturedContext();
-            await engine.Execute(new InitCustomer(20, 20)).NotOnCapturedContext();
+            await engine.Execute(new InitCustomer(10, 10));
+            await engine.Execute(new InitCustomer(20, 20));
 
             Print("THEN a journal file should now exist on the filesystem");
-            Assert.True(File.Exists(JsonJournalFile));
+            Assert.True(config.FileSystem.Exists(JsonJournalFile));
 
             Print("WHEN customer 10 transfers 5 points to customer 20");
-            var result = await engine.Execute(new TransferPoints(10, 20, 5)).NotOnCapturedContext();
+            var result = await engine.Execute(new TransferPoints(10, 20, 5));
 
             Print("THEN the new balance for them will be 5 and 25 respectively");
             Assert.AreEqual(5, result.Sender.LoyaltyPointBalance);
             Assert.AreEqual(25, result.Recipient.LoyaltyPointBalance);
 
             Print("WHEN I dispose of the memstate engine");
-            await engine.DisposeAsync().NotOnCapturedContext();
+            await engine.DisposeAsync();
 
             Print("THEN a journal file should still exist with all the commands I've played up to now");
-            Assert.True(File.Exists(JsonJournalFile));
+            Assert.True(config.FileSystem.Exists(JsonJournalFile));
 
             Print("WHEN I start up another engine");
-            engine = await Engine.Start<LoyaltyDB>(config).NotOnCapturedContext();
+            engine = await Engine.Start<LoyaltyDB>(config);
 
             Print("THEN the entire journal at this point should immediately replay all the journaled commands saved to the filesystem");
-            var allCustomers = await engine.Execute(new GetCustomers()).NotOnCapturedContext();
+            var allCustomers = await engine.Execute(new GetCustomers());
 
             Print("AND the database should be restored to the exact same state it was after the last command was executed");
             Assert.AreEqual(2, allCustomers.Count);
             Assert.AreEqual(5, allCustomers[10].LoyaltyPointBalance);
             Assert.AreEqual(25, allCustomers[20].LoyaltyPointBalance);
 
-            await engine.DisposeAsync().NotOnCapturedContext();
+            await engine.DisposeAsync();
         }
 
         private void Print(string text)

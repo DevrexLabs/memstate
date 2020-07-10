@@ -19,6 +19,8 @@
     <Summary>Storage provider for Memstate based on PostgreSQL</Summary>
     <Title>Memstate.Postgres</Title>
     <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
+    <Configurations>Debug;Release;Test</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="PostgresEngineBuilder.cs" />

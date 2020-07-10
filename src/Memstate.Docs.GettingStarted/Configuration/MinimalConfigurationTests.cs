@@ -13,17 +13,17 @@ namespace Memstate.Docs.GettingStarted.Configuration
         [TearDown]
         public void Setup()
         {
-            if(File.Exists("mestate.journal")) File.Delete("memstate.journal");
+            if(File.Exists("memstate.journal")) File.Delete("memstate.journal");
         }
 
         [Test]
         public async Task Most_compact_start_using_all_default_configurations()
         {
-            var engine = await Engine.Start<LoyaltyDB>().NotOnCapturedContext();
-            Print(await engine.Execute(new InitCustomer(10, 10)).NotOnCapturedContext());
-            Print(await engine.Execute(new InitCustomer(20, 20)).NotOnCapturedContext());
-            Print(await engine.Execute(new TransferPoints(10, 20, 5)).NotOnCapturedContext());
-            await engine.DisposeAsync().NotOnCapturedContext();
+            var engine = await Engine.Start<LoyaltyDB>();
+            Print(await engine.Execute(new InitCustomer(10, 10)));
+            Print(await engine.Execute(new InitCustomer(20, 20)));
+            Print(await engine.Execute(new TransferPoints(10, 20, 5)));
+            await engine.DisposeAsync();
 
             // Produces the following output :)
 

@@ -13,6 +13,8 @@
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <Product>Memstate</Product>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <Configurations>Debug;Release;Test</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

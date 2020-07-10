@@ -55,8 +55,10 @@ namespace Memstate.Configuration
             => Serializers.Resolve(serializer ?? SerializerName);
 
         public static Config CreateDefault(string[] args = null)
-        { 
+        {
+            #if TEST
             LogProvider.SetCurrentLogProvider(new ColoredConsoleLogProvider());
+            #endif
             args = args ?? Environment.GetCommandLineArgs();
 
             var settings = new SettingsBuilder()
@@ -66,7 +68,15 @@ namespace Memstate.Configuration
                 .UseIniFile("memstate.ini", required: false)
                 .Build();
 
-            return new Config(settings);
+            var config = new Config(settings);
+            
+            #if TEST
+            config.GetSettings<EngineSettings>()
+                .WithRandomSuffixAppendedToStreamName();
+            config.UseInMemoryFileSystem();
+            #endif
+            
+            return config;
         }
         
         public Config(Fig.Settings settings)
@@ -74,7 +84,6 @@ namespace Memstate.Configuration
             ConfigurationData = settings;
             ConfigurationData.Bind(this, requireAll:false, prefix:"Memstate");
             Container = new TinyIoCContainer();
-            GetSettings<EngineSettings>().WithRandomSuffixAppendedToStreamName();
             StorageProviders = new StorageProviders(this);
         }
 

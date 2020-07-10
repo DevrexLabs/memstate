@@ -31,7 +31,7 @@ namespace Memstate.SqlStreamStore
             while (true)
             {
                 var page = _streamStore.ReadStreamForwards(
-                    _streamId, (int) fromRecord, pageSize).Result;
+                    _streamId, (int) fromRecord, pageSize).GetAwaiter().GetResult();
                 foreach (var message in page.Messages)
                     yield return RecordFromStreamMessage(message);
                 if (page.IsEnd) break;
@@ -41,7 +41,7 @@ namespace Memstate.SqlStreamStore
 
         private JournalRecord RecordFromStreamMessage(StreamMessage streamMessage)
         {
-            var commandString = streamMessage.GetJsonData().Result;
+            var commandString = streamMessage.GetJsonData().GetAwaiter().GetResult();
             var command = (Command) _serializer.FromString(commandString);
             return new JournalRecord(
                 streamMessage.StreamVersion, 

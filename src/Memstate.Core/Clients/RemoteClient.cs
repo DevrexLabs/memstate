@@ -183,7 +183,7 @@ namespace Memstate
             return completionSource.Task;
         }
 
-        internal async override Task<object> ExecuteUntyped(Query query)
+        internal override async Task<object> ExecuteUntyped(Query query)
         {
             var request = new QueryRequest(query);
             var response = (QueryResponse)await SendAndReceive(request).NotOnCapturedContext();
@@ -216,11 +216,11 @@ namespace Memstate
             return SendAndReceive(new UnsubscribeRequest(typeof(T)));
         }
 
-        public override Task DisposeAsync()
+        public override async Task DisposeAsync()
         {
             _messageDispatcher.Dispose();
             _tcpClient.Dispose();
-            return Task.CompletedTask;
+            await _messageHandler;
         }
 
         public override Task Subscribe<T>(Action<T> handler, IEventFilter filter = null)

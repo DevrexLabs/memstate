@@ -77,7 +77,8 @@ namespace Memstate.EventStore
 
             while (true)
             {
-                var slice = _connection.ReadStreamEventsForwardAsync(_streamName, nextRecord, _eventsPerSlice, false).Result;
+                var slice = _connection.ReadStreamEventsForwardAsync(_streamName, nextRecord, _eventsPerSlice, false)
+                    .GetAwaiter().GetResult();
 
                 _logger.Debug("{0} events in slice from {0}", slice.Events.Length, slice.FromEventNumber);
 

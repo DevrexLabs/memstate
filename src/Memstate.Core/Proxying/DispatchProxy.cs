@@ -25,7 +25,9 @@ namespace Memstate
             var signature = GetSignature(targetMethod);
             var operationInfo = _methods.GetOperationInfo(signature);
             var methodCall = new MethodCall(targetMethod, args);
-            var result = operationInfo.Execute(_handler, methodCall, signature).Result;
+            var result = operationInfo
+                .Execute(_handler, methodCall, signature)
+                .GetAwaiter().GetResult();
             return result;
         }
     }

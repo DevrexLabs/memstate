@@ -9,8 +9,14 @@ namespace Memstate
 {
     public class FileJournalWriter : BatchingJournalWriter
     {
-        private readonly Stream _journalStream;
+        /// <summary>
+        /// The stream to write journal records to
+        /// </summary>
+        private Stream _journalStream;
 
+        /// <summary>
+        /// Serializer used to serialize journal records
+        /// </summary>
         private readonly ISerializer _serializer;
 
         /// <summary>
@@ -18,12 +24,22 @@ namespace Memstate
         /// </summary>
         private long _nextRecord;
 
-        public FileJournalWriter(Config config,  string fileName, long nextRecord)
+        private readonly Config _config;
+
+        
+        private readonly string _fileName;
+        
+        
+        private readonly TaskCompletionSource<long> _readyToWrite 
+            = new TaskCompletionSource<long>();
+
+        public FileJournalWriter(Config config,  string fileName)
             :base(config.GetSettings<EngineSettings>())
         {
-            _nextRecord = nextRecord;
-            _journalStream = config.FileSystem.OpenAppend(fileName);
+            _nextRecord = -1;
             _serializer = config.CreateSerializer();
+            _config = config;
+            _fileName = fileName;
         }
 
         public event RecordsWrittenHandler RecordsWritten = delegate { };
@@ -33,26 +49,45 @@ namespace Memstate
         public override async Task DisposeAsync()
         {
             await base.DisposeAsync().NotOnCapturedContext();
-
             await _journalStream.FlushAsync().NotOnCapturedContext();
-
             _journalStream.Dispose();
         }
 
-        protected override Task OnCommandBatch(IEnumerable<Command> commands)
+
+        private readonly List<Command> _buffer = new List<Command>(4096);
+
+        protected override async Task OnCommandBatch(IEnumerable<Command> commands)
         {
-            var records = commands.Select(ToJournalRecord).ToArray();
+        
+            _buffer.AddRange(commands);
+            if (_journalStream is null) return;
+            
+            var records = _buffer.Select(ToJournalRecord).ToArray();
+            _buffer.Clear();
 
-            _serializer.WriteObject(_journalStream, records);
-            _journalStream.Flush();
+            foreach(var record in records)
+                _serializer.WriteObject(_journalStream, record);
 
+            await _journalStream.FlushAsync().NotOnCapturedContext();
+            
             RecordsWritten.Invoke(records);
-            return Task.CompletedTask;
         }
-
+        
         private JournalRecord ToJournalRecord(Command command)
         {
             return new JournalRecord(_nextRecord++, DateTime.Now, command);
+        }
+
+        /// <summary>
+        /// Notify that loading is complete and writing to
+        /// the underlying file can commence
+        /// </summary>
+        internal Task Notify(long nextRecordNumber)
+        {
+            _nextRecord = nextRecordNumber;
+            _journalStream = _config.FileSystem.OpenAppend(_fileName);
+
+            return OnCommandBatch(Array.Empty<Command>());
         }
     }
 }

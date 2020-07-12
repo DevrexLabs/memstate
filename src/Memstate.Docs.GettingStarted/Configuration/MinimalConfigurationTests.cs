@@ -2,20 +2,12 @@
 using Memstate.Docs.GettingStarted.QuickStart.Commands;
 using NUnit.Framework;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Memstate.Docs.GettingStarted.Configuration
 {
     public class MinimalConfigurationTests
     {
-        [SetUp]
-        [TearDown]
-        public void Setup()
-        {
-            if(File.Exists("memstate.journal")) File.Delete("memstate.journal");
-        }
-
         [Test]
         public async Task Most_compact_start_using_all_default_configurations()
         {

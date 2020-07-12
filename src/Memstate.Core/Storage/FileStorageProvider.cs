@@ -4,7 +4,7 @@ using Memstate.Configuration;
 
 namespace Memstate
 {
-    public class FileStorageProvider : IStorageProvider
+    internal class FileStorageProvider : IStorageProvider
     {
         private FileJournalWriter _currentWriter;
 
@@ -25,14 +25,14 @@ namespace Memstate
 
         public IJournalReader CreateJournalReader()
         {
+            if (_currentWriter is null) throw new InvalidOperationException("Create a writer before creating a reader");
             return new FileJournalReader(_config, _fileName, _currentWriter);
         }
 
         public IJournalWriter CreateJournalWriter()
         {
-            //todo: figure out a way to initialize
-            var nextRecordNumber = 0;
-            _currentWriter = new FileJournalWriter(_config, _fileName, nextRecordNumber);
+            if (_currentWriter != null) throw new InvalidOperationException("Can only create one writer per FileStorageProvider");
+            _currentWriter = new FileJournalWriter(_config, _fileName);
             return _currentWriter;
         }
 

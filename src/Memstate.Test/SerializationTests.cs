@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-
 using Memstate.JsonNet;
-using Memstate.Test.EventfulTestDomain;
 using Memstate.Wire;
 using System;
 
@@ -35,7 +33,7 @@ namespace Memstate.Test
         [Test, TestCaseSource(nameof(Serializers))]
         public void Command_retains_id_when_deserialized(ISerializer serializer)
         {
-            var command = new Create("dummy");
+            var command = new MyCommand();
             var clone = serializer.Clone(command);
             Assert.AreEqual(command.CommandId, clone.CommandId);
         }
@@ -58,6 +56,14 @@ namespace Memstate.Test
 
     }
 
+    [Serializable]
+    internal class MyCommand : Command
+    {
+        internal override object ExecuteImpl(object model)
+        {
+            throw new NotImplementedException();
+        }
+    }
     [Serializable]
     internal class Poco {
         public string Name

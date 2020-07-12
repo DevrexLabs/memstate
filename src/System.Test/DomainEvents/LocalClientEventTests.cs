@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Memstate.Test.EventfulTestDomain;
 using NUnit.Framework;
 
@@ -16,11 +15,7 @@ namespace Memstate.Test
         [SetUp]
         public async Task SetUp()
         {
-            var config = Config.CreateDefault();
-            config.FileSystem = new InMemoryFileSystem();
-            _settings = config.GetSettings<EngineSettings>();
-            _settings.WithRandomSuffixAppendedToStreamName();
-            _engine = await Engine.Start<UsersModel>(config);
+            _engine = await Engine.Start<UsersModel>();
             _client = new LocalClient<UsersModel>(_engine);
         }
 
@@ -76,12 +71,11 @@ namespace Memstate.Test
             Assert.AreEqual(2, handledEvents);
         }
 
-        [Test, Ignore("Hangs when running all tests")]
+        [Test]
         public async Task Unsubscribe_from_an_event()
         {
             var eventsReceived = new List<Event>();
             
-
             await _client.Subscribe<Created>(eventsReceived.Add);
             await _client.Subscribe<Deleted>(eventsReceived.Add);
 

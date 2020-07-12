@@ -11,7 +11,7 @@ namespace Memstate.Test
         public async Task Batcher_terminates_when_disposed()
         {
             var batcher = new Batcher<int>(batch => Task.CompletedTask, 10, 10);
-            await batcher.DisposeAsync().NotOnCapturedContext();
+            await batcher.DisposeAsync();
         }
 
         [Test]

@@ -1,13 +1,10 @@
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
 using Memstate.Configuration;
 using Memstate.Models.KeyValue;
-using Memstate.Wire;
 
 namespace Memstate.Test
 {
@@ -41,7 +38,7 @@ namespace Memstate.Test
             //Get back all the entries, should be NumRecords
             var reader = provider.CreateJournalReader();
             Assert.AreEqual(NumRecords, reader.ReadRecords().Count());
-            await reader.DisposeAsync().NotOnCapturedContext();
+            await reader.DisposeAsync();
 
             //Count the actual lines in the file
             Assert.IsTrue(cfg.FileSystem.Exists(FileName));

@@ -22,7 +22,4 @@
     <ProjectReference Include="..\Memstate.SqlStreamStore\Memstate.SqlStreamStore.csproj" />
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DomainEvents\EventfulTestDomain\" />
-  </ItemGroup>
 </Project>

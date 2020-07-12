@@ -124,5 +124,16 @@ namespace Memstate.Test.Proxy
         {
             _map.GetOperationInfo("InternalQuery");
         }
+        
+        [Test]
+        [Ignore("Isolation is yet to be designed")]
+        public void ResultIsIsolated_attribute_is_recognized()
+        {
+            var map = MethodMap.MapFor<TestModel>();
+            var signature = typeof(MethodMapTests.TestModel)
+                .GetMethod("GetCustomersCloned").ToString();
+            var operationInfo = map.GetOperationInfo(signature);
+            Assert.True(operationInfo.OperationAttribute.Isolation.HasFlag(IsolationLevel.Output));
+        }
     }
 }

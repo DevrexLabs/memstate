@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Memstate.Models.Redis;
 using NUnit.Framework;
 
@@ -14,16 +13,11 @@ namespace Memstate.Test
         [SetUp]
         public void Init()
         {
-            var config = Config.CreateDefault().UseInMemoryFileSystem();
-            _engine = Engine.Build<RedisModel>(config);
+            _engine = Engine.Build<RedisModel>();
         }
 
         [TearDown]
-        public Task Teardown()
-        {
-            return _engine.DisposeAsync();
-
-        }
+        public Task Teardown() => _engine.DisposeAsync();
 
         [Test]
         public void Initial_state_is_NotStarted()

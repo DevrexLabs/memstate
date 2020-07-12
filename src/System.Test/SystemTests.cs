@@ -20,15 +20,15 @@ namespace System.Test
         public async Task CanWriteOne(Config config)
         {
             var provider = config.GetStorageProvider();
-            await provider.Provision();
+            //await provider.Provision();
             var writer = provider.CreateJournalWriter();
 
             await writer.Write(new AddStringCommand("hello"));
-            await writer.DisposeAsync().ConfigureAwait(false);
+            await writer.DisposeAsync();
 
             var reader = provider.CreateJournalReader();
             var records = reader.ReadRecords().ToArray();
-            await reader.DisposeAsync().ConfigureAwait(false);
+            await reader.DisposeAsync();
             Assert.AreEqual(1, records.Length);
         }
 
@@ -36,7 +36,6 @@ namespace System.Test
         public async Task WriteAndReadCommands(Config config)
         {
             var provider = config.GetStorageProvider();
-            await provider.Provision();
 
             var journalWriter = provider.CreateJournalWriter();
 
@@ -45,10 +44,10 @@ namespace System.Test
                 await journalWriter.Write(new AddStringCommand(i.ToString()));
             }
 
-            await journalWriter.DisposeAsync().ConfigureAwait(false);
+            await journalWriter.DisposeAsync();
             var journalReader = provider.CreateJournalReader();
             var records = journalReader.ReadRecords().ToArray();
-            await journalReader.DisposeAsync().ConfigureAwait(false);
+            await journalReader.DisposeAsync();
             Assert.AreEqual(10000, records.Length);
         }
 
@@ -65,14 +64,14 @@ namespace System.Test
                 await journalWriter.Write(new AddStringCommand(i.ToString()));
             }
 
-            await journalWriter.DisposeAsync().NotOnCapturedContext();
+            await journalWriter.DisposeAsync();
 
             var records = new List<JournalRecord>();
 
             var reader = provider.CreateJournalReader();
             var token = new CancellationToken();
             {
-                await reader.Subscribe(0, records.Count - 1, r =>
+                await reader.Subscribe(0, numRecords - 1, r =>
                 {
                     records.Add(r);
                     Console.WriteLine("record received # " + r.RecordNumber);
@@ -99,7 +98,7 @@ namespace System.Test
                 await writer.Write(new AddStringCommand(i.ToString()));
             }
 
-            await writer.DisposeAsync().NotOnCapturedContext();
+            await writer.DisposeAsync();
             await subTask;
 
             Assert.AreEqual(numRecords, records.Count);
@@ -121,7 +120,7 @@ namespace System.Test
             
             Console.WriteLine(config);
 
-            var engine = await Engine.Start<List<string>>(config).ConfigureAwait(false);
+            var engine = await Engine.Start<List<string>>(config);
 
             foreach (var number in Enumerable.Range(1, NumRecords))
             {
@@ -132,8 +131,8 @@ namespace System.Test
 
             await engine.DisposeAsync();
 
-            engine = await Engine.Start<List<string>>(config).ConfigureAwait(false);
-            var strings = await engine.Execute(new GetStringsQuery()).ConfigureAwait(false);
+            engine = await Engine.Start<List<string>>(config);
+            var strings = await engine.Execute(new GetStringsQuery());
             Assert.AreEqual(NumRecords, strings.Count);
             await engine.DisposeAsync();
         }

@@ -56,6 +56,7 @@ namespace Memstate.EventStore
                 }, 
                 subscriptionDropped: (s, r, e) =>
                 {
+                    if (e is null) return;
                     _logger.ErrorException("ES Subscription dropped, reason: " + r, e);
                     completionSource.SetException(e);
                 });

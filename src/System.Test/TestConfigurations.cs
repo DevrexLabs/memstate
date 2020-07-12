@@ -57,11 +57,11 @@ namespace System.Test
 
         protected virtual IEnumerable<string> ProviderNames()
         {
-            yield return "file";
+            //yield return "file";
             //yield return "postgres";
 
             yield return "eventstore";
-            yield return "sqlstreamstore";
+            //yield return "sqlstreamstore";
             //yield return "pravega";
         }
 
@@ -84,7 +84,7 @@ namespace System.Test
             protected override IEnumerable<string> ProviderNames()
             {
                 yield return "eventstore";
-                yield return "sqlstreamstore";
+                //yield return "sqlstreamstore";
                 //yield return "pravega";
 #if POSTGRES
                 yield return "postgres";

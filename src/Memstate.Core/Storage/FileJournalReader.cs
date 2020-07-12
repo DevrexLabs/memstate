@@ -26,14 +26,26 @@ namespace Memstate
 
         public override Task Subscribe(long first, long last, Action<JournalRecord> recordHandler, CancellationToken cancellationToken)
         {
+            long lastRecordNumber = 0;
+            
             return Task.Run(() =>
             {
+                foreach (var record in ReadRecords(first))
+                {
+                    if (record.RecordNumber >= first && record.RecordNumber <= last)
+                        recordHandler.Invoke(record);
+                    if (record.RecordNumber >= last) return;
+                    lastRecordNumber = record.RecordNumber;
+                }
+
                 var buffer = new BlockingCollection<JournalRecord>();
                 _writer.RecordsWritten += records =>
                 {
                     foreach (var record in records) buffer.Add(record, cancellationToken);
                 };
 
+                _writer.Notify(lastRecordNumber + 1);
+                
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     if (buffer.TryTake(out var record, 1000))
@@ -48,6 +60,8 @@ namespace Memstate
 
         public override IEnumerable<JournalRecord> ReadRecords(long from)
         {
+            if (!_fileSystem.Exists(_fileName)) yield break;
+
             using (var stream = _fileSystem.OpenRead(_fileName))
             {
                 foreach (var record in _serializer.ReadObjects<JournalRecord>(stream))

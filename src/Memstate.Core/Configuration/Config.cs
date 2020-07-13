@@ -67,14 +67,13 @@ namespace Memstate.Configuration
                 .UseIniFile("memstate.${ENV}.ini", required: false)
                 .UseIniFile("memstate.ini", required: false)
                 .Build();
-
             var config = new Config(settings);
             
             #if TEST
             config.GetSettings<EngineSettings>()
                 .WithRandomSuffixAppendedToStreamName();
             config.UseInMemoryFileSystem();
-            config.StorageProviderName = Memstate.StorageProviders.EventStore;
+            config.StorageProviderName = StorageProviders.EventStore;
             #endif
             
             return config;

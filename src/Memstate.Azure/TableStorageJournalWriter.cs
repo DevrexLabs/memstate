@@ -37,6 +37,10 @@ namespace Memstate.Azure
                 {
                     _head = await Stream.OpenAsync(cce.Partition).NotOnCapturedContext();
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                } 
             }
         }
 
@@ -49,7 +53,7 @@ namespace Memstate.Azure
                     Id = command.CommandId,
                     Type = command.GetType().Name,
                     Command = _serializer.ToString(command),
-                    Written = new DateTimeOffset()
+                    Written = DateTimeOffset.Now
                 };
 
                 var eventId = EventId.From(command.CommandId);

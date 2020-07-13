@@ -16,32 +16,32 @@ namespace System.Test
         {
             const int records = 100;
 
-            var writer = await Engine.Start<List<string>>(config).NotOnCapturedContext();
+            var writer = await Engine.Start<List<string>>(config);
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
-            readers[1] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
-            readers[2] = await Engine.Start<List<string>>(config).NotOnCapturedContext();
+            readers[0] = await Engine.Start<List<string>>(config);
+            readers[1] = await Engine.Start<List<string>>(config);
+            readers[2] = await Engine.Start<List<string>>(config);
 
             foreach (var number in Enumerable.Range(1, records))
             {
                 var command = new AddStringCommand($"{number}");
-                var count = await writer.Execute(command).NotOnCapturedContext();
+                var count = await writer.Execute(command);
                 Assert.AreEqual(number, count);
             }
 
-            await writer.DisposeAsync().NotOnCapturedContext();
+            await writer.DisposeAsync();
 
             foreach (var reader in readers)
             {
                 await reader.EnsureVersion(writer.LastRecordNumber);
-                
-                var strings = await reader.Execute(new GetStringsQuery()).NotOnCapturedContext();
+
+                var strings = await reader.Execute(new GetStringsQuery());
 
                 Assert.AreEqual(records, strings.Count);
 
-                await reader.DisposeAsync().NotOnCapturedContext();
+                await reader.DisposeAsync();
             }
         }
 

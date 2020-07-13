@@ -19,7 +19,6 @@ namespace Memstate.Azure
                 var engineSettings = config.GetSettings<EngineSettings>();
                 if (!config.Container.TryResolve(out CloudTable cloudTable)) throw new Exception("No CloudTable configured, did you forget to call Config.Current.UseAzureTableStorage()?");
                 _partition = new Partition(cloudTable, engineSettings.StreamName);
-                cloudTable.CreateIfNotExists();
             }
             catch (Exception e)
             {
@@ -27,11 +26,7 @@ namespace Memstate.Azure
             }
         }
 
-        public Task Provision()
-        {
-            //todo: Move cloudTable.CreateIfNotExists here
-            return Task.CompletedTask;
-        }
+        public Task Provision() => Stream.ProvisionAsync(_partition);
 
         public IJournalReader CreateJournalReader()
         {

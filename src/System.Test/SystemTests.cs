@@ -33,6 +33,27 @@ namespace System.Test
         }
 
         [TestCaseSource(nameof(Configurations))]
+        public async Task WriteAndSubscribeCommands(Config config)
+        {
+            var provider = config.GetStorageProvider();
+
+            var journalWriter = provider.CreateJournalWriter();
+
+            for (var i = 0; i < 10000; i++)
+            {
+                await journalWriter.Write(new AddStringCommand(i.ToString()));
+            }
+
+            await journalWriter.DisposeAsync();
+            var journalReader = provider.CreateJournalReader();
+            var records = new List<JournalRecord>(10000);
+            var task = journalReader.Subscribe(0, 9999, records.Add, CancellationToken.None);
+            await task;
+            await journalReader.DisposeAsync();
+            Assert.AreEqual(10000, records.Count);
+        }
+        
+        [TestCaseSource(nameof(Configurations))]
         public async Task WriteAndReadCommands(Config config)
         {
             var provider = config.GetStorageProvider();

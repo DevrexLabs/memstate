@@ -33,7 +33,7 @@ namespace Memstate.Test
             _engine.StateChanged += (oldState, newState) 
                 => transitions.Add((oldState, newState));
             
-            await _engine.Start().NotOnCapturedContext();
+            await _engine.Start();
 
             var expected = new[]
             {

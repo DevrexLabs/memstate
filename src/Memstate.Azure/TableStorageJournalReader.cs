@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Streamstone;
 
 namespace Memstate.Azure
@@ -25,14 +24,14 @@ namespace Memstate.Azure
             
             while (true)
             {
-                var slice = Stream.ReadAsync(_partition, version).ConfigureAwait(false).GetAwaiter().GetResult();
+                var slice = Stream.ReadAsync(_partition, version).NotOnCapturedContext().GetAwaiter().GetResult();
                 foreach (var properties in slice.Events)
                 {
                     yield return FromProperties(fromRecord++, properties);
                 }
                 
                 if (slice.IsEndOfStream) break;
-                version = slice.Stream.Version + 1;
+                version = slice.Stream.Version +1;
             }
         }
 

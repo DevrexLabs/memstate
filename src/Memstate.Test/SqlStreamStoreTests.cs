@@ -59,8 +59,8 @@ namespace Memstate.Test
             var streamStoreProvider = new SqlStreamStoreProvider(config, new InMemoryStreamStore());
             var writer = streamStoreProvider.CreateJournalWriter();
             foreach(var i in Enumerable.Range(1,101))
-                await writer.Write(new Set<int>("key" + i, i)).NotOnCapturedContext();
-            await writer.DisposeAsync().NotOnCapturedContext();
+                await writer.Write(new Set<int>("key" + i, i));
+            await writer.DisposeAsync();
 
             var reader = streamStoreProvider.CreateJournalReader();
             var records = new List<JournalRecord>(reader.ReadRecords().ToArray());
@@ -68,7 +68,7 @@ namespace Memstate.Test
             Assert.AreEqual("key1", ((Set<int>) records[0].Command).Key);
 
             records.Clear();
-            await reader.Subscribe(0, 100, jr => records.Add(jr), new CancellationToken()).NotOnCapturedContext();
+            await reader.Subscribe(0, 100, jr => records.Add(jr), new CancellationToken());
 
             Console.WriteLine("sub.Ready()");
 

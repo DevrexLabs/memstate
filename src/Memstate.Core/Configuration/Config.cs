@@ -69,7 +69,7 @@ namespace Memstate.Configuration
                 .Build();
             var config = new Config(settings);
             
-            #if TEST
+            #if DEBUG
             config.GetSettings<EngineSettings>()
                 .WithRandomSuffixAppendedToStreamName();
             config.UseInMemoryFileSystem();

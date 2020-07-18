@@ -8,14 +8,6 @@ namespace Memstate.Test
     public class ConfigTests
     {
         [Test]
-        public void BinarySerializerIsDefault()
-        {
-            var config = Config.CreateDefault();
-            var serializer = config.CreateSerializer();
-            Assert.IsInstanceOf<BinarySerializer>(serializer);
-        }
-
-        [Test]
         public void EngineSettingsAreBound()
         {
             int expected = 123;

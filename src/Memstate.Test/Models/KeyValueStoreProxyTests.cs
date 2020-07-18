@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using Memstate.Configuration;
 using Memstate.Models;
 
 namespace Memstate.Test.Models

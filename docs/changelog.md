@@ -12,7 +12,7 @@ Note: File Storage is currently broken, it will most probably deadlock.
 * Redesigned Engine start procedure
 * Introduced Control Commands for engine to engine communication and synchronization
 * Removed EngineBuilder, pushed replay into Engine.Start() method
-* Engine states: NotStarted, Started, Running, Stopped, Disposing, Disposed.
+* Engine states: NotStarted, S tarted, Running, Stopped, Disposing, Disposed.
 * Engine.StateTransitioned event
 * Added Azure Table Storage Provider
 

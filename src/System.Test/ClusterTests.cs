@@ -7,22 +7,30 @@ using NUnit.Framework;
 
 namespace System.Test
 {
-    [TestFixture]
+    [TestFixtureSource(typeof(TestConfigurations),  nameof(TestConfigurations.Cluster))]
     public class ClusterTests
     {
+        private readonly Config _config;
+
+        public ClusterTests(Config config)
+        {
+            Console.WriteLine(config);
+            this._config = config;
+        }
+        
         // One writer, multiple readers
-        [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteOneAndReadFromMany(Config config)
+        [Test]
+        public async Task CanWriteOneAndReadFromMany()
         {
             const int records = 100;
 
-            var writer = await Engine.Start<List<string>>(config);
+            var writer = await Engine.Start<List<string>>(_config);
 
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(config);
-            readers[1] = await Engine.Start<List<string>>(config);
-            readers[2] = await Engine.Start<List<string>>(config);
+            readers[0] = await Engine.Start<List<string>>(_config);
+            readers[1] = await Engine.Start<List<string>>(_config);
+            readers[2] = await Engine.Start<List<string>>(_config);
 
             foreach (var number in Enumerable.Range(1, records))
             {
@@ -46,18 +54,18 @@ namespace System.Test
         }
 
         // Multiple writers, one reader
-        [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromOne(Config config)
+        [Test]
+        public async Task CanWriteManyAndReadFromOne()
         {
             const int records = 100;
 
-            var reader = await Engine.Start<List<string>>(config);
+            var reader = await Engine.Start<List<string>>(_config);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(config);
-            writers[1] = await Engine.Start<List<string>>(config);
-            writers[2] = await Engine.Start<List<string>>(config);
+            writers[0] = await Engine.Start<List<string>>(_config);
+            writers[1] = await Engine.Start<List<string>>(_config);
+            writers[2] = await Engine.Start<List<string>>(_config);
 
             var totalCount = 0;
 
@@ -81,22 +89,22 @@ namespace System.Test
         }
 
         // Multiple writers, multiple readers
-        [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromMany(Config config)
+        [Test]
+        public async Task CanWriteManyAndReadFromMany()
         {
             const int records = 100;
             
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(config);
-            readers[1] = await Engine.Start<List<string>>(config);
-            readers[2] = await Engine.Start<List<string>>(config);
+            readers[0] = await Engine.Start<List<string>>(_config);
+            readers[1] = await Engine.Start<List<string>>(_config);
+            readers[2] = await Engine.Start<List<string>>(_config);
 
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(config);
-            writers[1] = await Engine.Start<List<string>>(config);
-            writers[2] = await Engine.Start<List<string>>(config);
+            writers[0] = await Engine.Start<List<string>>(_config);
+            writers[1] = await Engine.Start<List<string>>(_config);
+            writers[2] = await Engine.Start<List<string>>(_config);
 
             var totalCount = 0;
 
@@ -127,25 +135,25 @@ namespace System.Test
         }
 
         // Multiple writers, multiple readers, in parallel
-        [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteManyAndReadFromManyInParallel(Config config)
+        [Test]
+        public async Task CanWriteManyAndReadFromManyInParallel()
         {
             const int Records = 100;
 
             Console.WriteLine("Creating readers");
             var readers = new Engine<List<string>>[3];
 
-            readers[0] = await Engine.Start<List<string>>(config);
-            readers[1] = await Engine.Start<List<string>>(config);
-            readers[2] = await Engine.Start<List<string>>(config);
+            readers[0] = await Engine.Start<List<string>>(_config);
+            readers[1] = await Engine.Start<List<string>>(_config);
+            readers[2] = await Engine.Start<List<string>>(_config);
             Console.WriteLine("Readers created");
 
             Console.WriteLine("Creating writers");
             var writers = new Engine<List<string>>[3];
 
-            writers[0] = await Engine.Start<List<string>>(config);
-            writers[1] = await Engine.Start<List<string>>(config);
-            writers[2] = await Engine.Start<List<string>>(config);
+            writers[0] = await Engine.Start<List<string>>(_config);
+            writers[1] = await Engine.Start<List<string>>(_config);
+            writers[2] = await Engine.Start<List<string>>(_config);
             Console.WriteLine("Writers created");
 
             Console.WriteLine("Creating write tasks");
@@ -186,11 +194,6 @@ namespace System.Test
                 Console.WriteLine("Disposed reader");
             }
             Console.WriteLine("Done reading from all engines");
-        }
-
-        public static IEnumerable<Config> Configurations()
-        {
-            return new TestConfigurations.Cluster().GetConfigurations();
         }
     }
 }

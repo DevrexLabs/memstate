@@ -8,19 +8,21 @@ using NUnit.Framework;
 
 namespace System.Test
 {
-    [TestFixture]
+    [TestFixtureSource(typeof(TestConfigurations),  nameof(TestConfigurations.All))]
     public class SystemTests
     {
-        public static IEnumerable<Config> Configurations()
+
+        private readonly Config _config;
+
+        public SystemTests(Config config)
         {
-            return new TestConfigurations().GetConfigurations();
+            _config = config;
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task CanWriteOne(Config config)
+        [Test]
+        public async Task CanWriteOne()
         {
-            var provider = config.GetStorageProvider();
-            //await provider.Provision();
+            var provider = _config.GetStorageProvider();
             var writer = provider.CreateJournalWriter();
 
             await writer.Write(new AddStringCommand("hello"));
@@ -32,10 +34,10 @@ namespace System.Test
             Assert.AreEqual(1, records.Length);
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task WriteAndSubscribeCommands(Config config)
+        [Test]
+        public async Task WriteAndSubscribeCommands()
         {
-            var provider = config.GetStorageProvider();
+            var provider = _config.GetStorageProvider();
 
             var journalWriter = provider.CreateJournalWriter();
 
@@ -53,10 +55,10 @@ namespace System.Test
             Assert.AreEqual(10000, records.Count);
         }
         
-        [TestCaseSource(nameof(Configurations))]
-        public async Task WriteAndReadCommands(Config config)
+        [Test]
+        public async Task WriteAndReadCommands()
         {
-            var provider = config.GetStorageProvider();
+            var provider = _config.GetStorageProvider();
 
             var journalWriter = provider.CreateJournalWriter();
 
@@ -72,12 +74,10 @@ namespace System.Test
             Assert.AreEqual(10000, records.Length);
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task SubscriptionDeliversPreExistingCommands(Config config)
+        [Test]
+        public async Task SubscriptionDeliversPreExistingCommands()
         {
-            Console.WriteLine(config);
-
-            var provider = config.GetStorageProvider();
+            var provider = _config.GetStorageProvider();
             const int numRecords = 50;
             var journalWriter = provider.CreateJournalWriter();
             for (var i = 0; i < numRecords; i++)
@@ -101,13 +101,12 @@ namespace System.Test
             }
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task SubscriptionDeliversFutureCommands(Config config)
+        [Test]
+        public async Task SubscriptionDeliversFutureCommands()
         {
             const int numRecords = 5;
-            Console.WriteLine(config);
 
-            var provider = config.GetStorageProvider();
+            var provider = _config.GetStorageProvider();
             var records = new List<JournalRecord>();
             var writer = provider.CreateJournalWriter();
 
@@ -125,25 +124,22 @@ namespace System.Test
             Assert.AreEqual(numRecords, records.Count);
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task Can_execute_void_commands(Config config)
+        [Test]
+        public async Task Can_execute_void_commands()
         {
-            Console.WriteLine(config);
-            var engine = await Engine.Start<List<string>>(config);
+            var engine = await Engine.Start<List<string>>(_config);
             await engine.Execute(new Reverse());
             await engine.DisposeAsync();
         }
 
-        [TestCaseSource(nameof(Configurations))]
-        public async Task Smoke(Config config)
+        [Test]
+        public async Task Smoke()
         {
-            const int NumRecords = 100;
-            
-            Console.WriteLine(config);
+            const int numRecords = 100;
 
-            var engine = await Engine.Start<List<string>>(config);
+            var engine = await Engine.Start<List<string>>(_config);
 
-            foreach (var number in Enumerable.Range(1, NumRecords))
+            foreach (var number in Enumerable.Range(1, numRecords))
             {
                 var command = new AddStringCommand(number.ToString());
                 var count = await engine.Execute(command);
@@ -152,9 +148,9 @@ namespace System.Test
 
             await engine.DisposeAsync();
 
-            engine = await Engine.Start<List<string>>(config);
+            engine = await Engine.Start<List<string>>(_config);
             var strings = await engine.Execute(new GetStringsQuery());
-            Assert.AreEqual(NumRecords, strings.Count);
+            Assert.AreEqual(numRecords, strings.Count);
             await engine.DisposeAsync();
         }
     }

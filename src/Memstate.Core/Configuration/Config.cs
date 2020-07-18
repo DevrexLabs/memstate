@@ -73,7 +73,6 @@ namespace Memstate.Configuration
             config.GetSettings<EngineSettings>()
                 .WithRandomSuffixAppendedToStreamName();
             config.UseInMemoryFileSystem();
-            config.StorageProviderName = StorageProviders.EventStore;
             #endif
             
             return config;

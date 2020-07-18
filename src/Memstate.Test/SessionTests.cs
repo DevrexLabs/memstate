@@ -13,18 +13,15 @@ namespace Memstate.Test
     public class SessionTests
     {
         private  Session<KeyValueStore<int>> _session;
-        private KeyValueStore<int> _testModel;
         private List<Message> _messagesEmitted;
         private Engine<KeyValueStore<int>> _engine;
+        private KeyValueStore<int> _testModel;
 
         [SetUp]
         public async Task PerTestSetup()
         {
-            var cfg = Config.CreateDefault();
-            cfg.UseInMemoryFileSystem();
             _testModel = new KeyValueStore<int>();
-            _engine = Engine.Build(_testModel,cfg);
-            await _engine.Start(); 
+            _engine = await Engine.Start(_testModel);
             _session = new Session<KeyValueStore<int>>(_engine);
             _messagesEmitted = new List<Message>();
             _session.OnMessage += _messagesEmitted.Add;
@@ -137,11 +134,11 @@ namespace Memstate.Test
             return (T)message;
         }
 
-        internal class UnknownMessage : Message
+        private class UnknownMessage : Message
         {
         }
 
-        internal class FailingQuery : Query<KeyValueStore<int>, int>
+        private class FailingQuery : Query<KeyValueStore<int>, int>
         {
             public override int Execute(KeyValueStore<int> db)
             {

@@ -22,13 +22,14 @@ namespace Memstate
 
         public const string BinaryFormatter = "BinaryFormatter";
 
+        private const string BinaryFormatterType = "Memstate.BinaryFormatterAdapter, Memstate.Core";
         private const string WireTypeName = "Memstate.Wire.WireSerializerAdapter, Memstate.Wire";
         private const string NewtonSoftJsonTypeName = "Memstate.JsonNet.JsonSerializerAdapter, Memstate.JsonNet";
 
         public Serializers()
         {
             Register(Auto, AutoResolve);
-            Register(BinaryFormatter, () => InstanceFromTypeName(nameof(BinaryFormatterAdapter)));
+            Register(BinaryFormatter, () => InstanceFromTypeName(BinaryFormatterType));
             Register(Wire, () => InstanceFromTypeName(WireTypeName));
             Register(NewtonsoftJson, () => InstanceFromTypeName(NewtonSoftJsonTypeName));
         }
@@ -42,7 +43,7 @@ namespace Memstate
             yield return NewtonsoftJson;
 
             // Built into Memstate.Core so this is our fallback if no other serializer has
-            // been referenced using nuget
+            // been referenced
             yield return BinaryFormatter;
         }
     }

@@ -14,7 +14,6 @@ namespace Memstate
         public EngineState State { get; private set; } 
             = EngineState.NotStarted;
 
-        // ReSharper disable once StaticMemberInGenericType
         private readonly ILog _log = LogProvider.GetLogger(nameof(Engine));
 
         private readonly Kernel _kernel;

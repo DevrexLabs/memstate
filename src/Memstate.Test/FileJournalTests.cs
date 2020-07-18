@@ -32,6 +32,8 @@ namespace Memstate.Test
                 await writer.Write(new Set<int>("key" + i, i));
             }
 
+            if (writer is FileJournalWriter fjw) fjw.StartWritingFrom(NumRecords);
+
             //wait for the writes to complete
             await writer.DisposeAsync();
 

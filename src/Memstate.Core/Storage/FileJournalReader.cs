@@ -26,9 +26,9 @@ namespace Memstate
 
         public override Task Subscribe(long first, long last, Action<JournalRecord> recordHandler, CancellationToken cancellationToken)
         {
-            long lastRecordNumber = 0;
+            long lastRecordNumber = -1;
             
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 foreach (var record in ReadRecords(first))
                 {
@@ -44,7 +44,7 @@ namespace Memstate
                     foreach (var record in records) buffer.Add(record, cancellationToken);
                 };
 
-                _writer.Notify(lastRecordNumber + 1);
+                await _writer.StartWritingFrom(lastRecordNumber + 1);
                 
                 while (!cancellationToken.IsCancellationRequested)
                 {

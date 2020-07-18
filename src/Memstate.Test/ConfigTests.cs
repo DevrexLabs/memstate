@@ -1,5 +1,7 @@
 using System;
 using Memstate.Configuration;
+using Memstate.JsonNet;
+using Memstate.Wire;
 using NUnit.Framework;
 
 namespace Memstate.Test
@@ -40,6 +42,33 @@ namespace Memstate.Test
             var config = Config.CreateDefault();
             Console.WriteLine(config.ConfigurationData.ToString());
             Assert.DoesNotThrow(() => config.ConfigurationData.Get(key));
+        }
+
+        [Test]
+        public void CanResolveBinaryFormatter()
+        {
+            var config = Config.CreateDefault();
+            config.SerializerName = Serializers.BinaryFormatter;
+            var serializer = config.CreateSerializer();
+            Assert.IsInstanceOf<BinaryFormatterAdapter>(serializer);
+        }
+        
+        [Test]
+        public void CanResolveWireFormatter()
+        {
+            var config = Config.CreateDefault();
+            config.SerializerName = Serializers.Wire;
+            var serializer = config.CreateSerializer();
+            Assert.IsInstanceOf<WireSerializerAdapter>(serializer);
+        }
+        
+        [Test]
+        public void CanResolveNewtonsoftJsonFormatter()
+        {
+            var config = Config.CreateDefault();
+            config.SerializerName = Serializers.NewtonsoftJson;
+            var serializer = config.CreateSerializer();
+            Assert.IsInstanceOf<JsonSerializerAdapter>(serializer);
         }
     }
 }

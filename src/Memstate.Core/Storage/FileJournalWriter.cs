@@ -28,10 +28,6 @@ namespace Memstate
 
         
         private readonly string _fileName;
-        
-        
-        private readonly TaskCompletionSource<long> _readyToWrite 
-            = new TaskCompletionSource<long>();
 
         public FileJournalWriter(Config config,  string fileName)
             :base(config.GetSettings<EngineSettings>())
@@ -82,11 +78,10 @@ namespace Memstate
         /// Notify that loading is complete and writing to
         /// the underlying file can commence
         /// </summary>
-        internal Task Notify(long nextRecordNumber)
+        internal Task StartWritingFrom(long nextRecordNumber)
         {
             _nextRecord = nextRecordNumber;
             _journalStream = _config.FileSystem.OpenAppend(_fileName);
-
             return OnCommandBatch(Array.Empty<Command>());
         }
     }

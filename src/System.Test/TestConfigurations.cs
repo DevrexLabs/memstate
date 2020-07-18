@@ -1,32 +1,33 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Memstate;
 using Memstate.Azure;
 using Memstate.Configuration;
 using Microsoft.Azure.Cosmos.Table;
-using Serilog;
 using SqlStreamStore;
 
 namespace System.Test
 {
-    public class TestConfigurations : IEnumerable<object[]>
+    public static class TestConfigurations
     {
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
 
-        public IEnumerator<object[]> GetEnumerator()
+        public static IEnumerator<object[]> All()
         {
             return GetConfigurations()
                 .Select(ToObjectArray)
                 .GetEnumerator();
         }
 
-        public IEnumerable<Config> GetConfigurations()
+        public static IEnumerator<object[]> Cluster()
         {
-            foreach (var serializerName in Serializers())
+            return GetConfigurations()
+                .Where(c => c.StorageProviderName != StorageProviders.File)
+                .Select(ToObjectArray)
+                .GetEnumerator();
+        }
+        public static IEnumerable<Config> GetConfigurations()
+        {
+            foreach (var serializerName in GetSerializers())
             {
                 foreach (var providerName in ProviderNames())
                 {
@@ -45,24 +46,25 @@ namespace System.Test
             }
         }
 
-        private IEnumerable<string> Serializers()
+        private static IEnumerable<string> GetSerializers()
         {
-            yield return "newtonsoft.json";
-            yield return "wire";
+            yield return Serializers.Wire;
+            yield return Serializers.NewtonsoftJson;
+            yield return Serializers.BinaryFormatter;
         }
 
-        protected virtual IEnumerable<string> ProviderNames()
+        private static IEnumerable<string> ProviderNames()
         {
-            //yield return "file";
-            //yield return "postgres";
+            yield return StorageProviders.File;
+            yield return StorageProviders.Postgres;
 
-            //yield return StorageProviders.EventStore;
+            yield return StorageProviders.EventStore;
             yield return StorageProviders.AzureTableStorage;
             //yield return StorageProviders.SqlStreamStore;
-            //yield return "pravega";
+            //yield return StorageProviders.Pravega;
         }
 
-        private object[] ToObjectArray(object o)
+        private static object[] ToObjectArray(object o)
         {
             return new[] { o };
         }
@@ -86,19 +88,5 @@ namespace System.Test
             config.Container.Register<IStreamStore>(pgStreamStore);
             pgStreamStore.CreateSchemaIfNotExists().GetAwaiter().GetResult();
         }
-
-        public class Cluster : TestConfigurations
-        {
-            protected override IEnumerable<string> ProviderNames()
-            {
-                //yield return StorageProviders.EventStore;
-                yield return StorageProviders.AzureTableStorage;
-                //yield return "pravega";
-#if POSTGRES
-                yield return "postgres";
-#endif
-            }
-        }
-
     }
 }

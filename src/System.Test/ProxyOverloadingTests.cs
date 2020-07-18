@@ -1,20 +1,29 @@
 ﻿using System;
 using System.Linq;
+using System.Test;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using NUnit.Framework;
 
 namespace Memstate.Test.DispatchProxy
 {
+    [TestFixtureSource(typeof(TestConfigurations),  nameof(TestConfigurations.All))]
     public class ProxyOverloadingTests
     {
         private IModelWithOverloads _db;
+        private readonly Config _config;
 
         private Engine<IModelWithOverloads> _engine;
+
+        public ProxyOverloadingTests(Config config)
+        {
+            _config = config;
+        }
 
         [SetUp]
         public async Task Setup()
         {
-            _engine = Engine.Build<IModelWithOverloads>();
+            _engine = Engine.Build<IModelWithOverloads>(_config);
             await _engine.Start();
             var client = new LocalClient<IModelWithOverloads>(_engine);
             _db = client.GetDispatchProxy();
@@ -100,7 +109,7 @@ namespace Memstate.Test.DispatchProxy
                 });
         }
 
-        internal interface IModelWithOutArg
+        private interface IModelWithOutArg
         {
             void Method(out int a);
         }

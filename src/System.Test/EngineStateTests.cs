@@ -1,19 +1,29 @@
+using System;
 using System.Collections.Generic;
+using System.Test;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 using Memstate.Models.Redis;
 using NUnit.Framework;
 
 namespace Memstate.Test
 {
-    [TestFixture]
+    [TestFixtureSource(typeof(TestConfigurations),  nameof(TestConfigurations.All))]
     public class EngineStateTests
     {
         private Engine<RedisModel> _engine;
+        private readonly Config _config;
+
+        public EngineStateTests(Config config)
+        {
+            Console.WriteLine(config);
+            _config = config;
+        }
 
         [SetUp]
         public void Init()
         {
-            _engine = Engine.Build<RedisModel>();
+            _engine = Engine.Build<RedisModel>(_config);
         }
 
         [TearDown]

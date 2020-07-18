@@ -2,21 +2,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Test;
 using System.Threading.Tasks;
+using Memstate.Configuration;
 
 namespace Memstate.Test.Proxy
 {
 
-    [TestFixture]
+    [TestFixtureSource(typeof(TestConfigurations),  nameof(TestConfigurations.All))]
+
     public class ProxyTest
     {
         private ITestModel _proxy;
+        private readonly Config _config;
         private Engine<ITestModel> _engine;
+
+        public ProxyTest(Config config)
+        {
+            this._config = config;
+        }
 
         [SetUp]
         public async Task Setup()
         {
-            _engine = await Engine.Start<ITestModel>();
+            _engine = await Engine.Start<ITestModel>(_config);
             _proxy = new LocalClient<ITestModel>(_engine).GetDispatchProxy();
         }
 

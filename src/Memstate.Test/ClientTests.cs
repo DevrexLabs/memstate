@@ -12,10 +12,6 @@ namespace Memstate.Test
         public async Task HappyPath()
         {
             var config = Config.CreateDefault();
-            
-            //Journal stays in memory
-            config.UseInMemoryFileSystem();
-
             // Create LocalClient wrapping a newly started engine
             var client = await Client.For<KeyValueStore<int>>(config);
 

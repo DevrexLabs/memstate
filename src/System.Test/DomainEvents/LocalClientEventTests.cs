@@ -8,7 +8,6 @@ namespace Memstate.Test
     [TestFixture]
     public partial class LocalClientEventTests
     {
-        private EngineSettings _settings;
         private LocalClient<UsersModel> _client;
         private Engine<UsersModel> _engine;
 
@@ -30,7 +29,8 @@ namespace Memstate.Test
             var wittgenstein = await _client.Execute(new Create("Wittgenstein"));
 
             //Listen for Deleted event for the Kant user
-            await _client.Subscribe<Deleted>(eventsReceived.Add, new UserDeletedEventFilter(kant.Id));
+            await _client.Subscribe<Deleted>(eventsReceived.Add, 
+                new UserDeletedEventFilter(kant.Id));
 
             await _client.Execute(new Delete(wittgenstein.Id));
 

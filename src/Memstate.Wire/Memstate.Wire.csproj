@@ -11,7 +11,8 @@
     <PackageProjectUrl>https://github.com/devrexlabs/memstate/</PackageProjectUrl>
     <PackageReleaseNotes>See https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
     <Summary>Serialization module for Memstate based on the high performance binary serializer Wire.
-</Summary>
+    </Summary>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>Memstate.Wire</Title>
     <Description>Serialization module for Memstate based on the high performance binary serializer Wire.
 https://github.com/rogeralsing/Wire</Description>

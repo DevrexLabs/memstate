@@ -12,12 +12,12 @@ namespace Memstate.EngineTest
         [Test]
         public async Task CanResumeAfterFailedCommand()
         {
-            var config = Config.Current;
-            config.SerializerName = "NewtonSoft.Json";
+            var config = Config.CreateDefault();
+            config.SerializerName = Serializers.NewtonsoftJson;
             var settings = config.GetSettings<EngineSettings>();
             settings.WithRandomSuffixAppendedToStreamName();
             config.UseInMemoryFileSystem();
-            var db = await Engine.Start<LoyaltyDB>();
+            var db = await Engine.Start<LoyaltyDB>(config);
 
 
                 //Create a customer with id 1

@@ -173,8 +173,8 @@ namespace Memstate
                 var ctx = ExecutionContext.Current;
                 ctx.Reset(record.RecordNumber);
 
-                var result = _kernel.Execute(record.Command);
                 Interlocked.Exchange(ref _lastRecordNumber, record.RecordNumber);
+                var result = _kernel.Execute(record.Command);
                 NotifyCommandExecuted(record, isLocalCommand, ctx.Events);
 
                 completion?.SetResult(result);

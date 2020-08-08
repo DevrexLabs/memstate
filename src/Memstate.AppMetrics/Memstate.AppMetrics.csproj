@@ -14,6 +14,7 @@
     <Summary>Metrics implementation for MemState based on AppMetrics</Summary>
     <Title>Memstate.AppMetrics</Title>
     <PackageId>Memstate.AppMetrics</PackageId>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevrexLabs/memstate/</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>

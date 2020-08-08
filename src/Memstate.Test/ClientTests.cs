@@ -11,6 +11,8 @@ namespace Memstate.Test
         [Test]
         public async Task HappyPath()
         {
+            Config.Reset();
+            
             //Journal stays in memory
             Config.Current.UseInMemoryFileSystem();
 

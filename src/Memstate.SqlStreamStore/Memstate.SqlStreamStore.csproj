@@ -5,6 +5,7 @@
         <PackOnBuild>true</PackOnBuild>
         <PackageVersion>0.2</PackageVersion>
         <Authors>Devrex Labs</Authors>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Description>Storage provider based on SqlStreamStore allowing the use of any sql backend supported by SqlStreamStore. MsSql, PostgreSQL</Description>
         <Copyright>Devrex Labs</Copyright>
         <Owners>

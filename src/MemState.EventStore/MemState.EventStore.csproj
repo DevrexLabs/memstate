@@ -10,6 +10,7 @@
     <Copyright>Devrex Labs</Copyright>
     <PackOnBuild>true</PackOnBuild>
     <PackageVersion>0.2.0</PackageVersion>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Owners>Devrex Labs</Owners>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <Summary>Storage provider for Memstate</Summary>

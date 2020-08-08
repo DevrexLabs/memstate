@@ -11,6 +11,7 @@ Your data fits in RAM. Moving it back and forth between disk and memory is waste
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <PackageReleaseNotes>See http://github.com/devrexlabs/memstate/releases</PackageReleaseNotes>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RepositoryUrl>http://github.com/DevrexLabs/memstate</RepositoryUrl>
     <PackageProjectUrl>http://github.com/DevrexLabs/memstate</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>

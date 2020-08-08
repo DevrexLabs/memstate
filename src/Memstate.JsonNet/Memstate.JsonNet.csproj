@@ -9,6 +9,7 @@
     <Description>Json serialization for Memstate</Description>
     <Copyright>Devrex Labs</Copyright>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RepositoryUrl>https://github.com/devrexlabs/memstate</RepositoryUrl>
     <PackageProjectUrl>https://github.com/devrexlabs/memstate</PackageProjectUrl>
     <PackageVersion>0.2.0</PackageVersion>

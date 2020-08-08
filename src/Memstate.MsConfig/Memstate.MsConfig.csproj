@@ -16,6 +16,7 @@
     <PackageVersion>0.3.4</PackageVersion>
     <Owners>Devrex Labs</Owners>
     <Summary>MsConfig integration for Memstate</Summary>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>Memstate.MsConfig</Title>
   </PropertyGroup>
 

@@ -17,6 +17,7 @@
 https://github.com/rogeralsing/Wire</Description>
     <Configurations>Debug;Release;Test</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

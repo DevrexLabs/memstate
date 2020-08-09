@@ -19,6 +19,7 @@
     <PackageReleaseNotes>https://github.com/DevrexLabs/memstate/releases</PackageReleaseNotes>
     <Configurations>Debug;Release;Test</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

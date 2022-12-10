@@ -1,14 +1,14 @@
 # Memstate
 
-[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 
+[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Documentation](docs) | [memstate.io/docs](https://memstate.io/docs/core-1.0/)
 
-[![Join the chat at https://gitter.im/memstate/lobby](https://badges.gitter.im/DevrexLabs/memstate.svg)](https://gitter.im/memstate/lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/7tv5rh74v1o4upc9?svg=true)](https://ci.appveyor.com/project/rofr/memstate) [![NuGet Badge](https://buildstats.info/nuget/memstate.all)](https://www.nuget.org/packages/memstate.all/)
+[Join the chat on Discord](https://discord.gg/4aaw39rNBx) [![Build status](https://ci.appveyor.com/api/projects/status/7tv5rh74v1o4upc9?svg=true)](https://ci.appveyor.com/project/rofr/memstate) [![NuGet Badge](https://buildstats.info/nuget/memstate.all)](https://www.nuget.org/packages/memstate.all/)
 
 # What is Memstate?
 In-memory event-sourced ACID-transactional replicated object graph engine. What? Can you say that again? Ok, it's an application server that keeps all your data in RAM. It runs without a database because all the transactions are recorded in a log and used to restore the state of the application at startup or when setting up a replica. You define the object model, commands and queries using C#. Besides being very simple Memstate is also very fast and will outperform any relational database.
 
 # Why Memstate?
-Your data fits in RAM. Moving bits and pieces back and forth between disk and memory is slow, difficult to maintain and error prone. Use Memstate to structure and manage your data in-memory, providing transparent persistence, high performance, high availability, concurrency control and transactions with strong ACID guarantees.
+Your data fits in RAM. Moving data back and forth between disk and memory is slow, difficult to maintain and error prone. Use Memstate to structure and manage your data in-memory, providing transparent persistence, high performance, high availability, concurrency control and transactions with strong ACID guarantees.
 
 Memstate has many possible use cases but is designed primarily to handle complex OLTP workloads by replacing the datastore, data access layer and domain layer in a typical enterprise application.
 
@@ -123,14 +123,6 @@ Memstate relies on a backing storage provider for persistence and global message
 
 * **File system** - simple append only journaling. Single memstate node only.
 
-* **Kinesis** (AWS) - discontinued, end to end latency is too poor.
-
-* **Kafka** - discontinued, end to end latency is too poor.
-
 ## Memstate in the press
 
 * 28th June 2019 - https://dotnetcore.show/episode-28-memstate-with-robert-friberg/
-
-## Getting started
-
-[Quickstart](/src/Memstate.Docs.GettingStarted/QuickStart) | [Detailed Documentation](docs) 

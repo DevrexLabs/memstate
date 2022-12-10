@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="benchmarkdotnet" Version="0.12.1" />
@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
-    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />

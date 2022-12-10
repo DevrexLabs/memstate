@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>Devrex Labs</Authors>
     <Company>Devrex Labs</Company>
     <Product>Memstate</Product>
@@ -27,7 +27,6 @@
     <ProjectReference Include="..\Memstate.EventStore\Memstate.EventStore.csproj" />
     <ProjectReference Include="..\Memstate.JsonNet\Memstate.JsonNet.csproj" />
     <ProjectReference Include="..\Memstate.MsConfig\Memstate.MsConfig.csproj" />
-    <ProjectReference Include="..\Memstate.Postgresql\Memstate.Postgres.csproj" />
     <ProjectReference Include="..\Memstate.Wire\Memstate.Wire.csproj" />
     <ProjectReference Include="..\Memstate.AppMetrics\Memstate.AppMetrics.csproj" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
@@ -14,6 +14,6 @@
     <ProjectReference Include="..\Memstate.Host\Memstate.Host.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
   </ItemGroup>
 </Project>

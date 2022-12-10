@@ -8,7 +8,6 @@ using Memstate.Configuration;
 using Memstate.EventStore;
 using Memstate.Models;
 using Memstate.Models.KeyValue;
-using Memstate.Postgres;
 
 namespace Memstate.Benchmarks
 {
@@ -21,7 +20,6 @@ namespace Memstate.Benchmarks
 
         [Params(
             //typeof(InMemoryStorageProvider),
-            typeof(PostgresProvider),
             typeof(EventStoreProvider))]
         public Type StorageProviderTypes { get; set; }
 

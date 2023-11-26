@@ -5,10 +5,15 @@ namespace Memstate
     [Serializable]
     public abstract class Command
     {
+        [NonSerialized]
+        internal Action<Event> EventRaised;
+        
+//        internal ExecutionContext Context;
         internal abstract object ExecuteImpl(object model);
 
-        protected void RaiseEvent(Event @event) {
-            ExecutionContext.Current.AddEvent(@event);
+        protected void RaiseEvent(Event @event)
+        {
+            if (EventRaised != null) EventRaised.Invoke(@event);
         }
     }
 

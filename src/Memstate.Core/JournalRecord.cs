@@ -6,7 +6,7 @@ namespace Memstate
     public class JournalRecord
     {
         /// <summary>
-        /// Sequential id of the record, always starts at 0
+        /// Sequential id of the record, always starts at 1
         /// </summary>
         public readonly long RecordNumber;
 

@@ -21,7 +21,7 @@ namespace Memstate
             _engine.CommandExecuted -= OnCommandExecuted;
         }
 
-        private void OnCommandExecuted(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
+        private void OnCommandExecuted(Command command, bool isLocal, IEnumerable<Event> events)
         {
             foreach(var @event in events)
             {

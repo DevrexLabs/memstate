@@ -17,7 +17,7 @@ namespace Memstate
         }
 
         internal override Task<object> ExecuteUntyped(Query query) 
-            => Task.FromResult(_engine.ExecuteUntyped(query));
+            => _engine.ExecuteQuery(query);
 
         public override Task Execute(Command<TModel> command)
         {

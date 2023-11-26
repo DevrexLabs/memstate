@@ -8,13 +8,16 @@ namespace Memstate
     {
         private readonly EngineSettings _settings;
         private readonly StorageProvider _storageProvider;
+        private readonly IStorage _storage;
 
-        public EngineBuilder()
+        public EngineBuilder(Config config = null)
         {
-            var config = Config.Current;
+            config ??= new Config();
             _settings = config.GetSettings<EngineSettings>();
-            _storageProvider = config.GetStorageProvider();
-            _storageProvider.Initialize();
+            var serializer = config.CreateSerializer();
+            _storage = new FileStorage(new HostFileSystem(), _settings.StreamName, serializer);
+            //_storageProvider = config.GetStorageProvider();
+            //_storageProvider.Initialize();
         }
 
         public Task<Engine<T>> Build<T>() where T : class
@@ -43,28 +46,30 @@ namespace Memstate
 
         public async Task<Engine<T>> Build<T>(T initialState) where T : class
         {
-            var reader = _storageProvider.CreateJournalReader();
-            var model = Load(reader, initialState, out long lastRecordNumber);
-            await reader.DisposeAsync().ConfigureAwait(false);                                                                     
-            return new Engine<T>(_settings, model, lastRecordNumber);
+            var (model, lastRecordNumber) = await Load(_storage, initialState);
+            return new Engine<T>(_storage, _settings, model, lastRecordNumber);
         }
 
-        internal static TState Load<TState>(IJournalReader reader, TState initial, out long lastRecordNumber)
+        internal static async Task<(TModel, long)> Load<TModel>(IStorage storage, TModel initial)
         {
-            lastRecordNumber = -1;
-            foreach (var journalRecord in reader.GetRecords())
+            long lastRecordNumber = 0;
+            await foreach (var chunk in storage.ReadRecords(1) )
             {
-                try
+                foreach (var record in chunk)
                 {
-                    journalRecord.Command.ExecuteImpl(initial);
-                    lastRecordNumber = journalRecord.RecordNumber;
-                }
-                catch
-                {
-                    // ignored
+                    try
+                    {
+                        record.Command.ExecuteImpl(initial);
+                        lastRecordNumber = record.RecordNumber;
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                    
                 }
             }
-            return initial;
+            return (initial, lastRecordNumber);
         }
     }
 }

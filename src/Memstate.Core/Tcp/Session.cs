@@ -27,7 +27,7 @@ namespace Memstate.Tcp
             _subscriptions = new ConcurrentDictionary<Type, EventMatcher>();
         }
 
-        private void SendMatchingEvents(JournalRecord journalRecord, bool isLocal, IEnumerable<Event> events)
+        private void SendMatchingEvents(Command command, bool isLocal, IEnumerable<Event> events)
         {
             var matchingEvents = events
                 .Where(e => _subscriptions.Values.Any(matcher => matcher.IsMatch(e)))
@@ -85,14 +85,14 @@ namespace Memstate.Tcp
 
         private void HandleImpl(QueryRequest request)
         {
-            var result = _engine.ExecuteUntyped(request.Query);
+            var result = _engine.ExecuteQuery(request.Query);
             var response = new QueryResponse(result, request.Id);
             OnMessage.Invoke(response);
         }
 
         private async Task HandleImpl(CommandRequest request)
         {
-            var result = await _engine.ExecuteUntyped(request.Command);
+            var result = await _engine.ExecuteCommand(request.Command);
             var response = new CommandResponse(result, request.Id);
             OnMessage.Invoke(response);
         }

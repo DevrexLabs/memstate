@@ -5,13 +5,6 @@ namespace Memstate
     [Serializable]
     public abstract class Command
     {
-        protected Command()
-        {
-            Id = Guid.NewGuid();
-        }
-
-        public Guid Id { get; internal set; }
-
         internal abstract object ExecuteImpl(object model);
 
         protected void RaiseEvent(Event @event) {

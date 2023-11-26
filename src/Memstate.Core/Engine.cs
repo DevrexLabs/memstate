@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,26 +13,15 @@ namespace Memstate
         private readonly Kernel _kernel;
 
         private readonly EngineSettings _settings;
-
-        private readonly IJournalWriter _journalWriter;
-
-        /// <summary>
-        /// Commands that have been sent to the journal but not yet received 
-        /// and processed on the subscription
-        /// </summary>
-        private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingLocalCommands;
-
-        private readonly IDisposable _commandSubscription;
-
-        private readonly AutoResetEvent _pendingCommandsChanged = new AutoResetEvent(false);
+        
 
         private readonly IEngineMetrics _metrics;
 
         private volatile bool _stopped;
 
         /// <summary>
-        /// Last record number applied to the model, -1 if initial model
-        /// Numbering starts from 0!
+        /// Last record number applied to the model, 0 if initial model
+        /// Numbering starts from 1
         /// </summary>
         private long _lastRecordNumber;
 
@@ -42,19 +30,14 @@ namespace Memstate
         public Engine(
             EngineSettings settings,
             TModel model,
-            IJournalSubscriptionSource subscriptionSource,
-            IJournalWriter journalWriter,
-            long nextRecord)
+            long recordNumber)
         {
-            _lastRecordNumber = nextRecord - 1;
+            _lastRecordNumber = recordNumber;
             _logger = LogProvider.GetCurrentClassLogger();
             _kernel = new Kernel(settings, model);
             _settings = settings;
-            _journalWriter = journalWriter;
-            _pendingLocalCommands = new ConcurrentDictionary<Guid, TaskCompletionSource<object>>();
-            _commandSubscription = subscriptionSource.Subscribe(nextRecord, OnRecordReceived);
             _metrics = Metrics.Provider.GetEngineMetrics();
-            ExecutionContext.Current = new ExecutionContext(nextRecord);
+            ExecutionContext.Current = new ExecutionContext(recordNumber);
         }
 
         public long LastRecordNumber => Interlocked.Read(ref _lastRecordNumber);
@@ -76,37 +59,13 @@ namespace Memstate
             return Task.FromResult(result);
         }
 
-        public async Task DisposeAsync()
+        public Task DisposeAsync()
         {
             _logger.Debug("Begin Dispose");
-
-            await _journalWriter.DisposeAsync().ConfigureAwait(false);
-
-            while (!_pendingLocalCommands.IsEmpty)
-            {
-                _pendingCommandsChanged.WaitOne();
-            }
-
-            _commandSubscription.Dispose();
-
             _logger.Debug("End Dispose");
+            return Task.CompletedTask;
         }
-
-        /// <summary>
-        /// Wait until a specific record has beed executed
-        /// </summary>
-        /// <param name="recordNumber">The version </param>
-        /// <returns></returns>
-        public async Task EnsureVersion(long recordNumber)
-        {
-            EnsureOperational();
-
-            while (LastRecordNumber < recordNumber)
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
-            }
-        }
-
+        
         internal object ExecuteUntyped(Query query)
         {
             EnsureOperational();
@@ -130,82 +89,11 @@ namespace Memstate
         /// <summary>
         /// Execute non-generically typed command
         /// </summary>
-        internal Task<object> ExecuteUntyped(Command command)
+        internal async Task<object> ExecuteUntyped(Command command)
         {
-            EnsureOperational();
-
-            var completionSource = new TaskCompletionSource<object>();
-            _pendingLocalCommands[command.Id] = completionSource;
-
-            _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
-
-            using (_metrics.MeasureCommandExecution())
-            {
-                _journalWriter.Send(command);
-                return completionSource.Task;
-            }
+            return null;
         }
-
-        /// <summary>
-        /// Handler for records obtained through the subscription
-        /// </summary>
-        private void OnRecordReceived(JournalRecord record)
-        {
-
-            if (_stopped) return;
-            TaskCompletionSource<object> completion = null;
-
-            try
-            {
-                var command = record.Command;
-                var isLocalCommand = _pendingLocalCommands.TryRemove(command.Id, out completion);
-
-                if (isLocalCommand)
-                {
-                    _metrics.PendingLocalCommands(_pendingLocalCommands.Count);
-                    _pendingCommandsChanged.Set();
-                }
-
-                _logger.Debug("OnRecordReceived: {0}/{1}, isLocal: {2}", record.RecordNumber, command.GetType().Name, isLocalCommand);
-
-                VerifyRecordSequence(record.RecordNumber);
-
-                var ctx = ExecutionContext.Current;
-                ctx.Reset(record.RecordNumber);
-
-                Interlocked.Exchange(ref _lastRecordNumber, record.RecordNumber);
-                var result = _kernel.Execute(record.Command);
-                NotifyCommandExecuted(record, isLocalCommand, ctx.Events);
-
-                completion?.SetResult(result);
-                _metrics.CommandExecuted();
-            }
-            catch (Exception ex)
-            {
-                _metrics.CommandFailed();
-                _logger.Error(ex, "OnRecordReceived failed: {0}/{1}", record.RecordNumber, record.Command.GetType().Name);
-                completion?.SetException(ex);
-            }
-        }
-
-        private void VerifyRecordSequence(long actualRecordNumber)
-        {
-            var expected = Interlocked.Read(ref _lastRecordNumber) + 1;
-            if (expected != actualRecordNumber)
-            {
-                if (!_settings.AllowBrokenSequence)
-                {
-                    _stopped = true;
-                    throw new Exception($"Broken sequence, expected {expected}, got {actualRecordNumber}");
-                }
-
-                _logger.Warn(
-                    "OnRecordReceived: RecordNumber out of order. Expected {0}, got {1}",
-                    expected,
-                    actualRecordNumber);
-            }
-        }
-
+        
         private void EnsureOperational()
         {
             if (_stopped)

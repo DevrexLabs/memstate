@@ -45,12 +45,8 @@ namespace Memstate
         {
             var reader = _storageProvider.CreateJournalReader();
             var model = Load(reader, initialState, out long lastRecordNumber);
-            var nextRecordNumber = lastRecordNumber + 1;
             await reader.DisposeAsync().ConfigureAwait(false);                                                                     
-
-            var writer = _storageProvider.CreateJournalWriter(nextRecordNumber);
-            var subscriptionSource = _storageProvider.CreateJournalSubscriptionSource();
-            return new Engine<T>(_settings, model, subscriptionSource, writer, nextRecordNumber);
+            return new Engine<T>(_settings, model, lastRecordNumber);
         }
 
         internal static TState Load<TState>(IJournalReader reader, TState initial, out long lastRecordNumber)
